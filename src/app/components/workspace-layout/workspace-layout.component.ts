@@ -184,6 +184,11 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
               </div>
             }
 
+            <span class="chip green hidden md:inline-flex" title="Projeto Supabase conectado: https://gmwdahnksiqukovcwwid.supabase.co">
+              <span class="w-1.5 h-1.5 rounded-full bg-[#10B981]"></span>
+              Supabase · {{ state.supabase.projectRef }}
+            </span>
+
             <span class="chip cyan hidden sm:inline-flex">
               <span class="w-1.5 h-1.5 rounded-full bg-[#00B4D8]"></span>
               Graph API v22.0

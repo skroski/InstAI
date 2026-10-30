@@ -1,4 +1,5 @@
-import { Injectable, signal, computed, resource } from '@angular/core';
+import { Injectable, inject, signal, computed, resource } from '@angular/core';
+import { SupabaseService } from './supabase.service';
 import {
   ACCS,
   CMDS,
@@ -64,6 +65,7 @@ export interface TwinRuntimeSettings {
 
 @Injectable({ providedIn: 'root' })
 export class AccountStateService {
+  readonly supabase = inject(SupabaseService);
   private seq = 20;
   private toastTimer: ReturnType<typeof setTimeout> | null = null;
   private pgTimer: ReturnType<typeof setTimeout> | null = null;
@@ -75,10 +77,11 @@ export class AccountStateService {
   readonly metricsMap = METRICS;
   readonly twinsMap = TWINS;
 
-  // Angular 22 resource() API loading the unified .ai-skills/registry.json
+  // Angular 22 resource() API loading the unified .ai-skills/registry.json + checking Supabase connection
   readonly skillsRegistryResource = resource({
     loader: async () => {
       try {
+        await this.supabase.checkConnectionAndLoadSkills();
         const res = await fetch('/.ai-skills/registry.json');
         if (!res.ok) return null;
         return await res.json();
