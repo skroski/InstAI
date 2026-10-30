@@ -1,0 +1,179 @@
+version: "1.0.0"
+project: "codemix-insta-ai-hub"
+registry_source: ".ai-skills/registry.json"
+default_language: "pt-BR"
+models:
+  claude: "claude-3-7-sonnet-latest"
+  codex: "gpt-4o"
+  gemini: "gemini-2.5-pro"
+
+instructions: |
+  Você é o motor de automação e estruturação técnica (Codex / OpenAI) do Codemix Insta-AI Hub.
+  Respeite sempre o isolamento Multi-Tenant (tenant_id + RLS), o brand_voice_guidelines da conta ativa
+  e responda estritamente em Português do Brasil (pt-BR).
+
+tools:
+  - type: function
+    function:
+      name: legenda_feed
+      description: "Gera 3 variações de legenda para post único (AIDA, Storytelling e Direta) respeitando o brand_voice_guidelines."
+      parameters:
+        type: object
+        properties:
+          tema: { type: string }
+          objetivo: { type: string }
+        required: [tema]
+  - type: function
+    function:
+      name: carrossel
+      description: "Estrutura um carrossel de alta retenção slide a slide com gancho, conteúdo, resumo salvável e CTA."
+      parameters:
+        type: object
+        properties:
+          tema: { type: string }
+          num_slides: { type: integer, default: 7 }
+        required: [tema]
+  - type: function
+    function:
+      name: roteiro_reels
+      description: "Cria tabela de roteiro de Reels com tempo, cena, fala e legenda."
+      parameters:
+        type: object
+        properties:
+          ideia: { type: string }
+          duracao_segundos: { type: integer, default: 30 }
+        required: [ideia]
+  - type: function
+    function:
+      name: sequencia_stories
+      description: "Gera sequência estratégica de 5 a 7 stories com enquete, reação rápida e link no último frame."
+      parameters:
+        type: object
+        properties:
+          objetivo: { type: string, enum: [engajamento, venda, caixinha] }
+        required: [objetivo]
+  - type: function
+    function:
+      name: calendario
+      description: "Gera matriz editorial distribuída por funil de consciência pronta para salvar como DRAFT."
+      parameters:
+        type: object
+        properties:
+          dias: { type: integer, default: 7 }
+          pilares: { type: string }
+        required: [dias]
+  - type: function
+    function:
+      name: hashtags
+      description: "Gera 5 a 15 hashtags qualificadas + palavras-chave de SEO nativo para Instagram."
+      parameters:
+        type: object
+        properties:
+          nicho: { type: string }
+          localizacao: { type: string }
+        required: [nicho]
+  - type: function
+    function:
+      name: prompt_foto
+      description: "Gera prompts fotográficos detalhados EN/PT para Midjourney v6, Flux.1 e Imagen 3."
+      parameters:
+        type: object
+        properties:
+          conceito: { type: string }
+          aspect_ratio: { type: string, default: "4:5" }
+        required: [conceito]
+  - type: function
+    function:
+      name: prompt_carrossel
+      description: "Cria direção de arte e prompts de imagem consistentes para cada página de um carrossel."
+      parameters:
+        type: object
+        properties:
+          id_do_post: { type: string }
+        required: [id_do_post]
+  - type: function
+    function:
+      name: prompt_capa_reels
+      description: "Cria prompt de capa vertical 9:16 com safe zone 4:5 central para tipografia."
+      parameters:
+        type: object
+        properties:
+          titulo_gancho: { type: string }
+        required: [titulo_gancho]
+  - type: function
+    function:
+      name: prompt_estetico
+      description: "Extrai códigos visuais da conta e gera sufixo Style Reference padrão."
+      parameters:
+        type: object
+        properties:
+          referencia_marca: { type: string }
+  - type: function
+    function:
+      name: responder_dm
+      description: "Analisa conversa no Inbox Unificado e sugere resposta humanizada ou transbordo humano."
+      parameters:
+        type: object
+        properties:
+          contexto_opcional: { type: string }
+  - type: function
+    function:
+      name: moderar_comentarios
+      description: "Oculta spam/ofensas via Graph API e responde em lote + envia Private Reply."
+      parameters:
+        type: object
+        properties:
+          post_id: { type: string }
+          filtro: { type: string, enum: [todos, duvidas, elogios, spam, gatilhos] }
+  - type: function
+    function:
+      name: automacao_gatilho
+      description: "Configura regra de palavra-chave em comentários para envio automático de link no Direct."
+      parameters:
+        type: object
+        properties:
+          palavra_chave: { type: string }
+          link_destino: { type: string }
+        required: [palavra_chave, link_destino]
+  - type: function
+    function:
+      name: conta_trocar
+      description: "Alterna a conta ativa do Instagram no contexto do chat e da interface."
+      parameters:
+        type: object
+        properties:
+          username: { type: string }
+        required: [username]
+  - type: function
+    function:
+      name: conta_status
+      description: "Verifica saúde dos Long-Lived Tokens (60 dias), permissões e webhooks do Tenant."
+      parameters:
+        type: object
+        properties: {}
+  - type: function
+    function:
+      name: auditoria_perfil
+      description: "Analisa métricas de 30 dias da Insights API e entrega plano de ação."
+      parameters:
+        type: object
+        properties:
+          username: { type: string }
+  - type: function
+    function:
+      name: publicar_agora
+      description: "Executa fluxo /media -> /media_publish na Graph API v22.0 para post com mídia vinculada."
+      parameters:
+        type: object
+        properties:
+          post_id: { type: string }
+        required: [post_id]
+  - type: function
+    function:
+      name: debug_webhook
+      description: "Valida assinatura X-Hub-Signature-256 e diagnostica falhas de webhook da Meta."
+      parameters:
+        type: object
+        properties:
+          payload_id: { type: string }
+

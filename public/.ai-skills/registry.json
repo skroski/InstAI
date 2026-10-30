@@ -1,0 +1,408 @@
+{
+  "$schema": "https://codemix.com.br/schemas/ai-skills-registry-v1.json",
+  "version": "1.0.0",
+  "project": "codemix-insta-ai-hub",
+  "language": "pt-BR",
+  "groups": {
+    "1": {
+      "id": "content",
+      "name": "Conteúdo & copywriting",
+      "recommendedEngine": "claude"
+    },
+    "2": {
+      "id": "image-prompts",
+      "name": "Prompts de imagem",
+      "recommendedEngine": "gemini"
+    },
+    "3": {
+      "id": "moderation",
+      "name": "Atendimento & moderação",
+      "recommendedEngine": "gemini"
+    },
+    "4": {
+      "id": "operations",
+      "name": "Operação & multi-contas",
+      "recommendedEngine": "codex"
+    }
+  },
+  "skills": [
+    {
+      "slash_command": "/legenda-feed",
+      "command": "legenda-feed",
+      "name": "Gerador de Legendas para Feed (AIDA, Storytelling e Direta)",
+      "group": 1,
+      "category": "content",
+      "args": "[tema] [objetivo]",
+      "preferred_engine": "claude",
+      "description": "3 variações de legenda: AIDA, storytelling e direta, com CTA.",
+      "prompt_path": ".ai-skills/content/legenda-feed.md",
+      "system_prompt": "Você é estrategista de copywriting da conta ativa no Instagram. Gere exatamente 3 variações de legenda em Português do Brasil (1. AIDA, 2. Storytelling, 3. Direta) respeitando estritamente o brand_voice_guidelines (tom, público e regras) da conta ativa, com quebras de linha escaneáveis e chamada para ação (CTA) clara.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "tema": { "type": "string", "description": "Tema central da publicação" },
+          "objetivo": { "type": "string", "description": "Objetivo do post (engajamento, leads, autoridade, venda)" }
+        },
+        "required": ["tema"]
+      },
+      "output_format": "markdown",
+      "is_active": true
+    },
+    {
+      "slash_command": "/carrossel",
+      "command": "carrossel",
+      "name": "Estruturador de Carrossel de Alta Retenção",
+      "group": 1,
+      "category": "content",
+      "args": "[tema] [num_slides]",
+      "preferred_engine": "claude",
+      "description": "Carrossel slide a slide: gancho, conteúdo, resumo salvável e CTA.",
+      "prompt_path": ".ai-skills/content/carrossel.md",
+      "system_prompt": "Você é especialista em carrosséis de retenção para Instagram. Estruture o carrossel slide a slide em pt-BR: Slide 1 com gancho inevitável; Slides 2 até N-2 com conteúdo denso e prático; Penúltimo slide com resumo salvável em lista; Último slide com CTA + legenda completa do post.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "tema": { "type": "string" },
+          "num_slides": { "type": "integer", "minimum": 4, "maximum": 10, "default": 7 }
+        },
+        "required": ["tema"]
+      },
+      "output_format": "markdown",
+      "is_active": true
+    },
+    {
+      "slash_command": "/roteiro-reels",
+      "command": "roteiro-reels",
+      "name": "Roteirista de Reels com Retenção e Loop",
+      "group": 1,
+      "category": "content",
+      "args": "[ideia] [duracao_segundos]",
+      "preferred_engine": "claude",
+      "description": "Roteiro com tempo, fala e legenda da publicação.",
+      "prompt_path": ".ai-skills/content/roteiro-reels.md",
+      "system_prompt": "Crie uma tabela de roteiro de Reels em pt-BR dividida em: 0-3s (Hook visual/sonoro), 3-15s (Retenção com cortes dinâmicos), 15-30s (Entrega prática), Final (Loop que conecta com o início) + legenda otimizada com palavra-chave de automação.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "ideia": { "type": "string" },
+          "duracao_segundos": { "type": "integer", "default": 30 }
+        },
+        "required": ["ideia"]
+      },
+      "output_format": "markdown",
+      "is_active": true
+    },
+    {
+      "slash_command": "/sequencia-stories",
+      "command": "sequencia-stories",
+      "name": "Estrategista de Sequência de Stories",
+      "group": 1,
+      "category": "content",
+      "args": "[objetivo]",
+      "preferred_engine": "claude",
+      "description": "5 a 7 stories com enquete, reação rápida e link no último frame.",
+      "prompt_path": ".ai-skills/content/sequencia-stories.md",
+      "system_prompt": "Estruture uma sequência estratégica de 5 a 7 stories em pt-BR para o objetivo solicitado (engajamento, venda ou caixinha), incluindo enquete binária no início, contexto curto, reação rápida, prova social/bastidor e link estratégico no último frame.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "objetivo": { "type": "string", "enum": ["engajamento", "venda", "caixinha"] }
+        },
+        "required": ["objetivo"]
+      },
+      "output_format": "markdown",
+      "is_active": true
+    },
+    {
+      "slash_command": "/calendario",
+      "command": "calendario",
+      "name": "Matriz Editorial por Funil de Consciência",
+      "group": 1,
+      "category": "content",
+      "args": "[dias] [pilares]",
+      "preferred_engine": "claude",
+      "description": "Matriz editorial por funil, pronta para salvar como DRAFT.",
+      "prompt_path": ".ai-skills/content/calendario.md",
+      "system_prompt": "Gere uma matriz editorial completa em pt-BR (Feed, Reels, Carrossel e Stories) distribuída por estágio do funil de consciência (Topo, Meio e Fundo), pronta para ser salva como rascunhos (DRAFT) na tabela ig_posts.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "dias": { "type": "integer", "default": 7 },
+          "pilares": { "type": "string" }
+        },
+        "required": ["dias"]
+      },
+      "output_format": "markdown",
+      "is_active": true
+    },
+    {
+      "slash_command": "/hashtags",
+      "command": "hashtags",
+      "name": "Gerador de Hashtags e SEO Nativo para Instagram",
+      "group": 1,
+      "category": "content",
+      "args": "[nicho] [localizacao]",
+      "preferred_engine": "claude",
+      "description": "5 a 15 hashtags qualificadas + palavras-chave de SEO.",
+      "prompt_path": ".ai-skills/content/hashtags.md",
+      "system_prompt": "Gere um bloco de 5 a 15 hashtags altamente qualificadas e termos de SEO nativo para indexação na busca do Instagram em pt-BR.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "nicho": { "type": "string" },
+          "localizacao": { "type": "string" }
+        },
+        "required": ["nicho"]
+      },
+      "output_format": "markdown",
+      "is_active": true
+    },
+    {
+      "slash_command": "/prompt-foto",
+      "command": "prompt-foto",
+      "name": "Engenharia de Prompt Fotográfico (Midjourney v6 / Flux.1 / Imagen 3)",
+      "group": 2,
+      "category": "image-prompts",
+      "args": "[conceito] [aspect_ratio]",
+      "preferred_engine": "gemini",
+      "description": "Prompts fotográficos PT/EN para Midjourney v6, Flux.1 e Imagen 3.",
+      "prompt_path": ".ai-skills/image-prompts/prompt-foto.md",
+      "system_prompt": "Gere prompts fotográficos ultra-detalhados em Inglês (EN) e Português (PT) otimizados para Midjourney v6, Flux.1 e Google Imagen 3, especificando lente, iluminação volumétrica, textura, composição com área de respiro, Style Reference da conta e aspect ratio (--ar 4:5 ou 9:16).",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "conceito": { "type": "string" },
+          "aspect_ratio": { "type": "string", "default": "4:5" }
+        },
+        "required": ["conceito"]
+      },
+      "output_format": "markdown",
+      "is_active": true
+    },
+    {
+      "slash_command": "/prompt-carrossel",
+      "command": "prompt-carrossel",
+      "name": "Direção de Arte e Prompts para Carrossel",
+      "group": 2,
+      "category": "image-prompts",
+      "args": "[id_do_post]",
+      "preferred_engine": "gemini",
+      "description": "Direção de arte e prompts consistentes para cada página.",
+      "prompt_path": ".ai-skills/image-prompts/prompt-carrossel.md",
+      "system_prompt": "A partir do roteiro do carrossel selecionado, gere direção de arte e prompts de imagem consistentes para cada slide (capa, lâminas de conteúdo e CTA final) mantendo paleta e Style Reference da conta.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "id_do_post": { "type": "string" }
+        },
+        "required": ["id_do_post"]
+      },
+      "output_format": "markdown",
+      "is_active": true
+    },
+    {
+      "slash_command": "/prompt-capa-reels",
+      "command": "prompt-capa-reels",
+      "name": "Gerador de Prompt de Capa 9:16 com Safe Zone 4:5",
+      "group": 2,
+      "category": "image-prompts",
+      "args": "[titulo_gancho]",
+      "preferred_engine": "gemini",
+      "description": "Capa 9:16 com safe zone 4:5 para tipografia.",
+      "prompt_path": ".ai-skills/image-prompts/prompt-capa-reels.md",
+      "system_prompt": "Crie um prompt de imagem vertical (--ar 9:16) com área central de respiro (safe zone 4:5 do feed) para inserção de tipografia posterior, aplicando o Style Reference da conta ativa.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "titulo_gancho": { "type": "string" }
+        },
+        "required": ["titulo_gancho"]
+      },
+      "output_format": "markdown",
+      "is_active": true
+    },
+    {
+      "slash_command": "/prompt-estetico",
+      "command": "prompt-estetico",
+      "name": "Extrator de Style Reference da Marca",
+      "group": 2,
+      "category": "image-prompts",
+      "args": "[referencia_marca]",
+      "preferred_engine": "gemini",
+      "description": "Sufixo de estilo padrão (Style Reference) da conta.",
+      "prompt_path": ".ai-skills/image-prompts/prompt-estetico.md",
+      "system_prompt": "Extraia os códigos visuais da marca (paleta hexadecimal, iluminação, lente, acabamento editorial) e gere um sufixo de estilo padrão (Style Reference Prompt) para ser anexado automaticamente em todas as gerações de imagem da conta.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "referencia_marca": { "type": "string" }
+        }
+      },
+      "output_format": "markdown",
+      "is_active": true
+    },
+    {
+      "slash_command": "/responder-dm",
+      "command": "responder-dm",
+      "name": "Assistente de Resposta Humanizada para Direct (DM)",
+      "group": 3,
+      "category": "moderation",
+      "args": "[contexto_opcional]",
+      "preferred_engine": "gemini",
+      "description": "Sugere resposta humanizada ou aciona transbordo humano.",
+      "prompt_path": ".ai-skills/instagram-api/responder-dm.md",
+      "system_prompt": "Analise a conversa aberta no Inbox Unificado, aplique o brand_voice_guidelines da conta ativa e sugira uma resposta curta, natural e orientadora em pt-BR, ou recomende transbordo imediato para atendimento humano em casos sensíveis.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "contexto_opcional": { "type": "string" }
+        }
+      },
+      "output_format": "markdown",
+      "is_active": true
+    },
+    {
+      "slash_command": "/moderar-comentarios",
+      "command": "moderar-comentarios",
+      "name": "Moderador Inteligente de Comentários via Graph API",
+      "group": 3,
+      "category": "moderation",
+      "args": "[post_id] [filtro]",
+      "preferred_engine": "gemini",
+      "description": "Oculta spam, responde em lote e envia Private Reply.",
+      "prompt_path": ".ai-skills/instagram-api/moderar-comentarios.md",
+      "system_prompt": "Classifique os comentários pendentes em duvida, elogio, lead, gatilho, reclamacao, spam, ofensivo ou fora_do_escopo conforme prompts/resposta-comentarios.md. Oculte spam/ofensas (POST /{comment-id}?hide=true) e gere respostas públicas curtas + Private Reply por DM para gatilhos e leads.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "post_id": { "type": "string" },
+          "filtro": { "type": "string", "enum": ["todos", "duvidas", "elogios", "spam", "gatilhos"] }
+        }
+      },
+      "output_format": "json",
+      "is_active": true
+    },
+    {
+      "slash_command": "/automacao-gatilho",
+      "command": "automacao-gatilho",
+      "name": "Configurador de Regra de Palavra-Chave para Direct",
+      "group": 3,
+      "category": "moderation",
+      "args": "[palavra_chave] [link_destino]",
+      "preferred_engine": "codex",
+      "description": "Responde no Direct quando alguém comenta a palavra-chave.",
+      "prompt_path": ".ai-skills/instagram-api/automacao-gatilho.md",
+      "system_prompt": "Configure uma regra de automação de webhook para responder automaticamente via Private Reply no Direct sempre que um seguidor comentar a palavra-chave especificada em um Reel ou Post.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "palavra_chave": { "type": "string" },
+          "link_destino": { "type": "string" }
+        },
+        "required": ["palavra_chave", "link_destino"]
+      },
+      "output_format": "json",
+      "is_active": true
+    },
+    {
+      "slash_command": "/conta-trocar",
+      "command": "conta-trocar",
+      "name": "Alternador de Contexto Multi-Conta",
+      "group": 4,
+      "category": "operations",
+      "args": "[@username]",
+      "preferred_engine": "codex",
+      "description": "Alterna o contexto ativo do chat e da interface.",
+      "prompt_path": ".ai-skills/instagram-api/conta-trocar.md",
+      "system_prompt": "Alterne imediatamente a conta ativa (activeAccountSignal) do workspace e carregue o brand_voice_guidelines e Style Reference correspondentes.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "username": { "type": "string" }
+        },
+        "required": ["username"]
+      },
+      "output_format": "markdown",
+      "is_active": true
+    },
+    {
+      "slash_command": "/conta-status",
+      "command": "conta-status",
+      "name": "Diagnóstico de Tokens Long-Lived e Webhooks",
+      "group": 4,
+      "category": "operations",
+      "args": "",
+      "preferred_engine": "codex",
+      "description": "Saúde dos tokens, permissões e webhook de todas as contas.",
+      "prompt_path": ".ai-skills/instagram-api/conta-status.md",
+      "system_prompt": "Verifique a saúde dos tokens Long-Lived (60 dias), escopos concedidos na Meta Graph API v22.0 e status de assinatura de webhook de todas as contas do Tenant.",
+      "input_schema": {
+        "type": "object",
+        "properties": {}
+      },
+      "output_format": "markdown",
+      "is_active": true
+    },
+    {
+      "slash_command": "/auditoria-perfil",
+      "command": "auditoria-perfil",
+      "name": "Auditoria de Métricas e Retenção (Insights API)",
+      "group": 4,
+      "category": "operations",
+      "args": "[@username]",
+      "preferred_engine": "gemini",
+      "description": "Engajamento, melhor horário e formato campeão em 30 dias.",
+      "prompt_path": ".ai-skills/instagram-api/auditoria-perfil.md",
+      "system_prompt": "Analise as métricas de 30 dias da Insights API (taxa de engajamento, alcance, salvamentos, retenção por formato e melhores horários) e entregue um plano de ação prático em 3 pontos.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "username": { "type": "string" }
+        }
+      },
+      "output_format": "markdown",
+      "is_active": true
+    },
+    {
+      "slash_command": "/publicar-agora",
+      "command": "publicar-agora",
+      "name": "Publicador Graph API (/media -> /media_publish)",
+      "group": 4,
+      "category": "operations",
+      "args": "[post_id]",
+      "preferred_engine": "codex",
+      "description": "Fluxo /media → /media_publish para post com mídia vinculada.",
+      "prompt_path": ".ai-skills/instagram-api/publicar-agora.md",
+      "system_prompt": "Valide se o post possui mídia vinculada em media_urls e execute o fluxo em 2 etapas da Instagram Graph API v22.0: criação de container (POST /{ig-user-id}/media) seguida de publicação (POST /{ig-user-id}/media_publish).",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "post_id": { "type": "string" }
+        },
+        "required": ["post_id"]
+      },
+      "output_format": "json",
+      "is_active": true
+    },
+    {
+      "slash_command": "/debug-webhook",
+      "command": "debug-webhook",
+      "name": "Inspetor de Payloads e Assinatura X-Hub-Signature-256",
+      "group": 4,
+      "category": "operations",
+      "args": "[payload_id]",
+      "preferred_engine": "codex",
+      "description": "Valida X-Hub-Signature-256 e sugere correção de payload ou SQL.",
+      "prompt_path": ".ai-skills/instagram-api/debug-webhook.md",
+      "system_prompt": "Inspecione logs de falha de webhook da Meta Graph API v22.0, valide o HMAC-SHA256 do cabeçalho X-Hub-Signature-256 e gere a correção de payload ou consulta SQL parametrizada para a tabela ig_interactions.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "payload_id": { "type": "string" }
+        }
+      },
+      "output_format": "markdown",
+      "is_active": true
+    }
+  ]
+}

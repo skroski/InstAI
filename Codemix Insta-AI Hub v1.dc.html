@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/codemix-design-system-95bbea2c-11c8-419a-8232-d14e74590f4b/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/codemix-design-system-95bbea2c-11c8-419a-8232-d14e74590f4b/tokens/colors.css">
+<link rel="stylesheet" href="_ds/codemix-design-system-95bbea2c-11c8-419a-8232-d14e74590f4b/tokens/typography.css">
+<link rel="stylesheet" href="_ds/codemix-design-system-95bbea2c-11c8-419a-8232-d14e74590f4b/tokens/spacing.css">
+<link rel="stylesheet" href="_ds/codemix-design-system-95bbea2c-11c8-419a-8232-d14e74590f4b/tokens/effects.css">
+<link rel="stylesheet" href="_ds/codemix-design-system-95bbea2c-11c8-419a-8232-d14e74590f4b/tokens/motion.css">
+<link rel="stylesheet" href="_ds/codemix-design-system-95bbea2c-11c8-419a-8232-d14e74590f4b/styles.css">
+<script src="_ds/codemix-design-system-95bbea2c-11c8-419a-8232-d14e74590f4b/_ds_bundle.js"></script>
+<style>html,body{margin:0;background:#1f1f1f}*{box-sizing:border-box}::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:rgba(255,255,255,.16);border-radius:8px}button,textarea,input{font-family:inherit}a{color:#f1a10b}a:hover{color:#fbd23a}</style>
+</helmet>
+<div style="display:flex;height:100vh;background:#1f1f1f;color:#fefefe;font:400 14px/1.45 var(--font-sans);overflow-x:auto;overflow-y:hidden;position:relative">
+
+<!-- ============ SIDEBAR ============ -->
+<aside style="width:256px;flex:none;background:#2b2b2b;border-right:1px solid rgba(255,255,255,.14);display:flex;flex-direction:column;position:relative;z-index:5">
+  <div style="padding:16px 16px 14px;display:flex;flex-direction:column;gap:7px;border-bottom:1px solid rgba(255,255,255,.1)">
+    <img src="assets/logo-codemix-white.svg" alt="codemix" style="height:24px;width:auto;align-self:flex-start">
+    <div style="font:600 11px/1 var(--font-display);letter-spacing:.08em;text-transform:uppercase;color:#f6bc03">insta-ai hub . {{ tenantName }}</div>
+  </div>
+  <div style="padding:12px 12px 4px;display:flex;flex-direction:column;gap:8px;position:relative">
+    <div style="font:600 11px/1 var(--font-display);letter-spacing:.08em;text-transform:uppercase;color:#9a9d9f">conta ativa</div>
+    <button onClick="{{ toggleSwitcher }}" style="width:100%;display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);border-radius:6px;color:#fefefe;cursor:pointer;text-align:left" style-hover="background:rgba(255,255,255,.09)">
+      <span style="{{ avBig }}">{{ accIni }}</span>
+      <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px"><span style="font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">@{{ accUser }}</span><span style="display:flex;align-items:center;gap:6px;font-size:12px;color:#bbbcbe"><span style="{{ accDot }}"></span>token {{ accToneLabel }}</span></span>
+      <span style="color:#bbbcbe;font-size:11px">▾</span>
+    </button>
+    <sc-if value="{{ switcherOpen }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;top:calc(100% - 4px);left:12px;right:12px;background:#363d3f;border:1px solid rgba(255,255,255,.2);border-radius:6px;box-shadow:0 3px 10px rgba(0,0,0,.4);padding:6px;display:flex;flex-direction:column;gap:2px;z-index:20">
+        <sc-for list="{{ accList }}" as="a" hint-placeholder-count="4">
+          <button onClick="{{ a.onPick }}" style="{{ a.rowStyle }}">
+            <span style="{{ a.avStyle }}">{{ a.ini }}</span>
+            <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;text-align:left"><span style="font-weight:500">@{{ a.user }}</span><span style="display:flex;align-items:center;gap:6px;font-size:12px;color:#bbbcbe"><span style="{{ a.dot }}"></span>{{ a.toneLabel }}</span></span>
+            <sc-if value="{{ a.hasUnread }}" hint-placeholder-val="{{ false }}"><span style="min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:#f6bc03;color:#2b2b2b;font:600 12px/20px var(--font-display);text-align:center">{{ a.unread }}</span></sc-if>
+          </button>
+        </sc-for>
+        <button onClick="{{ connectAccount }}" style="margin-top:4px;padding:8px 10px;background:transparent;border:1px dashed rgba(255,255,255,.28);border-radius:4px;color:#fbd23a;cursor:pointer;font-size:13px;text-align:left" style-hover="background:rgba(255,255,255,.06)">+ conectar conta via oauth da meta</button>
+      </div>
+    </sc-if>
+    <button onClick="{{ openSearch }}" style="height:34px;display:flex;align-items:center;gap:8px;padding:0 10px;background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.14);border-radius:6px;color:#bbbcbe;font-size:13.5px;cursor:pointer;text-align:left" style-hover="border-color:rgba(255,255,255,.3)"><span style="flex:1">comandos e skills…</span><span style="font:12px/1 var(--font-mono);padding:3px 7px;border-radius:2px;background:rgba(255,255,255,.1);color:#fefefe">/</span></button>
+    <x-import component-from-global-scope="CodemixDesignSystem_95bbea.Button" variant="primary" arrow="{{ true }}" onClick="{{ newPost }}" style="width:100%;justify-content:space-between" hint-size="100%,34px">novo post</x-import>
+  </div>
+  <nav style="flex:1;min-height:0;overflow:auto;padding:12px 12px;display:flex;flex-direction:column;gap:16px">
+    <sc-for list="{{ navGroups }}" as="g" hint-placeholder-count="4">
+      <div style="display:flex;flex-direction:column;gap:2px">
+        <div style="font:600 11px/1 var(--font-display);letter-spacing:.08em;text-transform:uppercase;color:#9a9d9f;padding:0 10px 6px">{{ g.title }}</div>
+        <sc-for list="{{ g.items }}" as="n" hint-placeholder-count="2">
+          <button onClick="{{ n.onClick }}" style="{{ n.style }}">
+            <span style="{{ n.icon }}"></span>
+            <span style="flex:1">{{ n.label }}</span>
+            <sc-if value="{{ n.hasCount }}" hint-placeholder-val="{{ false }}"><span style="min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:#f6bc03;color:#2b2b2b;font:600 12px/20px var(--font-display);text-align:center">{{ n.count }}</span></sc-if>
+          </button>
+        </sc-for>
+      </div>
+    </sc-for>
+  </nav>
+  <div style="margin:0 12px 12px;padding:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.14);border-radius:6px;display:flex;flex-direction:column;gap:8px">
+    <div style="display:flex;align-items:center"><span style="font:600 11px/1 var(--font-display);letter-spacing:.08em;text-transform:uppercase;color:#9a9d9f">long-lived token</span><span style="margin-left:auto;font-size:12.5px;color:#fefefe">{{ tokLabel }}</span></div>
+    <span style="display:block;height:6px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden"><span style="{{ tokBar }}"></span></span>
+    <div style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:#bbbcbe"><span>webhook</span><span style="color:#fefefe">{{ whLabel }}</span><sc-if value="{{ tokNeedsFix }}" hint-placeholder-val="{{ false }}"><button onClick="{{ goAccounts }}" style="margin-left:auto;background:transparent;border:0;color:#f1a10b;cursor:pointer;font-size:12.5px;padding:0">resolver »</button></sc-if></div>
+  </div>
+  <div style="padding:12px 16px;border-top:1px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:10px">
+    <span style="width:30px;height:30px;border-radius:50%;background:var(--grad-brand);color:#2b2b2b;display:flex;align-items:center;justify-content:center;font:700 12px/1 var(--font-display)">AD</span>
+    <span style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font-size:13.5px;font-weight:500">Admin do tenant</span><span style="font-size:12px;color:#9a9d9f">plano pro . rls ativo</span></span>
+    <button onClick="{{ goAccounts }}" title="configurações" style="background:transparent;border:0;color:#bbbcbe;font-size:18px;cursor:pointer;line-height:1" style-hover="color:#fefefe">⚙</button>
+  </div>
+</aside>
+
+<!-- ============ CENTRAL ============ -->
+<main style="flex:1;min-width:680px;display:flex;flex-direction:column;position:relative;overflow:hidden">
+  <header style="height:60px;flex:none;display:flex;align-items:center;gap:16px;padding:0 24px;border-bottom:1px solid rgba(255,255,255,.14)">
+    <h1 style="margin:0;font-size:24px;line-height:1.2;white-space:nowrap;flex:none"><span style="font-weight:500">{{ titleLead }}</span> <span style="font-weight:300;color:#bbbcbe">{{ titleRest }}</span></h1>
+    <span style="font-size:13px;color:#9a9d9f;white-space:nowrap;flex:none">@{{ accUser }}</span>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:8px;flex:none">
+      <sc-if value="{{ isContent }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;padding:3px;gap:2px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);border-radius:6px">
+          <sc-for list="{{ modeList }}" as="m" hint-placeholder-count="2"><button onClick="{{ m.onClick }}" style="{{ m.style }}">{{ m.label }}</button></sc-for>
+        </div>
+        <x-import component-from-global-scope="CodemixDesignSystem_95bbea.Button" variant="primary" size="sm" arrow="{{ true }}" onClick="{{ newPost }}" hint-size="auto,26px">novo post</x-import>
+      </sc-if>
+    </div>
+  </header>
+
+  <div style="flex:1;min-height:0;overflow:auto;padding:20px 24px;position:relative">
+
+  <!-- ===== VISÃO GERAL ===== -->
+  <sc-if value="{{ isOverview }}" hint-placeholder-val="{{ true }}">
+    <div style="display:flex;flex-direction:column;gap:18px;max-width:1040px">
+      <div style="font-size:14px;color:#bbbcbe">{{ greeting }}</div>
+      <sc-if value="{{ hasMetrics }}" hint-placeholder-val="{{ true }}">
+        <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px">
+          <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4"><div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:14px;display:flex;flex-direction:column;gap:6px"><span style="font:600 11px/1 var(--font-display);letter-spacing:.08em;text-transform:uppercase;color:#9a9d9f">{{ k.label }}</span><span style="font:700 32px/1 var(--font-display)">{{ k.value }}</span><span style="font-size:13px;color:#7bbf4a">{{ k.delta }}</span></div></sc-for>
+        </div>
+      </sc-if>
+      <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start">
+        <section style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:16px;display:flex;flex-direction:column;gap:10px">
+          <div style="font-size:17px"><span style="font-weight:500">precisa</span> <span style="font-weight:300;color:#bbbcbe">de atenção</span></div>
+          <sc-for list="{{ attention }}" as="t" hint-placeholder-count="3">
+            <button onClick="{{ t.onClick }}" style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.1);border-radius:4px;color:#fefefe;cursor:pointer;text-align:left;font-size:14px" style-hover="border-color:rgba(246,188,3,.5)"><span style="{{ t.dot }}"></span><span style="flex:1">{{ t.label }}</span><span style="font:600 14px/1 var(--font-display);color:#fbd23a">{{ t.count }}</span><span style="color:#f1a10b">»</span></button>
+          </sc-for>
+          <sc-if value="{{ noAttention }}" hint-placeholder-val="{{ false }}"><div style="padding:14px;color:#bbbcbe;font-size:14px">Tudo em dia nesta conta.</div></sc-if>
+        </section>
+        <section style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:16px;display:flex;flex-direction:column;gap:10px">
+          <div style="font-size:17px"><span style="font-weight:500">agenda</span> <span style="font-weight:300;color:#bbbcbe">da semana</span></div>
+          <sc-for list="{{ agenda }}" as="p" hint-placeholder-count="3">
+            <button onClick="{{ p.onClick }}" style="display:flex;flex-direction:column;gap:4px;padding:10px 12px;background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.1);border-radius:4px;color:#fefefe;cursor:pointer;text-align:left" style-hover="border-color:rgba(246,188,3,.5)"><span style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:#bbbcbe"><span style="{{ p.dot }}"></span>{{ p.when }} . {{ p.type }}<span style="margin-left:auto">{{ p.statusLabel }}</span></span><span style="font-size:14px;font-weight:500;line-height:1.3">{{ p.topic }}</span></button>
+          </sc-for>
+          <sc-if value="{{ hasAgenda }}" hint-placeholder-val="{{ true }}"><span></span></sc-if>
+        </section>
+      </div>
+      <section style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.14);border-radius:6px;overflow:hidden">
+        <div style="padding:14px 16px;font-size:17px"><span style="font-weight:500">contas</span> <span style="font-weight:300;color:#bbbcbe">do tenant . clique para alternar</span></div>
+        <div style="display:grid;grid-template-columns:minmax(0,1.6fr) 100px 80px 80px 90px;gap:10px;padding:8px 14px;font:600 11px/1 var(--font-display);letter-spacing:.08em;text-transform:uppercase;color:#9a9d9f"><span>conta</span><span>token</span><span>expira</span><span>não lidas</span><span>agendados</span></div>
+        <sc-for list="{{ ovAccs }}" as="a" hint-placeholder-count="4">
+          <button onClick="{{ a.onClick }}" style="{{ a.style }}">
+            <span style="display:flex;align-items:center;gap:10px;min-width:0"><span style="{{ a.av }}">{{ a.ini }}</span><span style="display:flex;flex-direction:column"><span style="font-weight:500">@{{ a.user }}</span><span style="font-size:12.5px;color:#9a9d9f">{{ a.name }}</span></span></span>
+            <span style="display:flex;align-items:center;gap:6px;font-size:13px"><span style="{{ a.dot }}"></span>{{ a.toneLabel }}</span><span style="color:#d4d4d4">{{ a.days }}</span><span>{{ a.unread }}</span><span>{{ a.sched }}</span>
+          </button>
+        </sc-for>
+      </section>
+    </div>
+  </sc-if>
+
+  <!-- ===== CONTEÚDO ===== -->
+  <sc-if value="{{ isContent }}" hint-placeholder-val="{{ true }}">
+    <sc-if value="{{ isKanban }}" hint-placeholder-val="{{ true }}">
+      <div style="display:grid;grid-template-columns:repeat(4,minmax(190px,1fr));gap:12px;align-items:start">
+        <sc-for list="{{ cols }}" as="c" hint-placeholder-count="4">
+          <section style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:10px;display:flex;flex-direction:column;gap:8px;min-height:240px">
+            <div style="display:flex;align-items:center;gap:8px;padding:2px 4px 4px"><span style="font:600 12px/1 var(--font-display);letter-spacing:.08em;text-transform:uppercase;color:#bbbcbe">{{ c.title }}</span><span style="font-size:12px;color:#9a9d9f">{{ c.count }}</span></div>
+            <sc-for list="{{ c.posts }}" as="p" hint-placeholder-count="2">
+              <button onClick="{{ p.onClick }}" style="{{ p.style }}">
+                <span style="display:flex;align-items:center;gap:8px;width:100%">
+                  <span style="font:600 10.5px/1 var(--font-display);letter-spacing:.08em;text-transform:uppercase;padding:3px 6px;border-radius:2px;background:rgba(255,255,255,.1);color:#fefefe">{{ p.type }}</span>
+                  <span style="margin-left:auto;display:flex;align-items:center;gap:6px;font-size:12px;color:#bbbcbe;white-space:nowrap"><span style="{{ p.dot }}"></span>{{ p.statusLabel }}</span>
+                </span>
+                <span style="font-weight:500;font-size:14px;line-height:1.3;text-align:left">{{ p.topic }}</span>
+                <span style="font-size:12px;color:#9a9d9f;text-align:left">{{ p.meta }}</span>
+              </button>
+            </sc-for>
+            <sc-if value="{{ c.empty }}" hint-placeholder-val="{{ false }}"><div style="padding:18px 8px;text-align:center;font-size:13px;color:#9a9d9f;border:1px dashed rgba(255,255,255,.14);border-radius:4px">nenhum post</div></sc-if>
+          </section>
+        </sc-for>
+      </div>
+    </sc-if>
+    <sc-if value="{{ isCalendar }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:12px"><span style="font-weight:500">26 out – 01 nov 2026</span><span style="font-size:13px;color:#9a9d9f">posts agendados e publicados da semana</span></div>
+      <div style="display:grid;grid-template-columns:repeat(7,minmax(104px,1fr));gap:8px">
+        <sc-for list="{{ days }}" as="d" hint-placeholder-count="7">
+          <div style="{{ d.style }}">
+            <div style="{{ d.head }}">{{ d.label }}</div>
+            <sc-for list="{{ d.posts }}" as="p" hint-placeholder-count="1">
+              <button onClick="{{ p.onClick }}" style="{{ p.chip }}">
+                <span style="font-size:12px;color:#bbbcbe;display:flex;align-items:center;gap:6px"><span style="{{ p.dot }}"></span>{{ p.time }} . {{ p.type }}</span>
+                <span style="font-size:13px;line-height:1.3;text-align:left;font-weight:500">{{ p.topic }}</span>
+              </button>
+            </sc-for>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <!-- drawer do post -->
+    <sc-if value="{{ hasSel }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;top:0;right:0;bottom:0;width:440px;background:#2b2b2b;border-left:1px solid rgba(255,255,255,.2);box-shadow:-6px 0 20px rgba(0,0,0,.35);display:flex;flex-direction:column;z-index:10">
+        <div style="padding:16px 18px 12px;display:flex;flex-direction:column;gap:10px;border-bottom:1px solid rgba(255,255,255,.14)">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font:600 10.5px/1 var(--font-display);letter-spacing:.08em;text-transform:uppercase;padding:3px 6px;border-radius:2px;background:rgba(255,255,255,.1)">{{ selType }}</span>
+            <span style="display:flex;align-items:center;gap:6px;font-size:12.5px;color:#bbbcbe"><span style="{{ selDot }}"></span>{{ selStatus }}</span>
+            <button onClick="{{ closeSel }}" style="margin-left:auto;background:transparent;border:0;color:#bbbcbe;font-size:20px;line-height:1;cursor:pointer;padding:2px 6px" style-hover="color:#fefefe">×</button>
+          </div>
+          <div style="font-size:19px;font-weight:500;line-height:1.25">{{ selTopic }}</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <sc-for list="{{ statusMoves }}" as="s" hint-placeholder-count="3"><button onClick="{{ s.onClick }}" style="{{ s.style }}">{{ s.label }}</button></sc-for>
+          </div>
+          <div style="display:flex;gap:18px;margin-bottom:-12px">
+            <sc-for list="{{ drawerTabs }}" as="t" hint-placeholder-count="2"><button onClick="{{ t.onClick }}" style="{{ t.style }}">{{ t.label }}</button></sc-for>
+          </div>
+        </div>
+        <div style="flex:1;min-height:0;overflow:auto;padding:16px 18px;display:flex;flex-direction:column;gap:12px">
+          <sc-if value="{{ tabCaption }}" hint-placeholder-val="{{ true }}">
+            <label style="font:600 11px/1 var(--font-display);letter-spacing:.08em;text-transform:uppercase;color:#9a9d9f">legenda</label>
+            <textarea value="{{ selCaption }}" onChange="{{ onCaption }}" rows="10" style="width:100%;resize:vertical;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.14);border-radius:10px;color:#fefefe;padding:12px;font-size:14px;line-height:1.55;box-shadow:inset 0 1px 2px rgba(0,0,0,.3)" style-focus="outline:none;border-color:#f1a10b;box-shadow:0 0 0 3px rgba(241,161,11,.32)"></textarea>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              <sc-for list="{{ selTags }}" as="h" hint-placeholder-count="3"><span style="font:12px/1 var(--font-mono);padding:5px 8px;border-radius:2px;background:rgba(255,255,255,.08);color:#fbd23a">{{ h }}</span></sc-for>
+            </div>
+            <div style="font-size:12.5px;color:#9a9d9f">gerado por {{ selAi }} . brand voice de @{{ accUser }} aplicado</div>
+          </sc-if>
+          <sc-if value="{{ tabPrompts }}" hint-placeholder-val="{{ false }}">
+            <sc-for list="{{ selPrompts }}" as="p" hint-placeholder-count="2">
+              <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:12px;display:flex;flex-direction:column;gap:8px">
+                <div style="display:flex;align-items:center;gap:8px"><span style="font-weight:500">{{ p.title }}</span><span style="font:11px/1 var(--font-mono);color:#fbd23a;padding:3px 6px;background:rgba(246,188,3,.12);border-radius:2px">{{ p.ar }}</span>
+                <button onClick="{{ p.onCopy }}" style="margin-left:auto;height:26px;padding:0 10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);border-radius:4px;color:#fefefe;font-size:12.5px;cursor:pointer" style-hover="background:rgba(255,255,255,.12)">{{ p.btn }}</button></div>
+                <div style="font:12.5px/1.55 var(--font-mono);color:#d4d4d4">{{ p.text }}</div>
+              </div>
+            </sc-for>
+            <sc-if value="{{ noPrompts }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:22px 14px;border:1px dashed rgba(255,255,255,.2);border-radius:6px;text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center">
+                <div style="color:#bbbcbe">Nenhum prompt de imagem neste post.</div>
+                <button onClick="{{ askPrompts }}" style="height:30px;padding:0 14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);border-radius:4px;color:#fbd23a;cursor:pointer">gerar com /prompt-foto »</button>
+              </div>
+            </sc-if>
+          </sc-if>
+        </div>
+        <div style="padding:12px 18px;border-top:1px solid rgba(255,255,255,.14);display:flex;flex-direction:column;gap:8px;background:rgba(0,0,0,.18)">
+          <div style="font-size:12.5px;color:#9a9d9f">Publicação exige mídia final: /media → /media_publish (Graph API v22.0).</div>
+          <div style="display:flex;gap:8px">
+            <button onClick="{{ uploadMedia }}" style="height:32px;padding:0 14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);border-radius:4px;color:#fefefe;cursor:pointer" style-hover="background:rgba(255,255,255,.12)">anexar mídia</button>
+            <button disabled style="height:32px;padding:0 14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:4px;color:#7d8083;cursor:not-allowed">publicar agora</button>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+  </sc-if>
+
+  <!-- ===== INBOX ===== -->
+  <sc-if value="{{ isInbox }}" hint-placeholder-val="{{ false }}">
+    <sc-if value="{{ inboxEmpty }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:60px 20px;text-align:center;color:#bbbcbe;display:flex;flex-direction:column;gap:6px"><div style="font-size:18px;font-weight:500;color:#fefefe">Sem interações para @{{ accUser }}</div><div>{{ inboxEmptyNote }}</div></div>
+    </sc-if>
+    <sc-if value="{{ inboxFull }}" hint-placeholder-val="{{ true }}">
+      <div style="display:grid;grid-template-columns:minmax(260px,320px) minmax(0,1fr);gap:16px;align-items:start">
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <sc-for list="{{ intList }}" as="i" hint-placeholder-count="4">
+            <button onClick="{{ i.onClick }}" style="{{ i.style }}">
+              <span style="display:flex;align-items:center;gap:8px;width:100%"><span style="{{ i.av }}">{{ i.ini }}</span><span style="font-weight:500">@{{ i.user }}</span><span style="margin-left:auto;font-size:12px;color:#9a9d9f">{{ i.time }}</span></span>
+              <span style="font-size:13px;color:#bbbcbe;text-align:left;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">{{ i.snippet }}</span>
+              <span style="display:flex;align-items:center;gap:8px;font-size:12px;color:#bbbcbe"><span style="font:600 10.5px/1 var(--font-display);letter-spacing:.08em;text-transform:uppercase;padding:3px 6px;border-radius:2px;background:rgba(255,255,255,.1);color:#fefefe">{{ i.type }}</span><span style="{{ i.dot }}"></span>{{ i.status }}</span>
+            </button>
+          </sc-for>
+        </div>
+        <section style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:20px;display:flex;flex-direction:column;gap:16px">
+          <div style="display:flex;align-items:center;gap:10px"><span style="font-size:18px;font-weight:500">@{{ curUser }}</span><span style="font:600 10.5px/1 var(--font-display);letter-spacing:.08em;text-transform:uppercase;padding:3px 6px;border-radius:2px;background:rgba(255,255,255,.1)">{{ curType }}</span><span style="font-size:13px;color:#bbbcbe">sentimento: <span style="{{ curSentStyle }}">{{ curSent }}</span></span><span style="margin-left:auto;font-size:13px;color:#bbbcbe">{{ curStatus }}</span></div>
+          <sc-if value="{{ curHasMedia }}" hint-placeholder-val="{{ false }}"><div style="font-size:13px;color:#9a9d9f">em: {{ curMedia }}</div></sc-if>
+          <div style="padding:14px 16px;background:rgba(255,255,255,.06);border-radius:10px;line-height:1.55;max-width:560px">{{ curContent }}</div>
+          <div style="border:1px solid rgba(241,161,11,.55);border-radius:6px;padding:14px;display:flex;flex-direction:column;gap:10px;background:rgba(246,188,3,.05)">
+            <div style="display:flex;align-items:center;gap:8px"><span style="font:600 11px/1 var(--font-display);letter-spacing:.08em;text-transform:uppercase;color:#fbd23a">sugestão da ia</span><span style="font-size:12.5px;color:#9a9d9f">{{ curEngine }} . regras de @{{ accUser }}</span></div>
+            <div style="line-height:1.55">{{ curAi }}</div>
+            <div style="display:flex;gap:8px"><button onClick="{{ useAi }}" style="height:30px;padding:0 14px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:4px;color:#fefefe;cursor:pointer" style-hover="background:rgba(255,255,255,.14)">usar sugestão</button></div>
+          </div>
+          <textarea value="{{ curReply }}" onChange="{{ onReply }}" rows="4" placeholder="Escreva ou use a sugestão da IA…" style="width:100%;resize:vertical;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.14);border-radius:10px;color:#fefefe;padding:12px;font-size:14px;line-height:1.55" style-focus="outline:none;border-color:#f1a10b;box-shadow:0 0 0 3px rgba(241,161,11,.32)"></textarea>
+          <div style="display:flex;gap:8px;align-items:center">
+            <x-import component-from-global-scope="CodemixDesignSystem_95bbea.Button" variant="primary" arrow="{{ true }}" onClick="{{ sendReply }}" hint-size="auto,34px">{{ sendLabel }}</x-import>
+            <x-import component-from-global-scope="CodemixDesignSystem_95bbea.Button" variant="dark" onClick="{{ escalate }}" hint-size="auto,34px">escalar p/ humano</x-import>
+            <x-import component-from-global-scope="CodemixDesignSystem_95bbea.Button" variant="ghost" onClick="{{ archive }}" hint-size="auto,34px">arquivar</x-import>
+          </div>
+        </section>
+      </div>
+    </sc-if>
+  </sc-if>
+
+  <!-- ===== COMENTÁRIOS ===== -->
+  <sc-if value="{{ isComments }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;flex-wrap:wrap;gap:8px"><sc-for list="{{ cPosts }}" as="p" hint-placeholder-count="3"><button onClick="{{ p.onClick }}" style="{{ p.style }}"><span style="font-weight:500;font-size:13.5px;line-height:1.3;text-align:left">{{ p.label }}</span><span style="font-size:12px;color:#bbbcbe">{{ p.count }} comentários . {{ p.unread }} novos</span></button></sc-for></div>
+      <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(270px,320px);gap:16px;align-items:start">
+        <section style="display:flex;flex-direction:column;gap:10px;min-width:0">
+          <div style="display:flex;flex-wrap:wrap;gap:6px"><sc-for list="{{ cFilters }}" as="f" hint-placeholder-count="5"><button onClick="{{ f.onClick }}" style="{{ f.style }}">{{ f.label }}</button></sc-for></div>
+          <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:10px 12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.14);border-radius:6px">
+            <span style="font-size:13px;color:#bbbcbe;margin-right:auto">ações em lote no filtro atual</span>
+            <button onClick="{{ hideSpam }}" style="{{ spamStyle }}">{{ spamBtn }}</button>
+            <button onClick="{{ replyAll }}" style="{{ replyStyle }}">{{ replyBtn }}</button>
+            <button onClick="{{ modPrompt }}" style="height:30px;padding:0 12px;background:transparent;border:0;color:#f1a10b;font-size:13px;cursor:pointer">/moderar-comentarios »</button>
+          </div>
+          <sc-for list="{{ cItems }}" as="c" hint-placeholder-count="3">
+            <div style="{{ c.style }}">
+              <div style="display:flex;align-items:center;gap:8px"><span style="{{ c.av }}">{{ c.ini }}</span><span style="font-weight:500">@{{ c.user }}</span><span style="{{ c.catStyle }}">{{ c.cat }}</span><span style="margin-left:auto;font-size:12px;color:#9a9d9f">{{ c.time }}</span></div>
+              <div style="line-height:1.5">{{ c.text }}</div>
+              <div style="font-size:12px;color:#9a9d9f">em: {{ c.post }}</div>
+              <sc-if value="{{ c.open }}" hint-placeholder-val="{{ true }}">
+                <div style="border:1px solid rgba(241,161,11,.45);background:rgba(246,188,3,.05);border-radius:6px;padding:10px 12px;display:flex;flex-direction:column;gap:6px"><span style="font:600 11px/1 var(--font-display);letter-spacing:.08em;text-transform:uppercase;color:#9a9d9f;color:#fbd23a">{{ c.sugLabel }}</span><span style="line-height:1.5;font-size:14px">{{ c.ai }}</span></div>
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                  <x-import component-from-global-scope="CodemixDesignSystem_95bbea.Button" variant="primary" size="sm" onClick="{{ c.onPrimary }}" hint-size="auto,26px">{{ c.primaryLabel }}</x-import>
+                  <sc-if value="{{ c.showSec }}" hint-placeholder-val="{{ false }}"><button onClick="{{ c.onDm }}" style="height:28px;padding:0 12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);border-radius:4px;color:#fefefe;font-size:13px;cursor:pointer" style-hover="background:rgba(255,255,255,.12)">responder por dm (private reply)</button><button onClick="{{ c.onHide }}" style="height:28px;padding:0 10px;background:transparent;border:0;color:#bbbcbe;font-size:13px;cursor:pointer" style-hover="color:#fefefe">ocultar</button></sc-if>
+                </div>
+              </sc-if>
+              <sc-if value="{{ c.closed }}" hint-placeholder-val="{{ false }}"><div style="font-size:13px;color:#7bbf4a">✓ {{ c.closedNote }}</div></sc-if>
+            </div>
+          </sc-for>
+          <sc-if value="{{ cEmpty }}" hint-placeholder-val="{{ false }}"><div style="padding:36px;border:1px dashed rgba(255,255,255,.2);border-radius:6px;text-align:center;color:#bbbcbe">Nenhum comentário neste filtro.</div></sc-if>
+        </section>
+        <section style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:16px;display:flex;flex-direction:column;gap:12px">
+          <div style="font-size:17px"><span style="font-weight:500">automação</span> <span style="font-weight:300;color:#bbbcbe">por palavra-chave</span></div>
+          <div style="font-size:13px;color:#bbbcbe;line-height:1.45">Quando alguém comenta a palavra, o webhook responde no Direct com o link. Mesma regra do /automacao-gatilho.</div>
+          <sc-for list="{{ rules }}" as="r" hint-placeholder-count="2">
+            <div style="padding:10px 12px;background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.1);border-radius:4px;display:flex;flex-direction:column;gap:6px">
+              <div style="display:flex;align-items:center;gap:8px"><span style="font:600 12px/1 var(--font-mono);padding:4px 7px;border-radius:2px;background:rgba(246,188,3,.14);color:#fbd23a">{{ r.kw }}</span><span style="font-size:13px;color:#d4d4d4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1">→ {{ r.link }}</span><button onClick="{{ r.onToggle }}" style="{{ r.tgStyle }}">{{ r.tg }}</button></div>
+              <div style="font-size:12px;color:#9a9d9f">{{ r.post }}</div>
+            </div>
+          </sc-for>
+          <sc-if value="{{ noRules }}" hint-placeholder-val="{{ false }}"><div style="font-size:13px;color:#9a9d9f">Nenhuma regra nesta conta.</div></sc-if>
+          <div style="height:1px;background:rgba(255,255,255,.1)"></div>
+          <input value="{{ newKw }}" onChange="{{ onKw }}" placeholder="palavra-chave (ex.: QUERO)" style="height:34px;width:100%;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.14);border-radius:10px;color:#fefefe;padding:0 12px;font-size:14px" style-focus="outline:none;border-color:#f1a10b;box-shadow:0 0 0 3px rgba(241,161,11,.32)">
+          <input value="{{ newLink }}" onChange="{{ onLink }}" placeholder="link de destino" style="height:34px;width:100%;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.14);border-radius:10px;color:#fefefe;padding:0 12px;font-size:14px" style-focus="outline:none;border-color:#f1a10b;box-shadow:0 0 0 3px rgba(241,161,11,.32)">
+          <x-import component-from-global-scope="CodemixDesignSystem_95bbea.Button" variant="dark" onClick="{{ addRule }}" hint-size="auto,34px">criar regra</x-import>
+        </section>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ===== VERSÃO DIGITAL ===== -->
+  <sc-if value="{{ isTwin }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex;flex-direction:column;gap:16px;max-width:1180px">
+      <div style="display:flex;align-items:center;gap:14px;padding:16px 18px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.14);border-radius:6px">
+        <span style="{{ avBig }}">{{ accIni }}</span>
+        <div style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:0"><div style="font-size:18px"><span style="font-weight:500">versão digital</span> <span style="font-weight:300;color:#bbbcbe">de @{{ accUser }}</span></div><div style="font-size:13px;color:#bbbcbe">Treinada com o conteúdo e o tom de voz da conta. Responde só dentro dos campos de conhecimento.</div></div>
+        <div style="display:flex;flex-direction:column;gap:6px;width:200px"><div style="display:flex;font-size:12.5px"><span style="color:#bbbcbe">conhecimento indexado</span><span style="margin-left:auto;font-weight:500">{{ twPct }}</span></div><span style="display:block;height:6px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden"><span style="{{ twBar }}"></span></span></div>
+        <button onClick="{{ retrain }}" style="height:28px;padding:0 12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);border-radius:4px;color:#fefefe;font-size:13px;cursor:pointer" style-hover="background:rgba(255,255,255,.12)">retreinar</button>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px"><sc-for list="{{ twKpis }}" as="k" hint-placeholder-count="4"><div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:12px 14px;display:flex;flex-direction:column;gap:6px"><span style="font:600 11px/1 var(--font-display);letter-spacing:.08em;text-transform:uppercase;color:#9a9d9f">{{ k.label }}</span><span style="font:700 26px/1 var(--font-display)">{{ k.value }}</span></div></sc-for></div>
+      <div style="display:grid;grid-template-columns:minmax(0,1.25fr) minmax(300px,1fr);gap:16px;align-items:start">
+        <section style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:16px;display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;align-items:center"><div style="font-size:17px"><span style="font-weight:500">a diferença</span> <span style="font-weight:300;color:#bbbcbe">na prática</span></div><span style="margin-left:auto;font-size:12.5px;color:#9a9d9f">mesma pergunta, duas respostas</span></div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px"><sc-for list="{{ pgPresets }}" as="p" hint-placeholder-count="3"><button onClick="{{ p.onClick }}" style="height:28px;padding:0 12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);border-radius:4px;color:#fefefe;font-size:13px;cursor:pointer;color:#fbd23a" style-hover="background:rgba(255,255,255,.12)">{{ p.label }}</button></sc-for></div>
+          <div style="display:flex;gap:8px"><input value="{{ pgInput }}" onChange="{{ onPgInput }}" onKeyDown="{{ pgKey }}" placeholder="Pergunte como um seguidor perguntaria…" style="height:36px;width:100%;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.14);border-radius:10px;color:#fefefe;padding:0 12px;font-size:14px" style-focus="outline:none;border-color:#f1a10b;box-shadow:0 0 0 3px rgba(241,161,11,.32)"><x-import component-from-global-scope="CodemixDesignSystem_95bbea.Button" variant="primary" onClick="{{ pgAsk }}" hint-size="auto,34px">perguntar</x-import></div>
+          <sc-if value="{{ pgNoQ }}" hint-placeholder-val="{{ true }}"><div style="padding:36px 16px;border:1px dashed rgba(255,255,255,.2);border-radius:6px;text-align:center;color:#bbbcbe;font-size:14px">Escolha uma pergunta para comparar a IA genérica com a versão digital da conta.</div></sc-if>
+          <sc-if value="{{ pgHasQ }}" hint-placeholder-val="{{ false }}">
+            <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start">
+              <div style="background:rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:12px;display:flex;flex-direction:column;gap:10px">
+                <div style="display:flex;align-items:center;gap:8px"><span style="font-weight:500">IA genérica</span><span style="font:600 11px/1 var(--font-display);letter-spacing:.08em;text-transform:uppercase;color:#9a9d9f">informação</span></div>
+                <div style="align-self:flex-end;max-width:90%;padding:8px 11px;background:rgba(255,255,255,.08);border-radius:10px;font-size:13.5px">{{ pgQ }}</div>
+                <sc-if value="{{ pgTyping }}" hint-placeholder-val="{{ false }}"><div style="font-size:13px;color:#9a9d9f">digitando…</div></sc-if>
+                <sc-if value="{{ pgDone }}" hint-placeholder-val="{{ false }}"><div style="font-size:13.5px;line-height:1.55;color:#bbbcbe">{{ pgGeneric }}</div><div style="font-size:12.5px;color:#9a9d9f;border-top:1px solid rgba(255,255,255,.08);padding-top:8px">Guia teórico, longo e igual ao de qualquer outra IA.</div></sc-if>
+              </div>
+              <div style="background:rgba(246,188,3,.05);border:1px solid rgba(241,161,11,.45);border-radius:6px;padding:12px;display:flex;flex-direction:column;gap:10px">
+                <div style="display:flex;align-items:center;gap:8px"><span style="font-weight:500">@{{ accUser }}</span><span style="font-size:12px;color:#7bbf4a">● online</span><span style="font:600 11px/1 var(--font-display);letter-spacing:.08em;text-transform:uppercase;color:#9a9d9f;color:#fbd23a;margin-left:auto">orientação</span></div>
+                <div style="align-self:flex-end;max-width:90%;padding:8px 11px;background:rgba(246,188,3,.16);border:1px solid rgba(246,188,3,.3);border-radius:10px;font-size:13.5px">{{ pgQ }}</div>
+                <sc-if value="{{ pgTyping }}" hint-placeholder-val="{{ false }}"><div style="font-size:13px;color:#9a9d9f">digitando…</div></sc-if>
+                <sc-if value="{{ pgDone }}" hint-placeholder-val="{{ false }}">
+                  <sc-for list="{{ twMsgs }}" as="m" hint-placeholder-count="3"><div style="display:flex;flex-direction:column">
+                    <sc-if value="{{ m.isBot }}" hint-placeholder-val="{{ true }}"><div style="align-self:flex-start;max-width:92%;padding:8px 11px;background:rgba(255,255,255,.1);border-radius:10px;font-size:13.5px;line-height:1.5">{{ m.text }}</div></sc-if>
+                    <sc-if value="{{ m.isUser }}" hint-placeholder-val="{{ false }}"><div style="align-self:flex-end;max-width:90%;padding:8px 11px;background:rgba(246,188,3,.16);border:1px solid rgba(246,188,3,.3);border-radius:10px;font-size:13.5px">{{ m.text }}</div></sc-if>
+                  </div></sc-for>
+                  <sc-if value="{{ pgHasOffer }}" hint-placeholder-val="{{ false }}"><div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#2b2b2b;border:1px solid rgba(255,255,255,.18);border-radius:6px"><span style="font:600 10.5px/1 var(--font-display);letter-spacing:.08em;text-transform:uppercase;padding:3px 6px;border-radius:2px;background:var(--grad-brand);color:#2b2b2b">{{ offerKind }}</span><span style="display:flex;flex-direction:column;min-width:0"><span style="font-weight:500;font-size:13.5px">{{ offerName }}</span><span style="font-size:12px;color:#9a9d9f">{{ offerLink }}</span></span><span style="margin-left:auto;color:#f1a10b">»</span></div></sc-if>
+                  <div style="font-size:12.5px;color:#9a9d9f;border-top:1px solid rgba(255,255,255,.08);padding-top:8px">Treinada pela marca: entende o contexto e diz o que fazer hoje.</div>
+                </sc-if>
+              </div>
+            </div>
+          </sc-if>
+        </section>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <section style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:16px;display:flex;flex-direction:column;gap:10px">
+            <div style="font-size:17px"><span style="font-weight:500">onde</span> <span style="font-weight:300;color:#bbbcbe">responde</span></div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px"><sc-for list="{{ twCh }}" as="c" hint-placeholder-count="3"><button onClick="{{ c.onClick }}" style="{{ c.style }}">{{ c.label }}</button></sc-for></div>
+            <div style="font:600 11px/1 var(--font-display);letter-spacing:.08em;text-transform:uppercase;color:#9a9d9f;padding-top:4px">modo</div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px"><sc-for list="{{ twModes }}" as="c" hint-placeholder-count="3"><button onClick="{{ c.onClick }}" style="{{ c.style }}">{{ c.label }}</button></sc-for></div>
+            <div style="font:600 11px/1 var(--font-display);letter-spacing:.08em;text-transform:uppercase;color:#9a9d9f;padding-top:4px">estilo de resposta</div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px"><sc-for list="{{ twStyles }}" as="c" hint-placeholder-count="2"><button onClick="{{ c.onClick }}" style="{{ c.style }}">{{ c.label }}</button></sc-for></div>
+          </section>
+          <section style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:16px;display:flex;flex-direction:column;gap:10px">
+            <div style="font-size:17px"><span style="font-weight:500">campos</span> <span style="font-weight:300;color:#bbbcbe">de conhecimento</span></div>
+            <div style="font-size:13px;color:#bbbcbe">Fora desses temas, a versão digital recusa com educação.</div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px"><sc-for list="{{ twFields }}" as="c" hint-placeholder-count="5"><button onClick="{{ c.onClick }}" style="{{ c.style }}">{{ c.label }}</button></sc-for></div>
+            <div style="font-size:13px;line-height:1.5;padding:10px 12px;background:rgba(0,0,0,.22);border-radius:4px;color:#d4d4d4">“{{ twOut }}”</div>
+          </section>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:minmax(0,1.25fr) minmax(300px,1fr);gap:16px;align-items:start">
+        <section style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:16px;display:flex;flex-direction:column;gap:10px">
+          <div style="font-size:17px"><span style="font-weight:500">fontes</span> <span style="font-weight:300;color:#bbbcbe">de treinamento</span></div>
+          <sc-for list="{{ twSources }}" as="x" hint-placeholder-count="4"><div style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:rgba(0,0,0,.22);border-radius:4px"><span style="font:600 10.5px/1 var(--font-display);letter-spacing:.08em;padding:4px 6px;border-radius:2px;background:rgba(255,255,255,.1);min-width:50px;text-align:center">{{ x.type }}</span><span style="flex:1;min-width:0;font-size:14px">{{ x.name }}</span><span style="display:flex;align-items:center;gap:6px;font-size:12.5px;color:#bbbcbe"><span style="{{ x.dot }}"></span>{{ x.status }}</span></div></sc-for>
+          <sc-if value="{{ twNoSources }}" hint-placeholder-val="{{ false }}"><div style="font-size:13.5px;color:#9a9d9f">Nenhuma fonte. Reconecte a conta para importar os posts.</div></sc-if>
+          <div style="display:flex;flex-wrap:wrap;gap:6px"><button onClick="{{ addPosts }}" style="height:28px;padding:0 12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);border-radius:4px;color:#fefefe;font-size:13px;cursor:pointer" style-hover="background:rgba(255,255,255,.12)">+ importar posts</button><button onClick="{{ addPdf }}" style="height:28px;padding:0 12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);border-radius:4px;color:#fefefe;font-size:13px;cursor:pointer" style-hover="background:rgba(255,255,255,.12)">+ enviar pdf</button><button onClick="{{ addUrl }}" style="height:28px;padding:0 12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);border-radius:4px;color:#fefefe;font-size:13px;cursor:pointer" style-hover="background:rgba(255,255,255,.12)">+ url do site</button><button onClick="{{ addFaq }}" style="height:28px;padding:0 12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);border-radius:4px;color:#fefefe;font-size:13px;cursor:pointer" style-hover="background:rgba(255,255,255,.12)">+ faq do inbox</button></div>
+        </section>
+        <section style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:16px;display:flex;flex-direction:column;gap:10px">
+          <div style="font-size:17px"><span style="font-weight:500">chat + mentoria</span> <span style="font-weight:300;color:#bbbcbe">+ cursos</span></div>
+          <div style="font-size:13px;color:#bbbcbe">Ofertas que a versão digital indica na conversa, quando faz sentido.</div>
+          <sc-for list="{{ twOffers }}" as="o" hint-placeholder-count="2"><div style="padding:10px 12px;background:rgba(0,0,0,.22);border-radius:4px;display:flex;flex-direction:column;gap:4px"><div style="display:flex;align-items:center;gap:8px"><span style="font:600 10.5px/1 var(--font-display);letter-spacing:.08em;text-transform:uppercase;padding:3px 6px;border-radius:2px;background:var(--grad-brand);color:#2b2b2b">{{ o.kind }}</span><span style="font-weight:500">{{ o.name }}</span></div><span style="font-size:12.5px;color:#9a9d9f">{{ o.link }} . quando o seguidor {{ o.when }}</span></div></sc-for>
+          <sc-if value="{{ twNoOffers }}" hint-placeholder-val="{{ false }}"><div style="font-size:13.5px;color:#9a9d9f">Nenhuma oferta cadastrada.</div></sc-if>
+        </section>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ===== AUTOMAÇÕES ===== -->
+  <sc-if value="{{ isAutomations }}" hint-placeholder-val="{{ false }}">
+    <sc-if value="{{ noFlow }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:50px 20px;text-align:center;display:flex;flex-direction:column;gap:14px;align-items:center"><div style="font-size:18px;font-weight:500">Nenhuma automação em @{{ accUser }}</div><div style="color:#bbbcbe">Crie um fluxo a partir de um modelo.</div><div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center"><sc-for list="{{ flowTemplates }}" as="t" hint-placeholder-count="3"><button onClick="{{ t.onClick }}" style="height:28px;padding:0 12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);border-radius:4px;color:#fefefe;font-size:13px;cursor:pointer" style-hover="background:rgba(255,255,255,.12)">{{ t.label }}</button></sc-for></div></div>
+    </sc-if>
+    <sc-if value="{{ hasFlow }}" hint-placeholder-val="{{ true }}">
+      <div style="display:grid;grid-template-columns:minmax(210px,250px) minmax(300px,1fr) minmax(280px,320px);gap:16px;align-items:start">
+        <section style="display:flex;flex-direction:column;gap:8px">
+          <div style="font:600 11px/1 var(--font-display);letter-spacing:.08em;text-transform:uppercase;color:#9a9d9f">fluxos</div>
+          <sc-for list="{{ flowList }}" as="x" hint-placeholder-count="2">
+            <div onClick="{{ x.onClick }}" style="{{ x.style }}"><span style="font-weight:500;line-height:1.3">{{ x.name }}</span><span style="font-size:12.5px;color:#bbbcbe">{{ x.trig }}</span><span style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:#9a9d9f">{{ x.sent }}<button onClick="{{ x.onToggle }}" style="{{ x.tgStyle }};margin-left:auto">{{ x.tg }}</button></span></div>
+          </sc-for>
+          <div style="font:600 11px/1 var(--font-display);letter-spacing:.08em;text-transform:uppercase;color:#9a9d9f;padding-top:8px">novo a partir de modelo</div>
+          <sc-for list="{{ flowTemplates }}" as="t" hint-placeholder-count="3"><button onClick="{{ t.onClick }}" style="height:28px;padding:0 12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);border-radius:4px;color:#fefefe;font-size:13px;cursor:pointer;text-align:left" style-hover="background:rgba(255,255,255,.12)">{{ t.label }}</button></sc-for>
+        </section>
+        <section style="display:flex;flex-direction:column;gap:12px;min-width:0">
+          <div style="display:flex;align-items:center;gap:10px"><input value="{{ flowName }}" onChange="{{ onFlowName }}" style="flex:1;min-width:0;background:transparent;border:1px solid transparent;border-radius:4px;color:#fefefe;font:500 18px/1.2 var(--font-sans);padding:4px 6px" style-focus="outline:none;border-color:#f1a10b;box-shadow:0 0 0 3px rgba(241,161,11,.32)" style-hover="border-color:rgba(255,255,255,.18)"><button onClick="{{ toggleFlow }}" style="{{ flowOnStyle }}">{{ flowOnLabel }}</button></div>
+          <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px"><sc-for list="{{ flowStats }}" as="k" hint-placeholder-count="4"><div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:10px 12px;display:flex;flex-direction:column;gap:4px"><span style="font:600 11px/1 var(--font-display);letter-spacing:.08em;text-transform:uppercase;color:#9a9d9f">{{ k.label }}</span><span style="font:700 22px/1 var(--font-display)">{{ k.value }}</span></div></sc-for></div>
+          <div style="padding:18px 14px;background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.1);border-radius:6px;display:flex;flex-direction:column;align-items:center;max-width:460px;width:100%;align-self:center">
+            <sc-for list="{{ nodeList }}" as="n" hint-placeholder-count="4">
+              <div style="display:flex;flex-direction:column;align-items:center;width:100%">
+                <button onClick="{{ n.onClick }}" style="{{ n.cardStyle }}"><span style="{{ n.labelStyle }}">{{ n.label }}</span><span>{{ n.summary }}</span></button>
+                <span style="width:2px;height:12px;background:rgba(255,255,255,.25)"></span>
+                <button onClick="{{ n.onAdd }}" title="inserir etapa" style="width:24px;height:24px;border-radius:50%;border:1px solid rgba(255,255,255,.3);background:#2b2b2b;color:#fbd23a;font-size:15px;line-height:1;cursor:pointer;padding:0" style-hover="border-color:#f1a10b">+</button>
+                <sc-if value="{{ n.addOpen }}" hint-placeholder-val="{{ false }}"><div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:8px 0"><sc-for list="{{ n.addTypes }}" as="t" hint-placeholder-count="8"><button onClick="{{ t.onClick }}" style="height:26px;padding:0 10px;border-radius:999px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:#fefefe;font-size:12.5px;cursor:pointer" style-hover="background:rgba(255,255,255,.12)">{{ t.label }}</button></sc-for></div></sc-if>
+                <span style="width:2px;height:12px;background:rgba(255,255,255,.25)"></span>
+              </div>
+            </sc-for>
+            <span style="font-size:12px;color:#9a9d9f;padding-top:2px">fim do fluxo</span>
+          </div>
+        </section>
+        <section style="display:flex;flex-direction:column;gap:12px">
+          <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:14px;display:flex;flex-direction:column;gap:10px">
+            <div style="font-size:16px"><span style="font-weight:500">editar</span> <span style="font-weight:300;color:#bbbcbe">etapa</span></div>
+            <sc-if value="{{ noNode }}" hint-placeholder-val="{{ true }}"><div style="font-size:13.5px;color:#9a9d9f">Selecione uma etapa do fluxo para editar.</div></sc-if>
+            <sc-if value="{{ hasNode }}" hint-placeholder-val="{{ false }}">
+              <div style="font:600 11px/1 var(--font-display);letter-spacing:.08em;text-transform:uppercase;color:#9a9d9f;color:#fbd23a">{{ insTitle }}</div>
+              <sc-if value="{{ isTrigSel }}" hint-placeholder-val="{{ false }}"><div style="display:flex;flex-wrap:wrap;gap:6px"><sc-for list="{{ kindChips }}" as="k" hint-placeholder-count="4"><button onClick="{{ k.onClick }}" style="{{ k.style }}">{{ k.label }}</button></sc-for></div></sc-if>
+              <sc-for list="{{ insFields }}" as="fd" hint-placeholder-count="2">
+                <div style="display:flex;flex-direction:column;gap:6px"><label style="font-size:12.5px;color:#bbbcbe">{{ fd.label }}</label>
+                  <sc-if value="{{ fd.multi }}" hint-placeholder-val="{{ false }}"><textarea value="{{ fd.value }}" onChange="{{ fd.onChange }}" rows="3" style="width:100%;resize:vertical;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.14);border-radius:10px;color:#fefefe;padding:10px 12px;font-size:14px;line-height:1.5" style-focus="outline:none;border-color:#f1a10b;box-shadow:0 0 0 3px rgba(241,161,11,.32)"></textarea></sc-if>
+                  <sc-if value="{{ fd.single }}" hint-placeholder-val="{{ true }}"><input value="{{ fd.value }}" onChange="{{ fd.onChange }}" style="height:34px;width:100%;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.14);border-radius:10px;color:#fefefe;padding:0 12px;font-size:14px" style-focus="outline:none;border-color:#f1a10b;box-shadow:0 0 0 3px rgba(241,161,11,.32)"></sc-if>
+                </div>
+              </sc-for>
+              <sc-if value="{{ canEditNode }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:6px"><button onClick="{{ moveUp }}" style="height:28px;padding:0 12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);border-radius:4px;color:#fefefe;font-size:13px;cursor:pointer" style-hover="background:rgba(255,255,255,.12)">↑ subir</button><button onClick="{{ moveDown }}" style="height:28px;padding:0 12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);border-radius:4px;color:#fefefe;font-size:13px;cursor:pointer" style-hover="background:rgba(255,255,255,.12)">↓ descer</button><button onClick="{{ delNode }}" style="height:28px;padding:0 12px;background:transparent;border:1px solid rgba(232,96,79,.5);border-radius:4px;color:#e8604f;font-size:13px;cursor:pointer;margin-left:auto">excluir</button></div></sc-if>
+            </sc-if>
+          </div>
+          <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:14px;display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;align-items:center"><div style="font-size:16px"><span style="font-weight:500">simulador</span> <span style="font-weight:300;color:#bbbcbe">de dm</span></div><button onClick="{{ runSim }}" style="height:28px;padding:0 12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);border-radius:4px;color:#fefefe;font-size:13px;cursor:pointer;margin-left:auto" style-hover="background:rgba(255,255,255,.12)">testar fluxo ▸</button></div>
+            <div style="min-height:180px;max-height:340px;overflow:auto;background:rgba(0,0,0,.3);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:8px">
+              <sc-if value="{{ simEmpty }}" hint-placeholder-val="{{ true }}"><div style="font-size:13px;color:#9a9d9f;text-align:center;padding:50px 10px">Rode o teste para ver a conversa que o seguidor recebe.</div></sc-if>
+              <sc-for list="{{ sim }}" as="m" hint-placeholder-count="3">
+                <div style="display:flex;flex-direction:column;gap:6px">
+                  <sc-if value="{{ m.isU }}" hint-placeholder-val="{{ false }}"><div style="align-self:flex-end;max-width:85%;padding:8px 11px;background:rgba(246,188,3,.16);border:1px solid rgba(246,188,3,.3);border-radius:10px;font-size:13.5px">{{ m.text }}</div></sc-if>
+                  <sc-if value="{{ m.isB }}" hint-placeholder-val="{{ false }}"><div style="align-self:flex-start;max-width:85%;padding:8px 11px;background:rgba(255,255,255,.1);border-radius:10px;font-size:13.5px;line-height:1.45">{{ m.text }}</div></sc-if>
+                  <sc-if value="{{ m.hasOpts }}" hint-placeholder-val="{{ false }}"><div style="display:flex;flex-wrap:wrap;gap:6px"><sc-for list="{{ m.opts }}" as="o" hint-placeholder-count="2"><span style="padding:6px 12px;border-radius:999px;border:1px solid #f1a10b;color:#fbd23a;font-size:13px">{{ o.label }}</span></sc-for></div></sc-if>
+                  <sc-if value="{{ m.isS }}" hint-placeholder-val="{{ false }}"><div style="text-align:center;font-size:12px;color:#9a9d9f">{{ m.text }}</div></sc-if>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </section>
+      </div>
+    </sc-if>
+  </sc-if>
+
+  <!-- ===== AUDIÊNCIA ===== -->
+  <sc-if value="{{ isAudience }}" hint-placeholder-val="{{ false }}">
+    <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(270px,340px);gap:20px;align-items:start">
+      <section style="display:flex;flex-direction:column;gap:12px;min-width:0">
+        <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;max-width:420px"><div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:12px 14px;display:flex;flex-direction:column;gap:4px"><span style="font:600 11px/1 var(--font-display);letter-spacing:.08em;text-transform:uppercase;color:#9a9d9f">contatos</span><span style="font:700 26px/1 var(--font-display)">{{ ctN }}</span></div><div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:12px 14px;display:flex;flex-direction:column;gap:4px"><span style="font:600 11px/1 var(--font-display);letter-spacing:.08em;text-transform:uppercase;color:#9a9d9f">leads quentes</span><span style="font:700 26px/1 var(--font-display);color:#fbd23a">{{ leadN }}</span></div></div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px"><sc-for list="{{ segList }}" as="g" hint-placeholder-count="3"><button onClick="{{ g.onClick }}" style="{{ g.style }}">{{ g.label }}</button></sc-for></div>
+        <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.14);border-radius:6px;overflow:hidden">
+          <div style="display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) minmax(0,1fr) 100px;gap:10px;padding:10px 14px;font:600 11px/1 var(--font-display);letter-spacing:.08em;text-transform:uppercase;color:#9a9d9f"><span>contato</span><span>tags</span><span>origem</span><span>última</span></div>
+          <sc-for list="{{ ctList }}" as="c" hint-placeholder-count="4"><div style="display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) minmax(0,1fr) 100px;gap:10px;align-items:center;padding:10px 14px;border-top:1px solid rgba(255,255,255,.08);font-size:14px"><span style="display:flex;align-items:center;gap:10px;min-width:0"><span style="{{ c.av }}">{{ c.ini }}</span><span style="font-weight:500">@{{ c.user }}</span></span><span style="color:#fbd23a;font-size:13px">{{ c.tags }}</span><span style="color:#bbbcbe;font-size:13px">{{ c.src }}</span><span style="color:#9a9d9f;font-size:13px">{{ c.last }}</span></div></sc-for>
+          <sc-if value="{{ ctEmpty }}" hint-placeholder-val="{{ false }}"><div style="padding:30px;text-align:center;color:#bbbcbe;border-top:1px solid rgba(255,255,255,.08)">Nenhum contato neste segmento.</div></sc-if>
+        </div>
+      </section>
+      <section style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:16px;display:flex;flex-direction:column;gap:10px">
+        <div style="font-size:17px"><span style="font-weight:500">transmissão</span> <span style="font-weight:300;color:#bbbcbe">para o segmento</span></div>
+        <div style="font-size:13px;color:#bbbcbe;line-height:1.45">Envio em massa por DM só alcança quem interagiu nas últimas 24h (regra da Messaging API).</div>
+        <textarea value="{{ bcast }}" onChange="{{ onBcast }}" rows="5" placeholder="Mensagem da transmissão…" style="width:100%;resize:vertical;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.14);border-radius:10px;color:#fefefe;padding:10px 12px;font-size:14px;line-height:1.5" style-focus="outline:none;border-color:#f1a10b;box-shadow:0 0 0 3px rgba(241,161,11,.32)"></textarea>
+        <x-import component-from-global-scope="CodemixDesignSystem_95bbea.Button" variant="primary" arrow="{{ true }}" onClick="{{ sendBcast }}" hint-size="auto,34px">{{ bcastBtn }}</x-import>
+      </section>
+    </div>
+  </sc-if>
+
+  <!-- ===== PROMPT STUDIO ===== -->
+  <sc-if value="{{ isPrompts }}" hint-placeholder-val="{{ false }}">
+    <div style="display:grid;grid-template-columns:minmax(280px,360px) minmax(0,1fr);gap:20px;align-items:start">
+      <section style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:16px;display:flex;flex-direction:column;gap:10px">
+        <div style="font-size:17px"><span style="font-weight:500">style reference</span> <span style="font-weight:300;color:#bbbcbe">. @{{ accUser }}</span></div>
+        <div style="font-size:13px;color:#bbbcbe">Sufixo anexado a toda geração de prompt desta conta para manter consistência visual.</div>
+        <textarea value="{{ styleRef }}" onChange="{{ onStyle }}" rows="8" style="width:100%;resize:vertical;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.14);border-radius:10px;color:#d4d4d4;padding:12px;font:12.5px/1.6 var(--font-mono)" style-focus="outline:none;border-color:#f1a10b;box-shadow:0 0 0 3px rgba(241,161,11,.32)"></textarea>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          <sc-for list="{{ studioCmds }}" as="c" hint-placeholder-count="4"><button onClick="{{ c.onClick }}" style="height:28px;padding:0 10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);border-radius:4px;color:#fbd23a;font:12.5px/1 var(--font-mono);cursor:pointer" style-hover="background:rgba(255,255,255,.12)">{{ c.label }}</button></sc-for>
+        </div>
+        <div style="font-size:12.5px;color:#9a9d9f">Midjourney v6 . Flux.1 . Imagen 3 — sem render nesta fase.</div>
+      </section>
+      <section style="display:flex;flex-direction:column;gap:10px">
+        <div style="font-size:17px"><span style="font-weight:500">prompts salvos</span> <span style="font-weight:300;color:#bbbcbe">. image_prompts dos posts</span></div>
+        <sc-for list="{{ studioPrompts }}" as="p" hint-placeholder-count="3">
+          <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span style="font-weight:500">{{ p.title }}</span><span style="font:11px/1 var(--font-mono);color:#fbd23a;padding:3px 6px;background:rgba(246,188,3,.12);border-radius:2px">{{ p.ar }}</span><span style="font-size:12.5px;color:#9a9d9f">{{ p.post }} . {{ p.status }}</span>
+              <button onClick="{{ p.onCopy }}" style="margin-left:auto;height:26px;padding:0 10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);border-radius:4px;color:#fefefe;font-size:12.5px;cursor:pointer" style-hover="background:rgba(255,255,255,.12)">{{ p.btn }}</button></div>
+            <div style="font:12.5px/1.55 var(--font-mono);color:#d4d4d4">{{ p.text }}</div>
+          </div>
+        </sc-for>
+        <sc-if value="{{ studioEmpty }}" hint-placeholder-val="{{ false }}"><div style="padding:30px;border:1px dashed rgba(255,255,255,.2);border-radius:6px;text-align:center;color:#bbbcbe">Nenhum prompt salvo para esta conta. Use /prompt-foto no copiloto.</div></sc-if>
+      </section>
+    </div>
+  </sc-if>
+
+  <!-- ===== SKILLS ===== -->
+  <sc-if value="{{ isSkills }}" hint-placeholder-val="{{ false }}">
+    <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(270px,330px);gap:20px;align-items:start">
+      <section style="display:flex;flex-direction:column;gap:8px;min-width:0">
+        <input value="{{ skillQ }}" onChange="{{ onSkillQ }}" placeholder="Buscar skill ou comando…" style="height:34px;width:100%;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.14);border-radius:10px;color:#fefefe;padding:0 12px;font-size:14px" style-focus="outline:none;border-color:#f1a10b;box-shadow:0 0 0 3px rgba(241,161,11,.32)">
+        <sc-for list="{{ skillList }}" as="s" hint-placeholder-count="6">
+          <div>
+            <sc-if value="{{ s.isHeader }}" hint-placeholder-val="{{ false }}"><div style="font:600 11px/1 var(--font-display);letter-spacing:.08em;text-transform:uppercase;color:#9a9d9f;padding:14px 2px 4px">{{ s.label }}</div></sc-if>
+            <sc-if value="{{ s.isRow }}" hint-placeholder-val="{{ true }}">
+              <div style="{{ s.style }}">
+                <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap"><span style="font:13.5px/1.2 var(--font-mono);color:#fbd23a">/{{ s.cmd }}</span><span style="font:12px/1.2 var(--font-mono);color:#9a9d9f">{{ s.args }}</span><span style="margin-left:auto;font:600 10px/1 var(--font-display);letter-spacing:.08em;text-transform:uppercase;color:#bbbcbe">{{ s.eng }}</span></div>
+                <div style="font-size:13.5px;color:#d4d4d4;line-height:1.4">{{ s.desc }}</div>
+                <div style="display:flex;gap:8px;align-items:center"><button onClick="{{ s.onToggle }}" style="{{ s.tgStyle }}">{{ s.tg }}</button><button onClick="{{ s.onRun }}" style="background:transparent;border:0;color:#f1a10b;font-size:13px;cursor:pointer;padding:0">usar no copiloto »</button></div>
+              </div>
+            </sc-if>
+          </div>
+        </sc-for>
+      </section>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <section style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:16px;display:flex;flex-direction:column;gap:10px">
+          <div style="font-size:17px"><span style="font-weight:500">ambientes</span> <span style="font-weight:300;color:#bbbcbe">de agente</span></div>
+          <sc-for list="{{ envs }}" as="e" hint-placeholder-count="4"><div style="display:flex;flex-direction:column;gap:2px;padding:8px 10px;background:rgba(0,0,0,.2);border-radius:4px"><span style="font:12.5px/1.3 var(--font-mono);color:#fefefe">{{ e.path }}</span><span style="font-size:12.5px;color:#9a9d9f">{{ e.desc }} . <span style="color:#7bbf4a">sincronizado</span></span></div></sc-for>
+          <button onClick="{{ syncAll }}" style="height:28px;padding:0 12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);border-radius:4px;color:#fefefe;font-size:13px;cursor:pointer" style-hover="background:rgba(255,255,255,.12)">sincronizar registry »</button>
+        </section>
+        <section style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:16px;display:flex;flex-direction:column;gap:10px">
+          <div style="font-size:17px"><span style="font-weight:500">nova skill</span> <span style="font-weight:300;color:#bbbcbe">do tenant</span></div>
+          <input value="{{ nsCmd }}" onChange="{{ onNsCmd }}" placeholder="/comando" style="height:34px;width:100%;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.14);border-radius:10px;color:#fefefe;padding:0 12px;font-size:14px;font-family:var(--font-mono)" style-focus="outline:none;border-color:#f1a10b;box-shadow:0 0 0 3px rgba(241,161,11,.32)">
+          <textarea value="{{ nsPrompt }}" onChange="{{ onNsPrompt }}" rows="4" placeholder="System prompt em pt-BR" style="width:100%;resize:vertical;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.14);border-radius:10px;color:#fefefe;padding:10px 12px;font-size:14px" style-focus="outline:none;border-color:#f1a10b;box-shadow:0 0 0 3px rgba(241,161,11,.32)"></textarea>
+          <x-import component-from-global-scope="CodemixDesignSystem_95bbea.Button" variant="primary" arrow="{{ true }}" onClick="{{ addSkill }}" hint-size="auto,34px">criar skill</x-import>
+        </section>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ===== ANALYTICS ===== -->
+  <sc-if value="{{ isAnalytics }}" hint-placeholder-val="{{ false }}">
+    <sc-if value="{{ noMetrics }}" hint-placeholder-val="{{ false }}"><div style="padding:60px 20px;text-align:center;color:#bbbcbe"><div style="font-size:18px;font-weight:500;color:#fefefe">Insights indisponíveis</div><div>O token de @{{ accUser }} está com erro. Reconecte em contas.</div></div></sc-if>
+    <sc-if value="{{ hasMetrics }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:16px;max-width:980px">
+        <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px">
+          <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4"><div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:14px;display:flex;flex-direction:column;gap:6px"><span style="font:600 11px/1 var(--font-display);letter-spacing:.08em;text-transform:uppercase;color:#9a9d9f">{{ k.label }}</span><span style="font:700 32px/1 var(--font-display)">{{ k.value }}</span><span style="font-size:13px;color:#7bbf4a">{{ k.delta }}</span></div></sc-for>
+        </div>
+        <div style="display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:12px">
+          <section style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:16px;display:flex;flex-direction:column;gap:12px">
+            <div style="font-size:17px"><span style="font-weight:500">retenção</span> <span style="font-weight:300;color:#bbbcbe">por formato . 30 dias</span></div>
+            <sc-for list="{{ formats }}" as="f" hint-placeholder-count="4"><div style="display:grid;grid-template-columns:84px 1fr 40px;align-items:center;gap:10px;font-size:13.5px"><span>{{ f.name }}</span><span style="height:10px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden"><span style="{{ f.bar }}"></span></span><span style="color:#bbbcbe;text-align:right">{{ f.pct }}</span></div></sc-for>
+          </section>
+          <section style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:16px;display:flex;flex-direction:column;gap:12px">
+            <div style="font-size:17px"><span style="font-weight:500">melhores</span> <span style="font-weight:300;color:#bbbcbe">horários</span></div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px"><sc-for list="{{ bestHours }}" as="h" hint-placeholder-count="3"><span style="font:600 15px/1 var(--font-display);padding:8px 12px;border-radius:2px;background:rgba(246,188,3,.14);color:#fbd23a">{{ h }}</span></sc-for></div>
+          </section>
+        </div>
+        <section style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:16px;display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;align-items:center"><div style="font-size:17px"><span style="font-weight:500">plano de ação</span> <span style="font-weight:300;color:#bbbcbe">. /auditoria-perfil</span></div>
+          <button onClick="{{ askAudit }}" style="margin-left:auto;height:28px;padding:0 12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);border-radius:4px;color:#fbd23a;cursor:pointer" style-hover="background:rgba(255,255,255,.12)">rodar no copiloto »</button></div>
+          <sc-for list="{{ plan }}" as="p" hint-placeholder-count="3"><div style="display:flex;gap:10px;line-height:1.5"><span style="color:#f6bc03">•</span><span>{{ p }}</span></div></sc-for>
+        </section>
+      </div>
+    </sc-if>
+  </sc-if>
+
+  <!-- ===== CONTAS ===== -->
+  <sc-if value="{{ isAccounts }}" hint-placeholder-val="{{ false }}">
+    <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,400px);gap:20px;align-items:start">
+      <section style="display:flex;flex-direction:column;gap:10px">
+        <sc-for list="{{ accCards }}" as="a" hint-placeholder-count="4">
+          <div style="{{ a.style }}">
+            <div style="display:flex;align-items:center;gap:12px">
+              <span style="{{ a.av }}">{{ a.ini }}</span>
+              <div style="flex:1;min-width:0"><div style="font-weight:500;font-size:15px">@{{ a.user }}</div><div style="font-size:13px;color:#bbbcbe">{{ a.name }}</div></div>
+              <span style="display:flex;align-items:center;gap:6px;font-size:13px"><span style="{{ a.dot }}"></span>{{ a.toneLabel }}</span>
+              <button onClick="{{ a.onPick }}" style="{{ a.btn }}">{{ a.btnLabel }}</button>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;font-size:13px;color:#bbbcbe">
+              <div style="display:flex;flex-direction:column;gap:6px"><span>long-lived token</span><span style="height:6px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden"><span style="{{ a.bar }}"></span></span><span style="color:#fefefe">{{ a.daysLabel }}</span></div>
+              <div style="display:flex;flex-direction:column;gap:6px"><span>permissões</span><span style="color:#fefefe;margin-top:12px">{{ a.permsLabel }}</span></div>
+              <div style="display:flex;flex-direction:column;gap:6px"><span>webhook</span><span style="{{ a.whStyle }}">{{ a.whLabel }}</span></div>
+            </div>
+            <sc-if value="{{ a.needsFix }}" hint-placeholder-val="{{ false }}"><div style="font-size:13px;color:#fbd23a">{{ a.fixNote }} <button onClick="{{ a.onFix }}" style="background:transparent;border:0;color:#f1a10b;cursor:pointer;text-decoration:underline;font-size:13px;padding:0">reconectar via oauth »</button></div></sc-if>
+          </div>
+        </sc-for>
+        <button onClick="{{ connectAccount }}" style="height:44px;background:transparent;border:1px dashed rgba(255,255,255,.28);border-radius:6px;color:#fbd23a;cursor:pointer;font-size:14px" style-hover="background:rgba(255,255,255,.05)">+ conectar nova conta do Instagram</button>
+        <section style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:16px;display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;align-items:center"><div style="font-size:17px"><span style="font-weight:500">webhook</span> <span style="font-weight:300;color:#bbbcbe">. eventos recentes</span></div><button onClick="{{ debugWh }}" style="margin-left:auto;background:transparent;border:0;color:#f1a10b;font-size:13px;cursor:pointer">/debug-webhook »</button></div>
+          <sc-for list="{{ events }}" as="v" hint-placeholder-count="4"><div style="display:flex;align-items:center;gap:10px;font-size:13px;padding:6px 0;border-top:1px solid rgba(255,255,255,.08)"><span style="{{ v.dot }}"></span><span style="font-family:var(--font-mono);color:#9a9d9f">{{ v.time }}</span><span style="min-width:150px">{{ v.ev }}</span><span style="color:#bbbcbe">{{ v.note }}</span></div></sc-for>
+        </section>
+      </section>
+      <section style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:16px;display:flex;flex-direction:column;gap:12px;position:sticky;top:0">
+        <div style="font-size:17px"><span style="font-weight:500">tom de voz</span> <span style="font-weight:300;color:#bbbcbe">. @{{ accUser }}</span></div>
+        <div style="font-size:13px;color:#bbbcbe">brand_voice_guidelines — injetado no topo de toda chamada do copiloto.</div>
+        <label style="font:600 11px/1 var(--font-display);letter-spacing:.08em;text-transform:uppercase;color:#9a9d9f">tom</label>
+        <textarea value="{{ voiceTom }}" onChange="{{ onTom }}" rows="2" style="width:100%;resize:vertical;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.14);border-radius:10px;color:#fefefe;padding:10px 12px;font-size:14px" style-focus="outline:none;border-color:#f1a10b;box-shadow:0 0 0 3px rgba(241,161,11,.32)"></textarea>
+        <label style="font:600 11px/1 var(--font-display);letter-spacing:.08em;text-transform:uppercase;color:#9a9d9f">público</label>
+        <textarea value="{{ voicePub }}" onChange="{{ onPub }}" rows="2" style="width:100%;resize:vertical;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.14);border-radius:10px;color:#fefefe;padding:10px 12px;font-size:14px" style-focus="outline:none;border-color:#f1a10b;box-shadow:0 0 0 3px rgba(241,161,11,.32)"></textarea>
+        <label style="font:600 11px/1 var(--font-display);letter-spacing:.08em;text-transform:uppercase;color:#9a9d9f">regras</label>
+        <textarea value="{{ voiceRegras }}" onChange="{{ onRegras }}" rows="3" style="width:100%;resize:vertical;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.14);border-radius:10px;color:#fefefe;padding:10px 12px;font-size:14px" style-focus="outline:none;border-color:#f1a10b;box-shadow:0 0 0 3px rgba(241,161,11,.32)"></textarea>
+        <x-import component-from-global-scope="CodemixDesignSystem_95bbea.Button" variant="primary" arrow="{{ true }}" onClick="{{ saveVoice }}" hint-size="auto,34px">salvar tom de voz</x-import>
+      </section>
+    </div>
+  </sc-if>
+
+  </div>
+</main>
+
+<!-- ============ COPILOT DOCK ============ -->
+<aside style="{{ dockStyle }}">
+  <div onMouseDown="{{ startDrag }}" style="position:absolute;left:-3px;top:0;bottom:0;width:6px;cursor:col-resize;z-index:6" style-hover="background:rgba(241,161,11,.45)"></div>
+  <div style="padding:14px 16px 12px;border-bottom:1px solid rgba(255,255,255,.14);display:flex;flex-direction:column;gap:10px">
+    <div style="display:flex;align-items:center;gap:8px"><span style="font-size:17px"><span style="font-weight:500">ai</span> <span style="font-weight:300;color:#bbbcbe">copilot</span></span>
+      <span style="margin-left:auto;display:flex;align-items:center;gap:6px;font-size:12px;color:#bbbcbe;padding:3px 8px;border:1px solid rgba(255,255,255,.14);border-radius:999px"><span style="{{ accDot }}"></span>@{{ accUser }}</span></div>
+    <div style="display:flex;padding:3px;gap:2px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);border-radius:6px">
+      <sc-for list="{{ engineList }}" as="e" hint-placeholder-count="4"><button onClick="{{ e.onClick }}" style="{{ e.style }}">{{ e.label }}</button></sc-for>
+    </div>
+    <div style="font:11.5px/1.3 var(--font-mono);color:#9a9d9f">{{ engineNote }}</div>
+  </div>
+
+  <div ref="{{ msgRef }}" style="flex:1;min-height:0;overflow:auto;padding:14px 16px;display:flex;flex-direction:column;gap:14px">
+    <sc-for list="{{ messages }}" as="m" hint-placeholder-count="2">
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <sc-if value="{{ m.isSys }}" hint-placeholder-val="{{ false }}"><div style="text-align:center;font-size:12px;color:#9a9d9f;padding:2px 0">{{ m.text }}</div></sc-if>
+        <sc-if value="{{ m.isUser }}" hint-placeholder-val="{{ false }}"><div style="align-self:flex-end;max-width:92%;padding:9px 12px;background:rgba(246,188,3,.14);border:1px solid rgba(246,188,3,.3);border-radius:10px;font:13.5px/1.45 var(--font-mono);word-break:break-word">{{ m.text }}</div></sc-if>
+        <sc-if value="{{ m.isAi }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;align-items:center;gap:8px"><span style="font:600 11px/1 var(--font-display);letter-spacing:.08em;text-transform:uppercase;padding:3px 7px;border-radius:999px;box-shadow:inset 0 0 0 1px #ee9c0a;color:#fbd23a">{{ m.engine }}</span><span style="font:12px/1 var(--font-mono);color:#9a9d9f">{{ m.skill }}</span></div>
+          <div style="white-space:pre-wrap;line-height:1.55;font-size:14px;word-break:break-word">{{ m.text }}</div>
+          <sc-if value="{{ m.done }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;gap:6px;margin-top:2px">
+              <button onClick="{{ m.onCopy }}" style="height:26px;padding:0 10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);border-radius:4px;color:#fefefe;font-size:12.5px;cursor:pointer" style-hover="background:rgba(255,255,255,.12)">copiar</button>
+              <sc-if value="{{ m.saveable }}" hint-placeholder-val="{{ false }}"><button onClick="{{ m.onSave }}" style="height:26px;padding:0 10px;background:rgba(246,188,3,.14);border:1px solid rgba(246,188,3,.4);border-radius:4px;color:#fbd23a;font-size:12.5px;cursor:pointer" style-hover="background:rgba(246,188,3,.24)">salvar como rascunho</button></sc-if>
+            </div>
+          </sc-if>
+        </sc-if>
+      </div>
+    </sc-for>
+    <sc-if value="{{ showChips }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        <sc-for list="{{ chips }}" as="c" hint-placeholder-count="4"><button onClick="{{ c.onClick }}" style="height:28px;padding:0 10px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.16);border-radius:4px;color:#fbd23a;font:12.5px/1 var(--font-mono);cursor:pointer" style-hover="background:rgba(255,255,255,.1)">{{ c.label }}</button></sc-for>
+      </div>
+    </sc-if>
+  </div>
+
+  <div style="padding:12px 16px 14px;border-top:1px solid rgba(255,255,255,.14);position:relative">
+    <sc-if value="{{ palOpen }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;left:12px;right:12px;bottom:calc(100% - 4px);max-height:340px;overflow:auto;background:#363d3f;border:1px solid rgba(255,255,255,.22);border-radius:6px;box-shadow:0 -4px 16px rgba(0,0,0,.45);padding:6px;z-index:15">
+        <sc-for list="{{ palItems }}" as="p" hint-placeholder-count="6">
+          <div>
+            <sc-if value="{{ p.isHeader }}" hint-placeholder-val="{{ false }}"><div style="font:600 11px/1 var(--font-display);letter-spacing:.08em;text-transform:uppercase;color:#bbbcbe;padding:10px 8px 6px">{{ p.label }}</div></sc-if>
+            <sc-if value="{{ p.isCmd }}" hint-placeholder-val="{{ true }}">
+              <div onClick="{{ p.onPick }}" onMouseEnter="{{ p.onHover }}" style="{{ p.style }}">
+                <span style="display:flex;align-items:baseline;gap:8px"><span style="font:13px/1.2 var(--font-mono);color:#fbd23a">/{{ p.cmd }}</span><span style="font:12px/1.2 var(--font-mono);color:#9a9d9f">{{ p.args }}</span><span style="margin-left:auto;font:600 10px/1 var(--font-display);letter-spacing:.08em;text-transform:uppercase;color:#bbbcbe">{{ p.eng }}</span></span>
+                <span style="font-size:12.5px;color:#d4d4d4;line-height:1.35">{{ p.desc }}</span>
+              </div>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+    <div style="background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.18);border-radius:10px;padding:8px 8px 8px 12px;display:flex;align-items:flex-end;gap:8px" style-focus-within="border-color:#f1a10b">
+      <textarea ref="{{ inputRef }}" value="{{ input }}" onChange="{{ onInput }}" onKeyDown="{{ onKey }}" rows="2" placeholder="Digite / para skills ou descreva o que precisa…" style="flex:1;resize:none;background:transparent;border:0;outline:none;color:#fefefe;font:14px/1.5 var(--font-sans);padding:2px 0"></textarea>
+      <button onClick="{{ send }}" style="height:32px;padding:0 14px;background:var(--grad-brand);border:1px solid #c96a0c;border-radius:4px;color:#2b2b2b;font-weight:600;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.55)">enviar</button>
+    </div>
+    <div style="margin-top:8px;font-size:12px;color:#9a9d9f;display:flex;gap:12px"><span><span style="font-family:var(--font-mono);color:#bbbcbe">/</span> skills</span><span><span style="font-family:var(--font-mono);color:#bbbcbe">↑↓</span> navegar</span><span><span style="font-family:var(--font-mono);color:#bbbcbe">enter</span> enviar</span></div>
+  </div>
+</aside>
+
+<sc-if value="{{ compOpen }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute;inset:0;background:rgba(0,0,0,.65);z-index:60;display:flex;align-items:center;justify-content:center;padding:24px">
+    <div style="width:min(1040px,100%);max-height:100%;background:#2b2b2b;border:1px solid rgba(255,255,255,.2);border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.5);display:flex;flex-direction:column;overflow:hidden">
+      <div style="display:flex;align-items:center;padding:14px 20px;border-bottom:1px solid rgba(255,255,255,.14)"><div style="font-size:20px"><span style="font-weight:500">novo</span> <span style="font-weight:300;color:#bbbcbe">post</span></div><button onClick="{{ closeComp }}" style="margin-left:auto;background:transparent;border:0;color:#bbbcbe;font-size:22px;cursor:pointer;line-height:1" style-hover="color:#fefefe">×</button></div>
+      <div style="display:grid;grid-template-columns:minmax(0,1fr) 320px;overflow:hidden;min-height:0">
+        <div style="padding:16px 20px;overflow:auto;display:flex;flex-direction:column;gap:12px">
+          <div style="font:600 11px/1 var(--font-display);letter-spacing:.08em;text-transform:uppercase;color:#9a9d9f">contas</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px"><sc-for list="{{ compAccs }}" as="a" hint-placeholder-count="4"><button onClick="{{ a.onClick }}" style="{{ a.style }}">{{ a.label }}</button></sc-for></div>
+          <div style="font:600 11px/1 var(--font-display);letter-spacing:.08em;text-transform:uppercase;color:#9a9d9f">formato</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px"><sc-for list="{{ compTypes }}" as="t" hint-placeholder-count="4"><button onClick="{{ t.onClick }}" style="{{ t.style }}">{{ t.label }}</button></sc-for></div>
+          <div style="font:600 11px/1 var(--font-display);letter-spacing:.08em;text-transform:uppercase;color:#9a9d9f">tema e legenda</div>
+          <div style="display:flex;gap:8px"><input value="{{ compTopic }}" onChange="{{ onCompTopic }}" placeholder="Tema do post (opcional)" style="height:34px;width:100%;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.14);border-radius:10px;color:#fefefe;padding:0 12px;font-size:14px" style-focus="outline:none;border-color:#f1a10b;box-shadow:0 0 0 3px rgba(241,161,11,.32)"><button onClick="{{ compAi }}" style="height:28px;padding:0 12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);border-radius:4px;color:#fefefe;font-size:13px;cursor:pointer;height:34px;white-space:nowrap;color:#fbd23a" style-hover="background:rgba(255,255,255,.12)">gerar com ia</button></div>
+          <textarea value="{{ compCap }}" onChange="{{ onCompCap }}" rows="7" placeholder="Escreva a legenda…" style="width:100%;resize:vertical;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.14);border-radius:10px;color:#fefefe;padding:10px 12px;font-size:14px;line-height:1.5" style-focus="outline:none;border-color:#f1a10b;box-shadow:0 0 0 3px rgba(241,161,11,.32)"></textarea>
+          <input value="{{ compTags }}" onChange="{{ onCompTags }}" placeholder="#hashtags separadas por espaço" style="height:34px;width:100%;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.14);border-radius:10px;color:#fefefe;padding:0 12px;font-size:14px;font-family:var(--font-mono);font-size:13px" style-focus="outline:none;border-color:#f1a10b;box-shadow:0 0 0 3px rgba(241,161,11,.32)">
+          <div style="font:600 11px/1 var(--font-display);letter-spacing:.08em;text-transform:uppercase;color:#9a9d9f">prompt de imagem (opcional)</div>
+          <textarea value="{{ compPr }}" onChange="{{ onCompPr }}" rows="3" placeholder="Prompt para Midjourney, Flux ou Imagen — a arte final entra depois, no upload" style="width:100%;resize:vertical;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.14);border-radius:10px;color:#fefefe;padding:10px 12px;font-size:14px;line-height:1.5;font-family:var(--font-mono);font-size:12.5px" style-focus="outline:none;border-color:#f1a10b;box-shadow:0 0 0 3px rgba(241,161,11,.32)"></textarea>
+          <div style="font:600 11px/1 var(--font-display);letter-spacing:.08em;text-transform:uppercase;color:#9a9d9f">agendamento</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px"><sc-for list="{{ compDays }}" as="d" hint-placeholder-count="7"><button onClick="{{ d.onClick }}" style="{{ d.style }}">{{ d.label }}</button></sc-for></div>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><input value="{{ compTime }}" onChange="{{ onCompTime }}" style="height:34px;width:100%;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.14);border-radius:10px;color:#fefefe;padding:0 12px;font-size:14px;width:96px;text-align:center;font-family:var(--font-mono)" style-focus="outline:none;border-color:#f1a10b;box-shadow:0 0 0 3px rgba(241,161,11,.32)"><sc-if value="{{ hasBest }}" hint-placeholder-val="{{ false }}"><span style="font-size:13px;color:#9a9d9f">melhores horários:</span><sc-for list="{{ compBest }}" as="b" hint-placeholder-count="3"><button onClick="{{ b.onClick }}" style="height:26px;padding:0 10px;border-radius:2px;border:0;background:rgba(246,188,3,.14);color:#fbd23a;font:600 13px/1 var(--font-display);cursor:pointer">{{ b.label }}</button></sc-for></sc-if></div>
+        </div>
+        <div style="padding:16px 20px;background:rgba(0,0,0,.2);border-left:1px solid rgba(255,255,255,.1);overflow:auto;display:flex;flex-direction:column;gap:12px">
+          <div style="font:600 11px/1 var(--font-display);letter-spacing:.08em;text-transform:uppercase;color:#9a9d9f">prévia . instagram</div>
+          <div style="background:#1f1f1f;border:1px solid rgba(255,255,255,.14);border-radius:6px;overflow:hidden">
+            <div style="display:flex;align-items:center;gap:8px;padding:10px 12px"><span style="width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#5d6367,#363d3f);display:flex;align-items:center;justify-content:center;font:600 10px/1 var(--font-display)">{{ pvIni }}</span><span style="font-weight:500;font-size:13.5px">{{ pvUser }}</span><span style="margin-left:auto;font-size:12px;color:#9a9d9f">{{ pvType }}</span></div>
+            <div style="aspect-ratio:4/5;background:repeating-linear-gradient(135deg,#2b2b2b 0 14px,#262626 14px 28px);display:flex;align-items:center;justify-content:center;color:#9a9d9f;font:12px/1.4 var(--font-mono);text-align:center;padding:20px">mídia final entra no upload</div>
+            <div style="padding:10px 12px;font-size:13.5px;line-height:1.5;white-space:pre-wrap"><span style="font-weight:500">{{ pvUser }}</span> {{ pvCap }}<div style="color:#fbd23a;margin-top:6px;font-size:13px">{{ pvTags }}</div></div>
+          </div>
+          <div style="font-size:13px;color:#bbbcbe">publica em {{ pvWhen }} . {{ pvCount }} conta(s)</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;padding:12px 20px;border-top:1px solid rgba(255,255,255,.14);background:rgba(0,0,0,.18)"><span style="font-size:12.5px;color:#9a9d9f">Publicação imediata exige mídia final anexada.</span><span style="margin-left:auto"></span>
+        <x-import component-from-global-scope="CodemixDesignSystem_95bbea.Button" variant="ghost" onClick="{{ closeComp }}" hint-size="auto,34px">cancelar</x-import>
+        <x-import component-from-global-scope="CodemixDesignSystem_95bbea.Button" variant="dark" onClick="{{ saveDraftC }}" hint-size="auto,34px">salvar rascunho</x-import>
+        <x-import component-from-global-scope="CodemixDesignSystem_95bbea.Button" variant="primary" arrow="{{ true }}" onClick="{{ scheduleC }}" hint-size="auto,34px">agendar</x-import>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute;left:50%;bottom:24px;transform:translateX(-50%);background:#363d3f;border:1px solid rgba(246,188,3,.5);border-radius:6px;padding:10px 16px;font-size:14px;box-shadow:0 3px 10px rgba(0,0,0,.4);z-index:50">{{ toast }}</div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1600,&quot;height&quot;:900},&quot;defaultEngine&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;auto&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;auto&quot;,&quot;claude&quot;,&quot;codex&quot;,&quot;gemini&quot;],&quot;section&quot;:&quot;Copiloto&quot;},&quot;startView&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;overview&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;overview&quot;,&quot;content&quot;,&quot;comments&quot;,&quot;inbox&quot;,&quot;automations&quot;,&quot;audience&quot;,&quot;prompts&quot;,&quot;skills&quot;,&quot;analytics&quot;,&quot;accounts&quot;],&quot;section&quot;:&quot;Workspace&quot;},&quot;contentMode&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;kanban&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;kanban&quot;,&quot;calendar&quot;],&quot;section&quot;:&quot;Workspace&quot;}}">
+class Component extends DCLogic {
+  ACCS = [
+    { id:'a1', user:'codemix.web', name:'Codemix — Soluções Web', ini:'CW', st:'ativo', days:41, perms:4, wh:true,
+      voice:{ tom:'Direto, prático, primeira pessoa. Sem hype; termos técnicos em inglês.', pub:'Donos de negócio e gestores que querem lançar produto digital com agentes de IA.', regras:'Nunca prometer prazo sem escopo. Sem emojis. Citar a stack quando relevante.' },
+      style:'flat charcoal #2b2b2b background, amber-to-orange splash symbol (#FFCB05 → #F58220) at 6% opacity bleeding off one edge, generous negative space for headline type, matte editorial finish, no people --style raw' },
+    { id:'a2', user:'duplod.oficial', name:'Duplo D', ini:'DD', st:'expirando', days:6, perms:4, wh:true,
+      voice:{ tom:'Acolhedor e elegante, frases curtas.', pub:'Mulheres de 25 a 45 anos que buscam moda atemporal.', regras:'Sempre mencionar o catálogo no CTA. Sem gírias.' },
+      style:'soft natural window light, burgundy #ab2930 and plum #441556 accents on slate #647883 neutrals, film grain, 85mm lens, shallow depth of field --style raw' },
+    { id:'a3', user:'vetbots.ia', name:'VetBots', ini:'VB', st:'ativo', days:52, perms:4, wh:true,
+      voice:{ tom:'Próximo e descontraído, com empatia por tutores.', pub:'Donos de clínicas veterinárias e petshops.', regras:'Nunca dar diagnóstico. Sintomas graves: transbordo humano imediato.' },
+      style:'3D mascot dog on deep teal #032930 background, copper #bf7b40 rim light, soft studio lighting, clean product-render look --style raw' },
+    { id:'a4', user:'eagency.design', name:'e:agency', ini:'EA', st:'erro', days:0, perms:1, wh:false,
+      voice:{ tom:'Criativo e objetivo.', pub:'Agências e anunciantes.', regras:'Sem promessas de resultado.' },
+      style:'high-contrast editorial layouts, cool blue-grey palette, geometric composition --style raw' }
+  ];
+  CMDS = [
+    {g:1,c:'legenda-feed',a:'[tema] [objetivo]',d:'3 variações de legenda: AIDA, storytelling e direta, com CTA.',e:'claude'},
+    {g:1,c:'carrossel',a:'[tema] [num_slides]',d:'Carrossel slide a slide: gancho, conteúdo, resumo salvável e CTA.',e:'claude'},
+    {g:1,c:'roteiro-reels',a:'[ideia] [duracao_segundos]',d:'Roteiro com tempo, fala e legenda da publicação.',e:'claude'},
+    {g:1,c:'sequencia-stories',a:'[objetivo]',d:'5 a 7 stories com enquete, reação rápida e link no último frame.',e:'claude'},
+    {g:1,c:'calendario',a:'[dias] [pilares]',d:'Matriz editorial por funil, pronta para salvar como DRAFT.',e:'claude'},
+    {g:1,c:'hashtags',a:'[nicho] [localizacao]',d:'5 a 15 hashtags qualificadas + palavras-chave de SEO.',e:'claude'},
+    {g:2,c:'prompt-foto',a:'[conceito] [aspect_ratio]',d:'Prompts fotográficos PT/EN para Midjourney v6, Flux.1 e Imagen 3.',e:'gemini'},
+    {g:2,c:'prompt-carrossel',a:'[id_do_post]',d:'Direção de arte e prompts consistentes para cada página.',e:'gemini'},
+    {g:2,c:'prompt-capa-reels',a:'[titulo_gancho]',d:'Capa 9:16 com safe zone 4:5 para tipografia.',e:'gemini'},
+    {g:2,c:'prompt-estetico',a:'[referencia_marca]',d:'Sufixo de estilo padrão (Style Reference) da conta.',e:'gemini'},
+    {g:3,c:'responder-dm',a:'[contexto_opcional]',d:'Sugere resposta humanizada ou aciona transbordo humano.',e:'gemini'},
+    {g:3,c:'moderar-comentarios',a:'[post_id] [filtro]',d:'Oculta spam, responde em lote e envia Private Reply.',e:'gemini'},
+    {g:3,c:'automacao-gatilho',a:'[palavra_chave] [link_destino]',d:'Responde no Direct quando alguém comenta a palavra-chave.',e:'codex'},
+    {g:4,c:'conta-trocar',a:'[@username]',d:'Alterna o contexto ativo do chat e da interface.',e:'codex'},
+    {g:4,c:'conta-status',a:'',d:'Saúde dos tokens, permissões e webhook de todas as contas.',e:'codex'},
+    {g:4,c:'auditoria-perfil',a:'[@username]',d:'Engajamento, melhor horário e formato campeão em 30 dias.',e:'gemini'},
+    {g:4,c:'publicar-agora',a:'[post_id]',d:'Fluxo /media → /media_publish para post com mídia vinculada.',e:'codex'},
+    {g:4,c:'debug-webhook',a:'[payload_id]',d:'Valida X-Hub-Signature-256 e sugere correção de payload ou SQL.',e:'codex'}
+  ];
+  GROUPS = {1:'Conteúdo & copywriting',2:'Prompts de imagem',3:'Atendimento & moderação',4:'Operação & multi-contas',5:'Skills do tenant'};
+  ENG = {claude:'Claude 3.7 Sonnet', codex:'Codex · GPT-4o', gemini:'Gemini 2.5 Pro'};
+  DAYS = ['seg 26','ter 27','qua 28','qui 29','sex 30','sáb 31','dom 01'];
+  METRICS = {
+    a1:{k:[['engajamento','4,8%','+0,6 pp'],['alcance 30d','86,2 mil','+12%'],['seguidores','12,4 mil','+310'],['salvamentos','1.240','+18%']],f:[['Carrossel',72],['Reels',58],['Imagem',34],['Stories',21]],h:['ter 12h','qui 19h','sáb 10h'],p:['Publicar 2 carrosséis por semana: retêm 72% contra 34% de imagem única.','Concentrar Reels de terça a quinta, entre 12h e 19h.','Ativar /automacao-gatilho com a palavra AGENTE nos Reels de maior alcance.']},
+    a2:{k:[['engajamento','3,1%','+0,2 pp'],['alcance 30d','24,8 mil','+4%'],['seguidores','5,9 mil','+84'],['salvamentos','410','+7%']],f:[['Reels',64],['Carrossel',49],['Imagem',38],['Stories',27]],h:['qua 20h','sex 12h','dom 11h'],p:['Priorizar Reels de lookbook: 64% de retenção.','Renovar o token em até 6 dias para não pausar o agendamento.','Usar caixinhas nos Stories para alimentar o calendário.']},
+    a3:{k:[['engajamento','6,2%','+1,1 pp'],['alcance 30d','132 mil','+21%'],['seguidores','18,7 mil','+940'],['salvamentos','2.380','+26%']],f:[['Reels',81],['Carrossel',66],['Imagem',41],['Stories',33]],h:['seg 19h','qua 12h','sáb 09h'],p:['Reels com mascote lideram retenção: replicar o formato semanal.','Responder DMs em até 1h: 7 pendentes hoje.','Criar carrossel de perguntas frequentes dos tutores.']}
+  };
+  seq = 10; timers = {};
+  seedPosts = [
+    {id:'p1',a:'a1',t:'REELS',s:'DRAFT',topic:'3 sinais de que seu produto precisa de um agente de IA',cap:'Seu time responde a mesma pergunta 20 vezes por dia?\n\nSe sim, o problema não é equipe. É processo.\n\nSão 3 sinais de que um agente de IA já faria diferença no seu produto. Assista até o fim.\n\nQuer ver como eu monto isso? Comente AGENTE.',tags:['#ia','#automacao','#n8n','#supabase'],pr:[],day:null,time:'',ai:'Claude'},
+    {id:'p2',a:'a1',t:'CAROUSEL',s:'PROMPT_READY',topic:'Do briefing ao deploy: meu fluxo com agentes',cap:'Briefing, UI/UX, código, SEO e GEO. O fluxo completo em 7 slides.\n\nSalve para consultar na hora de montar o seu produto.\n\nDúvida sobre alguma etapa? Responda este post.',tags:['#produtodigital','#typescript','#uiux'],pr:[
+      {t:'Slide 1 · capa',ar:'4:5',x:'Flat charcoal #2b2b2b background, oversized amber-to-orange splash symbol bleeding off the right edge at 6% opacity, negative space on the left for headline typography, matte editorial look, no people --ar 4:5 --style raw'},
+      {t:'Slides 2–6 · conteúdo',ar:'4:5',x:'Minimal technical diagram on charcoal, thin amber lines, monospaced labels, soft vignette, consistent margins for text overlay --ar 4:5 --style raw'},
+      {t:'Slide 7 · CTA',ar:'4:5',x:'Charcoal gradient field with a single amber highlight bar across the lower third, empty centre for call-to-action type --ar 4:5 --style raw'}],day:null,time:'',ai:'Gemini'},
+    {id:'p3',a:'a1',t:'IMAGE',s:'SCHEDULED',topic:'Supabase RLS sem dor: multi-tenant na prática',cap:'Multi-tenant sem vazar dado entre clientes: RLS com tenant_id em toda tabela e auth.uid() nas policies.\n\nSalve para a próxima migration.',tags:['#supabase','#postgres','#saas'],pr:[{t:'Imagem única',ar:'4:5',x:'Dark graphite desk, laptop showing a schema diagram out of focus, warm amber key light, 35mm, shallow depth of field --ar 4:5'}],day:5,time:'18:00',ai:'Claude'},
+    {id:'p4',a:'a1',t:'STORIES',s:'PUBLISHED',topic:'Bastidores: TypeScript + n8n + Supabase',cap:'Sequência de 5 stories mostrando o setup do dia.',tags:[],pr:[],day:1,time:'12:30',ai:'Claude'},
+    {id:'p5',a:'a1',t:'IMAGE',s:'FAILED',topic:'Case UtJuris: rede social jurídica',cap:'Como a UtJuris organiza conteúdo jurídico com gerenciador próprio.',tags:['#case','#utjuris'],pr:[],day:3,time:'09:00',ai:'Claude'},
+    {id:'p6',a:'a3',t:'REELS',s:'SCHEDULED',topic:'Como a IA confirma consulta sem a recepção atender',cap:'A recepção atende tutor, telefone e balcão ao mesmo tempo. Veja como o agente confirma consultas sozinho.\n\nQuer na sua clínica? Comente AGENDA.',tags:['#vet','#clinicaveterinaria','#ia'],pr:[{t:'Capa 9:16',ar:'9:16',x:'3D dog mascot waving, deep teal #032930 background, copper rim light, central safe zone for title --ar 9:16'}],day:4,time:'19:00',ai:'Claude'},
+    {id:'p7',a:'a3',t:'CAROUSEL',s:'DRAFT',topic:'5 perguntas que o tutor faz antes de agendar',cap:'',tags:[],pr:[],day:null,time:'',ai:'Claude'},
+    {id:'p8',a:'a3',t:'IMAGE',s:'PUBLISHED',topic:'Lembrete: vacina antirrábica',cap:'Vacina em dia protege o seu pet e a sua família. Agende pelo link.',tags:['#vacina','#pet'],pr:[],day:0,time:'10:00',ai:'Claude'},
+    {id:'p9',a:'a2',t:'IMAGE',s:'DRAFT',topic:'Lançamento da linha de outono',cap:'',tags:[],pr:[],day:null,time:'',ai:'Claude'},
+    {id:'p10',a:'a2',t:'STORIES',s:'SCHEDULED',topic:'Caixinha: pergunte ao Duplo D',cap:'Caixinha de perguntas sobre combinações.',tags:[],pr:[],day:5,time:'11:00',ai:'Claude'},
+    {id:'p11',a:'a4',t:'IMAGE',s:'PUBLISHED',topic:'Branding que vende: bastidores',cap:'Bastidores do processo de branding.',tags:[],pr:[],day:2,time:'15:00',ai:'Claude'}
+  ];
+  TWINS = {
+    a1:{kpi:[['conversas 30d','1.284'],['resolvidas sem humano','87%'],['tempo de resposta','4 s'],['ofertas clicadas','212']],
+      sources:[['POSTS','142 legendas e roteiros do Instagram','indexado'],['PDF','Processo de desenvolvimento com agentes.pdf','indexado'],['SITE','codemix.com.br','indexado'],['VÍDEO','Transcrições de 12 Reels','processando'],['FAQ','38 perguntas frequentes','indexado']],
+      fields:[{l:'produto digital',on:true},{l:'agentes de IA',on:true},{l:'automação com n8n',on:true},{l:'Supabase',on:true},{l:'UI/UX',on:true},{l:'SEO e GEO',on:true},{l:'jurídico',on:false},{l:'finanças pessoais',on:false}],
+      out:'Esse assunto foge do que eu domino. Posso te ajudar com produto digital, agentes de IA e automação.',
+      offers:[{n:'Guia: primeiro agente com n8n',k:'material',link:'codemix.com.br/guia',when:'pede por onde começar'},{n:'Diagnóstico de produto com IA',k:'mentoria',link:'codemix.com.br/diagnostico',when:'descreve um projeto'}],
+      presets:['Como colocar IA no meu produto?','Quanto tempo leva um MVP?','Vale usar Supabase?'],
+      qa:{'Como colocar IA no meu produto?':{g:'Integrar IA em um produto envolve várias etapas: 1. Defina o problema que a IA vai resolver. 2. Escolha um modelo (GPT, Claude, Gemini). 3. Prepare e limpe os dados. 4. Integre via API. 5. Monitore custos, latência e qualidade. Também é importante considerar privacidade, governança e…',t:['Dá pra começar pequeno e já ter resultado. Antes, me conta: o seu produto já está no ar e qual tarefa mais toma tempo do seu time hoje?','Já está no ar. O suporte responde as mesmas dúvidas o dia todo.','Então o primeiro agente é de suporte: ele lê a sua base de ajuda no Supabase, responde no chat e passa para humano quando não souber. Em 2 a 3 semanas isso roda. Quer o fluxo que eu uso no n8n?'],offer:0},
+        'Quanto tempo leva um MVP?':{g:'O tempo para desenvolver um MVP varia bastante, geralmente entre 2 e 6 meses, dependendo da complexidade, do tamanho da equipe, das tecnologias escolhidas e da clareza dos requisitos. Metodologias ágeis podem ajudar a…',t:['Depende do que entra no MVP de verdade. Qual é a única coisa que o usuário precisa conseguir fazer no primeiro dia?','Agendar um horário e receber confirmação.','Isso cabe em 4 a 6 semanas: login, agenda e confirmação automática. O resto fica para depois do uso real. Quer montar esse escopo comigo no diagnóstico?'],offer:1},
+        'Vale usar Supabase?':{g:'Supabase é uma alternativa open source ao Firebase que oferece banco Postgres, autenticação, storage e funções. Entre as vantagens estão… entre as desvantagens estão… a escolha depende do seu caso de uso.',t:['Na maioria dos produtos que eu faço, sim. Ele vai atender várias empresas ou um único cliente?','Várias empresas, multi-tenant.','Então encaixa bem: RLS com tenant_id em cada tabela isola os dados sem código extra. Tenho um post explicando as policies, te mando o link.'],offer:-1}}},
+    a2:{kpi:[['conversas 30d','342'],['resolvidas sem humano','74%'],['tempo de resposta','5 s'],['ofertas clicadas','58']],sources:[['POSTS','86 legendas do Instagram','indexado'],['PDF','Catálogo outono 2026.pdf','indexado'],['FAQ','21 perguntas frequentes','indexado']],fields:[{l:'moda atemporal',on:true},{l:'combinações',on:true},{l:'cuidados com peças',on:true},{l:'tamanhos',on:true}],out:'Sobre isso eu não consigo ajudar, mas posso te mostrar combinações e peças do catálogo.',offers:[{n:'Consultoria de estilo',k:'mentoria',link:'duplod.com.br/estilo',when:'pede ajuda para montar looks'}],presets:['Como montar um look para o trabalho?','Qual tamanho escolher?'],qa:{}},
+    a3:{kpi:[['conversas 30d','2.106'],['resolvidas sem humano','91%'],['tempo de resposta','3 s'],['ofertas clicadas','344']],sources:[['POSTS','203 legendas do Instagram','indexado'],['SITE','vetbots.com.br','indexado'],['PDF','Protocolo de atendimento.pdf','indexado'],['FAQ','54 perguntas de tutores','indexado']],fields:[{l:'agendamento',on:true},{l:'gestão de clínica',on:true},{l:'atendimento ao tutor',on:true},{l:'diagnóstico',on:false}],out:'Não posso orientar sobre diagnóstico. Para sintomas, fale com o veterinário da sua clínica.',offers:[{n:'Demonstração da VetBots',k:'demo',link:'vetbots.com.br/demo',when:'pergunta sobre a clínica'}],presets:['Como reduzir faltas nas consultas?','A IA substitui a recepção?'],qa:{}},
+    a4:{kpi:[['conversas 30d','—'],['resolvidas sem humano','—'],['tempo de resposta','—'],['ofertas clicadas','—']],sources:[],fields:[{l:'branding',on:true},{l:'publicidade',on:true}],out:'',offers:[],presets:['O que faz uma marca forte?'],qa:{}}
+  };
+  seedFlows = [
+    {id:'f1',a:'a1',name:'Material do Reels . AGENTE',on:true,stats:{sent:184,open:'71%',clicks:38,leads:41},nodes:[
+      {id:'n1',t:'trigger',kind:'comentário',text:'AGENTE',extra:'Reels · 3 sinais de que seu produto precisa de um agente'},
+      {id:'n2',t:'message',text:'Oi! Aqui está o material sobre agentes de IA, como combinado.',extra:''},
+      {id:'n3',t:'buttons',text:'Quer ver como aplico isso no seu produto?',extra:'Quero conversar, Só o material'},
+      {id:'n4',t:'condition',text:'clicou em "Quero conversar"',extra:'encerrar'},
+      {id:'n5',t:'tag',text:'lead-quente',extra:''},
+      {id:'n6',t:'handoff',text:'Lead pediu conversa. Retornar em até 1h.',extra:''}]},
+    {id:'f2',a:'a1',name:'Boas-vindas às menções de story',on:true,stats:{sent:62,open:'84%',clicks:12,leads:9},nodes:[
+      {id:'n7',t:'trigger',kind:'menção',text:'qualquer menção',extra:'stories'},
+      {id:'n8',t:'message',text:'Obrigado pela menção! Vamos compartilhar nos nossos stories.',extra:''},
+      {id:'n9',t:'delay',text:'10 min',extra:''},
+      {id:'n10',t:'ai',text:'Pergunte qual desafio do produto digital a pessoa enfrenta.',extra:'Claude'}]},
+    {id:'f3',a:'a3',name:'Demonstração por palavra AGENDA',on:true,stats:{sent:97,open:'78%',clicks:51,leads:33},nodes:[
+      {id:'n11',t:'trigger',kind:'comentário',text:'AGENDA',extra:'Reels · Como a IA confirma consulta'},
+      {id:'n12',t:'message',text:'Oi! Vamos agendar uma demonstração para a sua clínica.',extra:''},
+      {id:'n13',t:'buttons',text:'Qual o melhor período?',extra:'Manhã, Tarde'},
+      {id:'n14',t:'link',text:'vetbots.com.br/demo',extra:'agendar demonstração'}]},
+    {id:'f4',a:'a2',name:'Catálogo por resposta de story',on:false,stats:{sent:0,open:'—',clicks:0,leads:0},nodes:[
+      {id:'n15',t:'trigger',kind:'resposta de story',text:'CATÁLOGO',extra:'stories'},
+      {id:'n16',t:'message',text:'Que bom ter você por aqui! Segue o nosso catálogo.',extra:''},
+      {id:'n17',t:'link',text:'duplod.com.br/catalogo',extra:'ver catálogo'}]}
+  ];
+  seedContacts = [
+    {id:'c1',a:'a1',u:'marina.lopes.dev',tags:['lead quente'],src:'AGENTE . Reels',last:'hoje 09:12'},
+    {id:'c2',a:'a1',u:'lucas.prod',tags:['lead quente','novo'],src:'AGENTE . Reels',last:'hoje 05:55'},
+    {id:'c3',a:'a1',u:'clinica.horizonte',tags:['cliente'],src:'menção de story',last:'ontem'},
+    {id:'c4',a:'a1',u:'rafa.tech',tags:['novo'],src:'comentário',last:'hoje 08:40'},
+    {id:'c5',a:'a1',u:'dev.carla',tags:['novo'],src:'comentário',last:'hoje 07:30'},
+    {id:'c6',a:'a3',u:'tutor.bia',tags:['cliente'],src:'dm',last:'hoje 10:03'},
+    {id:'c7',a:'a3',u:'petshop.sol',tags:['lead quente'],src:'AGENDA . Reels',last:'hoje 09:30'},
+    {id:'c8',a:'a3',u:'clinica.pet.sul',tags:['lead quente','novo'],src:'comentário',last:'hoje 08:05'},
+    {id:'c9',a:'a2',u:'loja.centro',tags:['lead quente'],src:'dm',last:'hoje 11:20'}
+  ];
+  seedInts = [
+    {id:'i1',a:'a1',u:'marina.lopes.dev',t:'DM',s:'UNREAD',sent:'positivo',time:'09:12',c:'Oi! Vi o reels sobre agentes de IA. Vocês fazem integração com WhatsApp também? Tenho um SaaS de agendamento.',media:'',ai:'Oi, Marina! Faço sim: agentes integrados ao WhatsApp com n8n + Supabase. Me conta em duas linhas como é o fluxo de agendamento hoje? Com isso te passo um caminho e um prazo realista.'},
+    {id:'i2',cat:'duvida',a:'a1',u:'rafa.tech',t:'COMMENT',s:'UNREAD',sent:'neutro',time:'08:40',c:'Qual a diferença pra usar só o ChatGPT?',media:'Reels · 3 sinais de que seu produto precisa de um agente',ai:'Boa pergunta, Rafa! O chat só conversa. Um agente acessa seus dados e executa ações: agenda, consulta, atualiza. Posso detalhar em um post.'},
+    {id:'i3',cat:'spam',a:'a1',u:'promo.seguidores22',t:'COMMENT',s:'UNREAD',sent:'negativo',time:'07:55',c:'Ganhe seguidores rápido!! link na bio',media:'Carrossel · Do briefing ao deploy',ai:'Spam detectado. Ação sugerida: ocultar comentário (hide=true), sem resposta pública.',spam:true},
+    {id:'i4',a:'a1',u:'clinica.horizonte',t:'STORY_MENTION',s:'AI_REPLIED',sent:'positivo',time:'ontem',c:'Mencionou você em um story.',media:'',ai:'Obrigado pela menção! Vamos compartilhar nos nossos stories.'},
+    {id:'i5',a:'a3',u:'tutor.bia',t:'DM',s:'UNREAD',sent:'neutro',time:'10:03',c:'Meu cachorro está com febre, consigo consulta hoje?',media:'',ai:'Sinto muito pelo Thor! Vou avisar a equipe agora para atendê-la com prioridade. Pode me passar seu telefone?',esc:true},
+    {id:'i6',cat:'duvida',a:'a3',u:'petshop.sol',t:'COMMENT',s:'UNREAD',sent:'positivo',time:'09:30',c:'Quero saber os planos!',media:'Reels · Como a IA confirma consulta',ai:'Oi! Te mandei os planos por DM agora mesmo.'},
+    {id:'i7',a:'a2',u:'loja.centro',t:'DM',s:'UNREAD',sent:'positivo',time:'11:20',c:'Vocês têm representantes no Paraná?',media:'',ai:'Olá! Temos sim. Me conta sua cidade e a loja que você tem para indicarmos o contato regional.'},
+    {id:'i8',cat:'elogio',a:'a1',u:'dev.carla',t:'COMMENT',s:'UNREAD',sent:'positivo',time:'07:30',c:'Conteúdo excelente, salvei para mostrar ao time!',media:'Carrossel · Do briefing ao deploy',ai:'Obrigado, Carla! Fico feliz que seja útil para o time. Se quiser, abro a etapa de SEO e GEO em um próximo post.'},
+    {id:'i9',cat:'duvida',a:'a1',u:'startup.nuvem',t:'COMMENT',s:'UNREAD',sent:'neutro',time:'06:48',c:'Isso funciona com Supabase self-hosted?',media:'Reels · 3 sinais de que seu produto precisa de um agente',ai:'Funciona, sim. O agente acessa o Postgres por API ou conexão direta, hospedado onde você preferir. Te explico a arquitetura por DM?'},
+    {id:'i10',cat:'spam',a:'a1',u:'agente.quero',t:'COMMENT',s:'UNREAD',sent:'negativo',time:'06:10',c:'Compre seguidores baratos, acesse bit.ly/xxx',media:'Reels · 3 sinais de que seu produto precisa de um agente',ai:'Spam detectado. Ação sugerida: ocultar comentário.'},
+    {id:'i11',cat:'gatilho',a:'a1',u:'lucas.prod',t:'COMMENT',s:'UNREAD',sent:'positivo',time:'05:55',c:'AGENTE',media:'Reels · 3 sinais de que seu produto precisa de um agente',ai:'Oi, Lucas! Te enviei o material por DM.'},
+    {id:'i12',cat:'elogio',a:'a3',u:'clinica.pet.sul',t:'COMMENT',s:'UNREAD',sent:'positivo',time:'08:05',c:'Que ideia boa, queremos testar!',media:'Reels · Como a IA confirma consulta',ai:'Que bom, equipe! Te chamei por DM para combinar um teste.'}
+  ];
+  state = { twins:{}, twSrc:{}, pgQ:'', pgStage:0, pgAcc:'', pgInput:'', comp:null, flows:this.seedFlows, flowId:null, nodeId:null, addAt:null, simN:0, contacts:this.seedContacts, seg:'todos', bcast:'', cFilter:'todos', cPost:'all', rules:[{id:'r1',a:'a1',kw:'AGENTE',link:'codemix.com.br/agentes',post:'Reels · 3 sinais de que seu produto precisa de um agente',on:true},{id:'r2',a:'a3',kw:'AGENDA',link:'vetbots.com.br/demo',post:'Reels · Como a IA confirma consulta',on:true}], newKw:'', newLink:'', skillOn:{}, skillQ:'', custom:[], nsCmd:'', nsPrompt:'', view:null, mode:null, activeId:'a1', switcherOpen:false, posts:this.seedPosts, ints:this.seedInts, selId:null, tab:'cap', caps:{}, replies:{}, intId:null, voice:{}, styles:{}, copied:'', toast:'', dockW:350, input:'', selIdx:0, palOff:false, engine:null,
+    messages:[{id:'m1',role:'sys',text:'sessão iniciada . contexto @codemix.web'},{id:'m2',role:'ai',text:'Olá! Sou o copiloto do hub. Digite / para abrir as skills ou descreva o que precisa para a conta ativa.',engine:'claude',skill:'boas-vindas',done:true,saveable:false}] };
+
+  componentDidMount(){ this.msgRef=this.msgRef||null; }
+  componentDidUpdate(){ const el=this.msgRef&&this.msgRef.current; if(el) el.scrollTop=el.scrollHeight; }
+  componentWillUnmount(){ Object.values(this.timers).forEach(clearInterval); clearInterval(this.simT); }
+  msgRef = React.createRef(); inputRef = React.createRef();
+
+  allCmds(all){ const on=this.state.skillOn; const l=[...this.CMDS,...this.state.custom]; return all?l:l.filter(c=>on[c.c]!==false); }
+  modScope(acc,args){ const f={duvidas:'duvida',elogios:'elogio',spam:'spam'}; const tok=args.toLowerCase().split(/\s+/).map(t=>f[t]).find(Boolean); return this.state.ints.filter(i=>i.a===acc.id&&i.t==='COMMENT'&&i.s==='UNREAD'&&(!tok||i.cat===tok)); }
+  twinAnswer(acc,q){ const T=this.TWINS[acc.id]; if(T.qa[q]) return T.qa[q]; const f=T.fields.filter(x=>x.on).map(x=>x.l); return {g:'Sobre "'+q+'", existem várias abordagens possíveis. De forma geral, recomenda-se entender o cenário, comparar alternativas e definir prioridades. Alguns pontos importantes incluem planejamento, execução consistente e acompanhamento de resultados…',t:['Consigo te ajudar com isso. Antes, me conta um pouco do seu contexto: qual é o seu objetivo agora e o que você já tentou?','Quero resolver ainda este mês e não tentei nada.','Ótimo ponto de partida. Pelo que eu ensino sobre '+f.slice(0,2).join(' e ')+', o primeiro passo é escolher uma única ação para esta semana e medir o resultado. Quer que eu te indique o material certo para começar?'],offer:T.offers.length?0:-1}; }
+  acc(){ return this.ACCS.find(a=>a.id===this.state.activeId); }
+  voice(id){ return this.state.voice[id] || this.ACCS.find(a=>a.id===id).voice; }
+  toast(t){ this.setState({toast:t}); clearTimeout(this.tt); this.tt=setTimeout(()=>this.setState({toast:''}),2200); }
+  copy(text,key){ try{ navigator.clipboard.writeText(text); }catch(e){} this.setState({copied:key}); setTimeout(()=>this.setState(s=>s.copied===key?{copied:''}:null),1500); }
+  prefill(v){ this.setState({input:v,selIdx:0,palOff:true}); setTimeout(()=>this.inputRef.current&&this.inputRef.current.focus(),0); }
+  filtered(){ const v=this.state.input; if(!v.startsWith('/')||/\s/.test(v)) return []; const q=v.slice(1).toLowerCase(); return this.allCmds(false).filter(c=>c.c.includes(q)); }
+
+  pick(c){ this.setState({input:'/'+c.c+' ',selIdx:0,palOff:true}); setTimeout(()=>this.inputRef.current&&this.inputRef.current.focus(),0); }
+  onKey = (e)=>{
+    const f=this.filtered(), open=f.length>0&&!this.state.palOff;
+    if(open){
+      if(e.key==='ArrowDown'){ e.preventDefault(); this.setState(s=>({selIdx:(s.selIdx+1)%f.length})); return; }
+      if(e.key==='ArrowUp'){ e.preventDefault(); this.setState(s=>({selIdx:(s.selIdx-1+f.length)%f.length})); return; }
+      if(e.key==='Enter'||e.key==='Tab'){ e.preventDefault(); this.pick(f[Math.min(this.state.selIdx,f.length-1)]); return; }
+      if(e.key==='Escape'){ this.setState({palOff:true}); return; }
+    }
+    if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); this.send(); }
+  };
+  onInput = (e)=>this.setState({input:e.target.value,selIdx:0,palOff:false});
+
+  send = ()=>{
+    const raw=this.state.input.trim(); if(!raw) return;
+    let cmd='',args='',def=null;
+    if(raw[0]==='/'){ const p=raw.slice(1).split(/\s+/); cmd=p[0]; args=p.slice(1).join(' '); def=this.allCmds(false).find(c=>c.c===cmd); }
+    let acc=this.acc(); const eng=this.state.engine||this.props.defaultEngine||'auto';
+    const used=eng==='auto'?(def?def.e:'claude'):eng;
+    let full, sw=null;
+    if(raw[0]==='/'&&!def) full=`Skill "/${cmd}" não encontrada ou inativa. Digite / para ver o catálogo.`;
+    else if(!def) full=`Posso ajudar com isso para @${acc.user}. Para respostas estruturadas, use uma skill: digite / e escolha uma.`;
+    else if(cmd==='conta-trocar'){ const t=args.replace('@','').trim(); const a=this.ACCS.find(x=>x.user===t); if(a){ sw=a; acc=a; full=`Contexto alterado para @${a.user} (${a.name}).\nTom de voz e regras da conta foram carregados.`; } else full=`Conta "${args||'—'}" não encontrada. Disponíveis: ${this.ACCS.map(a=>'@'+a.user).join(', ')}.`; }
+    else full=this.gen(cmd,args,acc);
+    const mod=(def&&cmd==='moderar-comentarios')?this.modScope(acc,args):[]; const trig=(def&&cmd==='automacao-gatilho'&&args.trim())?args.trim().split(/\s+/):null; const accId=acc.id;
+    const mid='m'+(++this.seq), uid='u'+this.seq;
+    const um={id:uid,role:'user',text:raw}, am={id:mid,role:'ai',text:'',engine:used,skill:def?'/'+cmd:'chat',done:false,saveable:!!def&&def.g===1,cmd,args,full};
+    this.setState(s=>({messages:[...s.messages,um,am],input:'',palOff:false,...(sw?{activeId:sw.id,selId:null,intId:null}:{}),...(mod.length?{ints:s.ints.map(i=>mod.find(x=>x.id===i.id)?(i.cat==='spam'?{...i,s:'ARCHIVED',hidden:true}:{...i,s:'AI_REPLIED'}):i)}:{}),...(trig?{rules:[...s.rules,{id:'r'+mid,a:accId,kw:trig[0].toUpperCase(),link:trig[1]||'(definir destino)',post:'todos os posts',on:true}]}:{})}));
+    let n=0; this.timers[mid]=setInterval(()=>{ n+=14; const done=n>=full.length; this.setState(s=>({messages:s.messages.map(m=>m.id===mid?{...m,text:full.slice(0,n),done}:m)})); if(done){ clearInterval(this.timers[mid]); } },22);
+  };
+
+  saveDraft(m){
+    const T={'legenda-feed':'IMAGE',carrossel:'CAROUSEL','roteiro-reels':'REELS','sequencia-stories':'STORIES'};
+    const p={id:'n'+(++this.seq),a:this.state.activeId,t:T[m.cmd]||'IMAGE',s:'DRAFT',topic:(m.args||m.skill).slice(0,70),cap:m.full,tags:[],pr:[],day:null,time:'',ai:this.ENG[m.engine].split(' ')[0]};
+    this.setState(s=>({posts:[p,...s.posts],view:'content',selId:p.id,tab:'cap'})); this.toast('Rascunho salvo em conteúdo');
+  }
+
+  gen(cmd,args,acc){
+    const v=this.voice(acc.id), a=args.trim(), u='@'+acc.user, tema=a||'seu tema';
+    const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
+    const nums=a.match(/\d+/g);
+    switch(cmd){
+      case 'legenda-feed': return `3 variações para ${u}\ntom aplicado: ${v.tom}\n\n① AIDA\n${cap(tema)} está custando mais do que parece.\nQuando o processo roda sozinho, o time volta a pensar em produto.\nEu monto isso com agentes, n8n e Supabase, sem enrolação.\nSalve este post e comente QUERO para receber o passo a passo.\n\n② Storytelling\nSemana passada um cliente me contou que perdia 3 horas por dia com ${tema}. Hoje isso leva 4 minutos. O que mudou foi o fluxo, não a equipe. Quer ver como?\n\n③ Direta\n${cap(tema)}: o que funciona na prática. Três ajustes, zero enrolação. Link na bio.`;
+      case 'carrossel': { const n=Math.max(4,Math.min(10,+(nums&&nums[nums.length-1])||7)); const t=a.replace(/\s*\d+\s*$/,'')||'seu tema'; let o=`Carrossel de ${n} slides · ${u}\n\nSlide 1 · Gancho\n"${cap(t)}: o erro que quase todo mundo comete."\n`; for(let i=2;i<=n-2;i++) o+=`\nSlide ${i} · Conteúdo\nPonto ${i-1}: ação concreta, um exemplo e um número.\n`; o+=`\nSlide ${n-1} · Resumo salvável\nOs ${n-3} pontos em uma lista para guardar.\n\nSlide ${n} · CTA\nSalve, compartilhe e comente QUERO para receber o material.\n\nLegenda\n${cap(t)} em ${n} slides. Salve para aplicar depois.`; return o; }
+      case 'roteiro-reels': return `Roteiro de Reels · ${u}\nideia: ${tema}\n\ntempo | cena | fala / texto em tela\n0–3s | hook visual | "Ninguém te conta isso sobre ${tema}."\n3–15s | retenção | três erros comuns, um corte a cada 2s\n15–30s | entrega | a solução em passo único, tela do produto\nfinal | loop | volta ao hook: "Agora você sabe."\n\nLegenda\n${cap(tema)} em 30 segundos. Comente AGENTE para o checklist.`;
+      case 'sequencia-stories': return `Sequência de 6 stories · ${u}\nobjetivo: ${a||'engajamento'}\n\n1 · Enquete: "Você já passou por isso?"\n2 · Contexto em 1 frase, texto grande\n3 · Reação rápida (slider de emoji)\n4 · Prova: print ou bastidor\n5 · Caixinha: "Qual sua maior dúvida?"\n6 · CTA com link estratégico no último frame`;
+      case 'calendario': return `Calendário · ${nums?nums[0]:7} dias · ${u}\n\nseg | Reels | topo · gancho sobre ${tema}\nter | Carrossel | meio · passo a passo\nqua | Stories | caixinha de dúvidas\nqui | Feed | meio · caso real\nsex | Reels | fundo · demo do produto\nsáb | Stories | enquete leve\ndom | Feed | topo · reflexão da semana\n\nSalve como rascunho para criar os posts DRAFT.`;
+      case 'hashtags': return `Hashtags · ${a||'nicho'}\n\n#produtodigital #iaparanegocios #automacao #n8n #supabase #typescript #uiux #saas #agentesdeia #desenvolvimentoweb\n\nSEO nativo: "desenvolvimento de produto digital", "automação com IA", "agentes de IA para empresas"`;
+      case 'prompt-foto': return `Prompt de foto · ${tema}\n\nEN\nEditorial photograph of ${tema}, 50mm lens, f/2.0, volumetric side light, matte texture, balanced composition with negative space ${acc.style} --ar ${(nums&&a.includes(':'))?a.match(/\d+:\d+/)[0]:'4:5'}\n\nPT\nFotografia editorial de ${tema}, lente 50mm, luz lateral volumétrica, textura fosca, composição com respiro.\n\nSalvo em image_prompts. Status do post: PROMPT_READY.`;
+      case 'prompt-carrossel': return `Direção de arte do carrossel\npaleta: ${acc.style.split(',')[0]}\nconsistência: mesmo fundo, margens de 8%, tipografia posterior.\n\nPágina 1 · capa com respiro à esquerda\nPáginas 2–N · composição limpa, acento único\nÚltima · campo livre para CTA`;
+      case 'prompt-capa-reels': return `Capa 9:16 · ${tema}\n\nVertical cover, subject in lower third, empty central safe zone (4:5 feed crop) for typography, ${acc.style} --ar 9:16`;
+      case 'prompt-estetico': return `Style Reference · ${u}\n\n${acc.style}\n\nAnexado automaticamente em toda geração de prompt desta conta.`;
+      case 'responder-dm': { const d=this.state.ints.find(i=>i.a===acc.id&&i.t==='DM'&&i.s==='UNREAD'); return d?`DM aberta: @${d.u}\n"${d.c}"\n\nResposta sugerida (${v.tom.split('.')[0].toLowerCase()}):\n${d.ai}\n\n${d.esc?'Atenção: assunto sensível. Recomendo transbordo para humano.':'Pode enviar pelo Inbox em 1 clique.'}`:`Nenhuma DM não lida em ${u}.`; }
+      case 'moderar-comentarios': { const sc=this.modScope(acc,a); if(!sc.length) return 'Moderação · '+u+'\n\nNenhum comentário pendente para este filtro.'; const sp=sc.filter(x=>x.cat==='spam').length, gt=sc.filter(x=>x.cat==='gatilho').length, rs=sc.length-sp; return 'Moderação · '+u+'\nfiltro: '+(a||'todos')+'\n\n'+sp+' spam oculto(s) (POST /{comment-id}?hide=true)\n'+rs+' resposta(s) pública(s) publicada(s)\n'+gt+' Private Reply enviada(s) por DM a leads com palavra-chave\n\nAplicado na aba comentários.'; }
+      case 'automacao-gatilho': return `Regra criada · ${u}\ngatilho: comentário com "${a.split(' ')[0]||'QUERO'}"\nação: DM automática com link ${a.split(' ')[1]||'(informar destino)'}\nwebhook: ativo`;
+      case 'conta-status': return `Saúde dos tokens · tenant Codemix\n\n`+this.ACCS.map(x=>`@${x.user} · ${x.st==='ativo'?'ativo':x.st==='expirando'?'expirando':'erro'} · ${x.days} dias · ${x.perms}/4 permissões · webhook ${x.wh?'ok':'falha'}`).join('\n')+`\n\nAção sugerida: renovar @duplod.oficial e reconectar @eagency.design.`;
+      case 'auditoria-perfil': { const m=this.METRICS[acc.id]; return m?`Auditoria · ${u} · 30 dias\n\nengajamento ${m.k[0][1]} (${m.k[0][2]})\nformato campeão: ${m.f[0][0]} (${m.f[0][1]}% de retenção)\nmelhores horários: ${m.h.join(', ')}\n\nPlano de ação\n`+m.p.map((x,i)=>`${i+1}. ${x}`).join('\n'):`Sem dados: token de ${u} com erro.`; }
+      case 'publicar-agora': return `Post ${a||'(informe o id)'} sem mídia vinculada.\nAnexe a arte final no editor do post; depois executo /media → /media_publish.`;
+      case 'debug-webhook': return `Payload ${a||'último'} inspecionado\n\nX-Hub-Signature-256: válida\ncampo "entry[0].messaging" ausente no evento de comentário\n\ncorreção sugerida\nselect * from ig_interactions where external_id = '${a||'…'}';`;
+      default: { const cu=this.state.custom.find(x=>x.c===cmd); return cu?('Skill do tenant /'+cmd+'\n\nsystem prompt aplicado:\n'+cu.sys+'\n\nentrada: '+(a||'—')+'\ncontexto: '+u):'Skill executada.'; }
+    }
+  }
+
+  renderVals(){
+    const st=this.state, P=this.props, A=this.ACCS, acc=this.acc();
+    const view=st.view||P.startView||'overview', mode=st.mode||P.contentMode||'kanban', engine=st.engine||P.defaultEngine||'auto';
+    const TONE={ativo:['Ativo','#7bbf4a'],expirando:['Expirando','#f1a10b'],erro:['Erro','#e8604f']};
+    const PS={DRAFT:['rascunho','#bbbcbe'],PROMPT_READY:['prompt pronto','#6fb0d6'],SCHEDULED:['agendado','#fbd23a'],PUBLISHED:['publicado','#7bbf4a'],FAILED:['falhou','#e8604f']};
+    const TY={IMAGE:'Imagem',CAROUSEL:'Carrossel',REELS:'Reels',STORIES:'Stories'};
+    const ITY={DM:'DM',COMMENT:'Comentário',STORY_MENTION:'Menção'};
+    const IST={UNREAD:['não lida','#f6bc03'],AI_REPLIED:['respondida pela ia','#7bbf4a'],HUMAN_ESCALATED:['escalada','#6fb0d6'],ARCHIVED:['arquivada','#9a9d9f']};
+    const dot=c=>({width:8,height:8,borderRadius:'50%',background:c,flex:'none'});
+    const av=(s,on)=>({width:s,height:s,borderRadius:'50%',background:'linear-gradient(135deg,#5d6367,#363d3f)',display:'flex',alignItems:'center',justifyContent:'center',font:'600 '+Math.round(s*.38)+'px/1 var(--font-display)',color:'#fefefe',flex:'none',boxShadow:on?'0 0 0 2px #2b2b2b,0 0 0 4px #f1a10b':'none'});
+    const unread=id=>st.ints.filter(i=>i.a===id&&i.s==='UNREAD').length;
+    const posts=st.posts.filter(p=>p.a===acc.id), ints=st.ints.filter(i=>i.a===acc.id);
+    const tone=TONE[acc.st];
+    const set=o=>()=>this.setState(o);
+    const card=p=>({id:p.id,topic:p.topic,type:TY[p.t],statusLabel:PS[p.s][0],dot:dot(PS[p.s][1]),time:p.time,
+      meta:p.day!==null?this.DAYS[p.day]+(p.time?' . '+p.time:''):(p.pr.length?p.pr.length+' prompt'+(p.pr.length>1?'s':''):'sem data'),
+      onClick:()=>this.setState({selId:p.id,tab:'cap'}),
+      style:{display:'flex',flexDirection:'column',gap:8,alignItems:'flex-start',padding:10,background:st.selId===p.id?'rgba(246,188,3,.12)':'#2b2b2b',border:'1px solid '+(st.selId===p.id?'#f1a10b':'rgba(255,255,255,.14)'),borderRadius:6,color:'#fefefe',cursor:'pointer',width:'100%'},
+      chip:{display:'flex',flexDirection:'column',gap:4,alignItems:'flex-start',padding:'7px 8px',background:st.selId===p.id?'rgba(246,188,3,.12)':'#2b2b2b',border:'1px solid '+(st.selId===p.id?'#f1a10b':'rgba(255,255,255,.14)'),borderRadius:4,color:'#fefefe',cursor:'pointer',width:'100%'}});
+    const segBtn=on=>({height:26,padding:'0 12px',border:0,borderRadius:4,background:on?'#f6bc03':'transparent',color:on?'#2b2b2b':'#d4d4d4',fontWeight:on?600:400,fontSize:13,cursor:'pointer',flex:1});
+
+    // nav
+    const NAV=[['content','conteúdo',0],['inbox','inbox',unread(acc.id)],['prompts','prompt studio',0],['analytics','analytics',0],['accounts','contas',0]];
+    const navList=NAV.map(([k,l,c])=>({label:l,count:c,hasCount:c>0,dot:dot(view===k?'#f6bc03':'rgba(255,255,255,.2)'),onClick:set({view:k,switcherOpen:false}),
+      style:{display:'flex',alignItems:'center',gap:10,padding:'9px 10px',border:0,borderRadius:4,background:view===k?'rgba(246,188,3,.12)':'transparent',color:view===k?'#fbd23a':'#e6e6e6',fontSize:15,cursor:'pointer',fontWeight:view===k?500:400}}));
+    const TT={twin:['versão','digital . ia treinada pela marca'],automations:['automações','. fluxos de dm'],audience:['audiência','& transmissões'],overview:['visão','geral . '+acc.name],comments:['comentários','& moderação . graph api'],skills:['skills','& comandos /'],content:['conteúdo','& agendamento'],inbox:['inbox','unificado . dms e comentários'],prompts:['prompt','studio . imagens'],analytics:['analytics','. insights api'],accounts:['contas','& tom de voz']}[view];
+    const accList=A.map(a=>({user:a.user,ini:a.ini,toneLabel:TONE[a.st][0],dot:dot(TONE[a.st][1]),unread:unread(a.id),hasUnread:unread(a.id)>0,avStyle:av(30,a.id===acc.id),
+      rowStyle:{display:'flex',alignItems:'center',gap:10,padding:'7px 8px',background:a.id===acc.id?'rgba(246,188,3,.14)':'transparent',border:0,borderRadius:4,color:'#fefefe',cursor:'pointer'},
+      onPick:()=>this.setState({activeId:a.id,switcherOpen:false,selId:null,intId:null,messages:[...st.messages,{id:'s'+(++this.seq),role:'sys',text:'contexto alterado para @'+a.user}]})}));
+
+    // content
+    const IP={'layout-dashboard':'<rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/>','calendar-days':'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"/>','message-circle':'<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>','inbox':'<path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>','image':'<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.09-3.09a2 2 0 0 0-2.82 0L6 21"/>','sparkles':'<path d="M9.94 15.5A2 2 0 0 0 8.5 14.06l-6.14-1.58a.5.5 0 0 1 0-.96L8.5 9.94A2 2 0 0 0 9.94 8.5l1.58-6.14a.5.5 0 0 1 .96 0l1.58 6.14a2 2 0 0 0 1.44 1.44l6.14 1.58a.5.5 0 0 1 0 .96l-6.14 1.58a2 2 0 0 0-1.44 1.44l-1.58 6.14a.5.5 0 0 1-.96 0z"/>','chart-column':'<path d="M3 3v16a2 2 0 0 0 2 2h16M18 17V9M13 17V5M8 17v-3"/>','at-sign':'<circle cx="12" cy="12" r="4"/><path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-4 8"/>','workflow':'<rect x="3" y="3" width="8" height="8" rx="2"/><path d="M7 11v4a2 2 0 0 0 2 2h4"/><rect x="13" y="13" width="8" height="8" rx="2"/>','bot':'<path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2M20 14h2M15 13v2M9 13v2"/>','users':'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>'};
+    const ico=(n,on)=>{ const u='url("data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+(IP[n]||'')+'</svg>')+'") center/contain no-repeat'; return {width:16,height:16,flex:'none',background:on?'#f6bc03':'#bbbcbe',WebkitMask:u,mask:u}; };
+    const CATS={duvida:['dúvida','#6fb0d6'],elogio:['elogio','#7bbf4a'],spam:['spam','#e8604f'],gatilho:['gatilho','#fbd23a']};
+    const cs=ints.filter(i=>i.t==='COMMENT');
+    const unrCom=cs.filter(i=>i.s==='UNREAD').length, unrDm=ints.filter(i=>i.t!=='COMMENT'&&i.s==='UNREAD').length;
+    const mk=(k,l,ic,c)=>({label:l,icon:ico(ic,view===k),count:c||0,hasCount:!!c,onClick:set({view:k,switcherOpen:false}),style:{display:'flex',alignItems:'center',gap:10,height:34,padding:'0 10px',border:0,borderRadius:4,background:view===k?'rgba(246,188,3,.12)':'transparent',color:view===k?'#fbd23a':'#e6e6e6',fontSize:14.5,cursor:'pointer',fontWeight:view===k?500:400,width:'100%',textAlign:'left'}});
+    const navGroups=[{title:'operação',items:[mk('overview','visão geral','layout-dashboard'),mk('content','conteúdo','calendar-days'),mk('comments','comentários','message-circle',unrCom),mk('inbox','inbox unificado','inbox',unrDm+unrCom)]},{title:'engajamento',items:[mk('twin','versão digital','bot'),mk('automations','automações','workflow'),mk('audience','audiência','users')]},{title:'criação',items:[mk('prompts','prompt studio','image'),mk('skills','skills & comandos','sparkles')]},{title:'análise',items:[mk('analytics','analytics','chart-column')]},{title:'configuração',items:[mk('accounts','contas & tom de voz','at-sign')]}];
+    const tokBar={display:'block',height:'100%',width:Math.round(acc.days/60*100)+'%',background:tone[1]};
+    // overview
+    const att=[]; const pushA=(n,l,c,v)=>{ if(n>0) att.push({count:n,label:l,dot:dot(c),onClick:set({view:v})}); };
+    pushA(unrCom,'comentários aguardando resposta','#fbd23a','comments');
+    pushA(unrDm,'dms e menções não lidas','#6fb0d6','inbox');
+    pushA(posts.filter(p=>p.s==='DRAFT'&&p.pr.length===0).length,'rascunhos sem prompt de imagem','#bbbcbe','content');
+    pushA(posts.filter(p=>p.s==='FAILED').length,'post com falha de publicação','#e8604f','content');
+    pushA(acc.st!=='ativo'?1:0,acc.st==='erro'?'token inválido: reconecte a conta':'token expira em '+acc.days+' dias',TONE[acc.st][1],'accounts');
+    const agenda=posts.filter(p=>p.day!==null&&(p.s==='SCHEDULED'||p.s==='PUBLISHED'||p.s==='FAILED')).sort((a,b)=>a.day-b.day||(a.time<b.time?-1:1)).map(p=>({when:this.DAYS[p.day]+' . '+p.time,topic:p.topic,type:TY[p.t],statusLabel:PS[p.s][0],dot:dot(PS[p.s][1]),onClick:set({view:'content',selId:p.id,tab:'cap'})}));
+    const ovAccs=A.map(a=>({user:a.user,name:a.name,ini:a.ini,av:av(30,a.id===acc.id),toneLabel:TONE[a.st][0],dot:dot(TONE[a.st][1]),days:a.st==='erro'?'—':a.days+' dias',unread:unread(a.id),sched:st.posts.filter(p=>p.a===a.id&&p.s==='SCHEDULED').length,onClick:set({activeId:a.id,selId:null,intId:null}),style:{display:'grid',gridTemplateColumns:'minmax(0,1.6fr) 100px 80px 80px 90px',alignItems:'center',gap:10,padding:'10px 14px',background:a.id===acc.id?'rgba(246,188,3,.08)':'transparent',border:0,borderTop:'1px solid rgba(255,255,255,.08)',color:'#fefefe',cursor:'pointer',width:'100%',textAlign:'left',fontSize:14}}));
+    // comments
+    const cLabels=[...new Set(cs.map(i=>i.media))];
+    const cPostSel=cLabels.includes(st.cPost)?st.cPost:'all';
+    const cPosts=[{key:'all',label:'todos os posts'},...cLabels.map(l=>({key:l,label:l}))].map(p=>{ const l=cs.filter(i=>p.key==='all'||i.media===p.key); const on=cPostSel===p.key; return {label:p.label,count:l.length,unread:l.filter(i=>i.s==='UNREAD').length,onClick:set({cPost:p.key}),style:{display:'flex',flexDirection:'column',gap:3,alignItems:'flex-start',padding:'8px 12px',background:on?'rgba(246,188,3,.12)':'rgba(255,255,255,.04)',border:'1px solid '+(on?'#f1a10b':'rgba(255,255,255,.14)'),borderRadius:6,color:'#fefefe',cursor:'pointer',maxWidth:280}}; });
+    const scope=cs.filter(i=>cPostSel==='all'||i.media===cPostSel);
+    const cFilters=[['todos','todos'],['duvida','dúvidas'],['elogio','elogios'],['spam','spam'],['gatilho','gatilhos']].map(([k,l])=>{ const n=scope.filter(i=>k==='todos'||i.cat===k).length, on=st.cFilter===k; return {label:l+' '+n,onClick:set({cFilter:k}),style:{height:28,padding:'0 12px',borderRadius:999,border:'1px solid '+(on?'#f1a10b':'rgba(255,255,255,.18)'),background:on?'rgba(246,188,3,.16)':'transparent',color:on?'#fbd23a':'#d4d4d4',fontSize:13,cursor:'pointer'}}; });
+    const upd=(ids,patch,msg)=>{ this.setState(s=>({ints:s.ints.map(i=>ids.includes(i.id)?{...i,...patch}:i)})); this.toast(msg); };
+    const spamOpen=scope.filter(i=>i.s==='UNREAD'&&i.cat==='spam'), replyOpen=scope.filter(i=>i.s==='UNREAD'&&i.cat!=='spam');
+    const cItems=scope.filter(i=>st.cFilter==='todos'||i.cat===st.cFilter).map(i=>{ const sp=i.cat==='spam'; return {user:i.u,ini:i.u[0].toUpperCase(),av:av(26,false),time:i.time,text:i.c,cat:CATS[i.cat][0],catStyle:{font:'600 10.5px/1 var(--font-display)',letterSpacing:'.08em',textTransform:'uppercase',padding:'3px 6px',borderRadius:2,color:CATS[i.cat][1],boxShadow:'inset 0 0 0 1px '+CATS[i.cat][1]},post:i.media,ai:i.ai,open:i.s==='UNREAD',closed:i.s!=='UNREAD',closedNote:i.hidden?'comentário ocultado (hide=true)':i.dm?'private reply enviada por dm':i.s==='AI_REPLIED'?'resposta pública publicada':IST[i.s][0],sugLabel:sp?'ação sugerida':'resposta da versão digital',primaryLabel:sp?'ocultar comentário':'responder',showSec:!sp,onPrimary:()=>sp?upd([i.id],{s:'ARCHIVED',hidden:true},'Comentário ocultado'):upd([i.id],{s:'AI_REPLIED'},'Resposta pública publicada'),onDm:()=>upd([i.id],{s:'AI_REPLIED',dm:true},'Private Reply enviada por DM'),onHide:()=>upd([i.id],{s:'ARCHIVED',hidden:true},'Comentário ocultado'),style:{background:'rgba(255,255,255,.04)',border:'1px solid rgba(255,255,255,.14)',borderRadius:6,padding:14,display:'flex',flexDirection:'column',gap:10,opacity:i.s==='UNREAD'?1:.7}}; });
+    const batchStyle=n=>({height:30,padding:'0 12px',borderRadius:4,border:'1px solid rgba(255,255,255,.2)',background:'rgba(255,255,255,.06)',color:'#fefefe',fontSize:13,cursor:n?'pointer':'not-allowed',opacity:n?1:.4});
+    const accRules=st.rules.filter(r=>r.a===acc.id).map(r=>({kw:r.kw,link:r.link,post:r.post,tg:r.on?'ativa':'pausada',tgStyle:{height:24,padding:'0 10px',borderRadius:999,border:'1px solid '+(r.on?'#7bbf4a':'rgba(255,255,255,.2)'),background:'transparent',color:r.on?'#7bbf4a':'#bbbcbe',fontSize:12.5,cursor:'pointer'},onToggle:()=>this.setState(s=>({rules:s.rules.map(x=>x.id===r.id?{...x,on:!x.on}:x)}))}));
+    // skills
+    const sq=(st.skillQ||'').toLowerCase(), skillList=[]; let lg=0;
+    this.allCmds(true).filter(c=>!sq||c.c.includes(sq)||c.d.toLowerCase().includes(sq)).forEach(c=>{ if(c.g!==lg){ lg=c.g; skillList.push({isHeader:true,isRow:false,label:this.GROUPS[c.g]}); } const on=st.skillOn[c.c]!==false; skillList.push({isHeader:false,isRow:true,cmd:c.c,args:c.a,desc:c.d,eng:c.e,tg:on?'ativa':'inativa',tgStyle:{height:26,padding:'0 10px',borderRadius:999,border:'1px solid '+(on?'#7bbf4a':'rgba(255,255,255,.2)'),background:'transparent',color:on?'#7bbf4a':'#bbbcbe',fontSize:12.5,cursor:'pointer'},onToggle:()=>this.setState(s=>({skillOn:{...s.skillOn,[c.c]:!on}})),onRun:()=>this.prefill('/'+c.c+' '),style:{background:'rgba(255,255,255,.04)',border:'1px solid rgba(255,255,255,.14)',borderRadius:6,padding:'10px 12px',display:'flex',flexDirection:'column',gap:6,opacity:on?1:.55}}); });
+    const envs=[['.ai-skills/registry.json','fonte única da verdade'],['.claude/commands','/project:legenda-feed'],['.gemini/skills','Gemini CLI . Antigravity'],['.codex/skills.yaml','function schemas']].map(([p,d])=>({path:p,desc:d}));
+    const events=[['10:03','messages . DM',true,'200 . 84 ms'],['09:30','comments . COMMENT',true,'200 . 61 ms'],['08:12','comments . COMMENT',false,'401 . assinatura X-Hub-Signature-256 inválida'],['07:55','mentions . STORY_MENTION',true,'200 . 72 ms']].map(([t,e,ok,n])=>({time:t,ev:e,note:n,dot:dot(ok?'#7bbf4a':'#e8604f')}));
+    // versão digital (versio-like)
+    const TW=this.TWINS[acc.id], tw={mode:'aprovacao',style:'orientacao',ch:{dm:true,com:true,bio:false},fields:TW.fields,...(st.twins[acc.id]||{})};
+    const setTw=p=>this.setState(s=>({twins:{...s.twins,[acc.id]:{...(s.twins[acc.id]||{}),...p}}}));
+    const srcRaw=st.twSrc[acc.id]||TW.sources;
+    const twSources=srcRaw.map(x=>({type:x[0],name:x[1],status:x[2],dot:dot(x[2]==='indexado'?'#7bbf4a':'#f1a10b')}));
+    const twPct=srcRaw.length?Math.round(srcRaw.filter(x=>x[2]==='indexado').length/srcRaw.length*100):0;
+    const addSrc=(type,name)=>()=>{ const id=acc.id; this.setState(s=>({twSrc:{...s.twSrc,[id]:[...(s.twSrc[id]||this.TWINS[id].sources),[type,name,'processando']]}})); this.toast('Fonte adicionada · indexando'); setTimeout(()=>this.setState(s=>({twSrc:{...s.twSrc,[id]:(s.twSrc[id]||[]).map(x=>x[1]===name?[x[0],x[1],'indexado']:x)}})),2200); };
+    const segS=on=>({height:28,padding:'0 12px',borderRadius:999,border:'1px solid '+(on?'#f1a10b':'rgba(255,255,255,.18)'),background:on?'rgba(246,188,3,.16)':'transparent',color:on?'#fbd23a':'#d4d4d4',fontSize:13,cursor:'pointer'});
+    const twModes=[['auto','automático'],['aprovacao','aprovação humana'],['off','desligada']].map(([k,l])=>({label:l,style:segS(tw.mode===k),onClick:()=>setTw({mode:k})}));
+    const twStyles=[['orientacao','orientação . pergunta o contexto antes'],['informacao','informação . responde direto']].map(([k,l])=>({label:l,style:segS(tw.style===k),onClick:()=>setTw({style:k})}));
+    const twCh=[['dm','DMs'],['com','comentários'],['bio','página pública . link na bio']].map(([k,l])=>({label:l,style:segS(tw.ch[k]),onClick:()=>setTw({ch:{...tw.ch,[k]:!tw.ch[k]}})}));
+    const twFields=tw.fields.map((x,i)=>({label:x.l,style:{...segS(x.on),textDecoration:x.on?'none':'line-through'},onClick:()=>setTw({fields:tw.fields.map((y,j)=>j===i?{...y,on:!y.on}:y)})}));
+    const pgActive=st.pgAcc===acc.id&&st.pgQ;
+    const ans=pgActive?this.twinAnswer(acc,st.pgQ):null;
+    const twMsgs=ans?(tw.style==='orientacao'?[[1,ans.t[0]],[0,ans.t[1]],[1,ans.t[2]]]:[[1,ans.t[2]]]).map(([b,x])=>({isBot:!!b,isUser:!b,text:x})):[];
+    const offer=ans&&ans.offer>=0?TW.offers[ans.offer]:null;
+    const ask=q=>{ if(!q.trim()) return; this.setState({pgQ:q.trim(),pgStage:1,pgAcc:acc.id,pgInput:''}); clearTimeout(this.pgT); this.pgT=setTimeout(()=>this.setState({pgStage:2}),800); };
+    // automations (manychat-like)
+    const NT={trigger:['gatilho',[['palavra-chave','text',0],['alcance (post ou story)','extra',0]]],message:['mensagem',[['mensagem','text',1]]],buttons:['botões',[['mensagem','text',1],['opções (separe por vírgula)','extra',0]]],delay:['atraso',[['espera','text',0]]],condition:['condição',[['se','text',0],['senão','extra',0]]],tag:['tag',[['tag aplicada','text',0]]],ai:['ia responde',[['instrução ao agente','text',1],['motor','extra',0]]],link:['link',[['url de destino','text',0],['rótulo do botão','extra',0]]],handoff:['humano',[['nota para o atendente','text',1]]]};
+    const KINDS=['comentário','resposta de story','dm','menção'];
+    const DEF={message:['Nova mensagem.',''],buttons:['Escolha uma opção:','Sim, Não'],delay:['10 min',''],condition:['respondeu','encerrar'],tag:['lead-quente',''],ai:['Responda com o tom de voz da conta.','Claude'],link:['codemix.com.br','saiba mais'],handoff:['Encaminhar para atendimento humano.','']};
+    const LC={trigger:'#fbd23a',ai:'#6fb0d6',handoff:'#e8604f',tag:'#7bbf4a'};
+    const flows=st.flows.filter(x=>x.a===acc.id), flow=flows.find(x=>x.id===st.flowId)||flows[0];
+    const patchFlow=fn=>this.setState(s=>({flows:s.flows.map(x=>x.id===flow.id?fn(x):x)}));
+    const flowList=flows.map(x=>({name:x.name,trig:x.nodes[0].kind+' . '+x.nodes[0].text,sent:x.stats.sent+' enviados',tg:x.on?'ativa':'pausada',tgStyle:{height:24,padding:'0 10px',borderRadius:999,border:'1px solid '+(x.on?'#7bbf4a':'rgba(255,255,255,.2)'),background:'transparent',color:x.on?'#7bbf4a':'#bbbcbe',fontSize:12.5,cursor:'pointer'},onToggle:e=>{ e.stopPropagation(); this.setState(s=>({flows:s.flows.map(y=>y.id===x.id?{...y,on:!y.on}:y)})); },onClick:()=>this.setState({flowId:x.id,nodeId:null,simN:0,addAt:null}),style:{padding:'10px 12px',background:flow&&flow.id===x.id?'rgba(246,188,3,.1)':'rgba(255,255,255,.04)',border:'1px solid '+(flow&&flow.id===x.id?'#f1a10b':'rgba(255,255,255,.14)'),borderRadius:6,display:'flex',flexDirection:'column',gap:6,cursor:'pointer'}}));
+    const mkFlow=kind=>()=>{ const id='f'+(++this.seq); this.setState(s=>({flows:[...s.flows,{id,a:acc.id,name:'Nova automação . '+kind,on:false,stats:{sent:0,open:'—',clicks:0,leads:0},nodes:[{id:'n'+(++this.seq),t:'trigger',kind,text:'QUERO',extra:'todos os posts'},{id:'n'+(++this.seq),t:'message',text:'Oi! Obrigado pelo interesse. Como posso ajudar?',extra:''}]}],flowId:id,nodeId:null,simN:0})); };
+    const flowTemplates=['comentário','resposta de story','dm'].map(k=>({label:'+ '+k+' → dm',onClick:mkFlow(k)}));
+    const summ=n=>({trigger:()=>n.kind+' com “'+n.text+'”'+(n.extra?' . '+n.extra:''),message:()=>n.text,buttons:()=>n.text+'  ['+n.extra.split(',').map(x=>x.trim()).join(' | ')+']',delay:()=>'aguarda '+n.text,condition:()=>'se '+n.text+' . senão '+n.extra,tag:()=>'aplicar tag “'+n.text+'”',ai:()=>n.text+' ('+n.extra+')',link:()=>n.extra+' → '+n.text,handoff:()=>n.text}[n.t]());
+    const nodeSel=flow?flow.nodes.find(n=>n.id===st.nodeId):null;
+    const nodeList=flow?flow.nodes.map((n,i)=>({label:NT[n.t][0],summary:summ(n),labelStyle:{font:'600 11px/1 var(--font-display)',letterSpacing:'.08em',textTransform:'uppercase',color:LC[n.t]||'#bbbcbe'},cardStyle:{width:'100%',display:'flex',flexDirection:'column',gap:6,alignItems:'flex-start',padding:'12px 14px',background:st.nodeId===n.id?'rgba(246,188,3,.1)':'#2b2b2b',border:'1px solid '+(st.nodeId===n.id?'#f1a10b':'rgba(255,255,255,.18)'),borderRadius:6,color:'#fefefe',cursor:'pointer',textAlign:'left',fontSize:14,lineHeight:1.4},onClick:set({nodeId:n.id}),addOpen:st.addAt===i,onAdd:()=>this.setState({addAt:st.addAt===i?null:i}),addTypes:Object.keys(NT).filter(k=>k!=='trigger').map(k=>({label:NT[k][0],onClick:()=>{ const id='n'+(++this.seq); patchFlow(x=>({...x,nodes:[...x.nodes.slice(0,i+1),{id,t:k,text:DEF[k][0],extra:DEF[k][1]},...x.nodes.slice(i+1)]})); this.setState({addAt:null,nodeId:id}); }}))})):[];
+    const insFields=nodeSel?NT[nodeSel.t][1].map(([l,k,mu])=>({label:l,value:nodeSel[k]||'',multi:!!mu,single:!mu,onChange:e=>{ const v=e.target.value; patchFlow(x=>({...x,nodes:x.nodes.map(n=>n.id===nodeSel.id?{...n,[k]:v}:n)})); }})):[];
+    const kindChips=nodeSel&&nodeSel.t==='trigger'?KINDS.map(k=>({label:k,onClick:()=>patchFlow(x=>({...x,nodes:x.nodes.map(n=>n.id===nodeSel.id?{...n,kind:k}:n)})),style:{height:26,padding:'0 10px',borderRadius:999,border:'1px solid '+(nodeSel.kind===k?'#f1a10b':'rgba(255,255,255,.18)'),background:nodeSel.kind===k?'rgba(246,188,3,.16)':'transparent',color:nodeSel.kind===k?'#fbd23a':'#d4d4d4',fontSize:12.5,cursor:'pointer'}})):[];
+    const moveNode=d=>()=>patchFlow(x=>{ const i=x.nodes.findIndex(n=>n.id===nodeSel.id), j=i+d; if(i<1||j<1||j>=x.nodes.length) return x; const a=[...x.nodes]; [a[i],a[j]]=[a[j],a[i]]; return {...x,nodes:a}; });
+    const steps=flow?flow.nodes.map(n=>{ const t=n.t; if(t==='trigger') return {u:1,text:(n.kind==='comentário'?'comentou: ':'')+n.text}; if(t==='message') return {b:1,text:n.text}; if(t==='ai') return {b:1,text:'('+n.extra+') '+n.text}; if(t==='buttons') return {b:1,text:n.text,opts:n.extra.split(',').map(x=>x.trim()).filter(Boolean)}; if(t==='link') return {b:1,text:'Acesse aqui:',opts:[n.extra]}; if(t==='delay') return {s:1,text:'aguarda '+n.text}; if(t==='condition') return {s:1,text:'verifica: '+n.text}; if(t==='tag') return {s:1,text:'tag aplicada: '+n.text}; return {s:1,text:'transferido para atendente humano'}; }):[];
+    const sim=steps.slice(0,st.simN).map(x=>({isU:!!x.u,isB:!!x.b,isS:!!x.s,text:x.text,hasOpts:!!(x.opts&&x.opts.length),opts:(x.opts||[]).map(o=>({label:o}))}));
+    const runSim=()=>{ clearInterval(this.simT); this.setState({simN:0}); let n=0; this.simT=setInterval(()=>{ n++; this.setState({simN:n}); if(n>=steps.length) clearInterval(this.simT); },750); };
+    // audience
+    const cts=st.contacts.filter(c=>c.a===acc.id), segs=['todos',...new Set(cts.flatMap(c=>c.tags))], segSel=segs.includes(st.seg)?st.seg:'todos';
+    const segList=segs.map(k=>({label:k+' '+cts.filter(c=>k==='todos'||c.tags.includes(k)).length,onClick:set({seg:k}),style:{height:28,padding:'0 12px',borderRadius:999,border:'1px solid '+(segSel===k?'#f1a10b':'rgba(255,255,255,.18)'),background:segSel===k?'rgba(246,188,3,.16)':'transparent',color:segSel===k?'#fbd23a':'#d4d4d4',fontSize:13,cursor:'pointer'}}));
+    const ctList=cts.filter(c=>segSel==='todos'||c.tags.includes(segSel)).map(c=>({user:c.u,ini:c.u[0].toUpperCase(),av:av(28,false),tags:c.tags.join(' . '),src:c.src,last:c.last}));
+    // composer (hootsuite-like)
+    const comp=st.comp;
+    const setC=p=>this.setState(s=>({comp:{...s.comp,...p}}));
+    const cAccs=comp?comp.accs.map(id=>A.find(a=>a.id===id)):[];
+    const cFirst=cAccs[0]||acc;
+    const chipS=on=>({height:28,padding:'0 12px',borderRadius:999,border:'1px solid '+(on?'#f1a10b':'rgba(255,255,255,.18)'),background:on?'rgba(246,188,3,.16)':'transparent',color:on?'#fbd23a':'#d4d4d4',fontSize:13,cursor:'pointer'});
+    const compAccs=comp?A.map(a=>{ const on=comp.accs.includes(a.id); return {label:'@'+a.user,style:{...chipS(on),opacity:a.st==='erro'?.4:1},onClick:()=>{ if(a.st==='erro'){ this.toast('Token com erro: reconecte @'+a.user); return; } setC({accs:on?comp.accs.filter(x=>x!==a.id):[...comp.accs,a.id]}); }}; }):[];
+    const compTypes=comp?Object.keys(TY).map(k=>({label:TY[k],style:chipS(comp.t===k),onClick:()=>setC({t:k})})):[];
+    const compDays=comp?this.DAYS.map((d,i)=>({label:d,style:chipS(comp.day===i),onClick:()=>setC({day:i})})):[];
+    const compBest=(comp&&this.METRICS[cFirst.id])?this.METRICS[cFirst.id].h.map(h=>({label:h,onClick:()=>{ const p=h.split(' '); const i=this.DAYS.findIndex(d=>d.startsWith(p[0])); setC({day:i>=0?i:comp.day,time:p[1].replace('h','').padStart(2,'0')+':00'}); }})):[];
+    const compSave=status=>()=>{ if(!comp.accs.length||!comp.cap.trim()){ this.toast('Escolha uma conta e escreva a legenda'); return; } const np=comp.accs.map(id=>({id:'n'+(++this.seq),a:id,t:comp.t,s:status==='SCHEDULED'?'SCHEDULED':(comp.pr.trim()?'PROMPT_READY':'DRAFT'),topic:(comp.topic.trim()||comp.cap.trim().split('\n')[0]).slice(0,70),cap:comp.cap,tags:comp.tags.split(/\s+/).filter(Boolean),pr:comp.pr.trim()?[{t:'Prompt do post',ar:comp.t==='IMAGE'||comp.t==='CAROUSEL'?'4:5':'9:16',x:comp.pr.trim()}]:[],day:status==='SCHEDULED'?comp.day:null,time:status==='SCHEDULED'?comp.time:'',ai:'Manual'})); this.setState(s=>({posts:[...np,...s.posts],comp:null,view:'content',selId:null})); this.toast(status==='SCHEDULED'?np.length+' post(s) agendado(s)':'Rascunho salvo'); };
+    const compAi=()=>{ const t=(comp.topic||'').trim()||'o tema do post'; const vv=this.voice(cFirst.id); setC({cap:t.charAt(0).toUpperCase()+t.slice(1)+' está custando mais do que parece.\n\nQuando o processo roda sozinho, o time volta a pensar no que importa.\n\nSalve este post e comente QUERO para receber o passo a passo.',tags:comp.tags||'#produtodigital #automacao #ia'}); this.toast('Legenda gerada com Claude · tom: '+vv.tom.split('.')[0].toLowerCase()); };
+    const openComp=()=>this.setState({comp:{accs:[acc.id],t:'IMAGE',topic:'',cap:'',tags:'',pr:'',day:5,time:'18:00'}});
+    const COLS=[['DRAFT','rascunho'],['PROMPT_READY','prompt pronto'],['SCHEDULED','agendado'],['PUBLISHED','publicado']];
+    const cols=COLS.map(([s,t])=>{ const l=posts.filter(p=>p.s===s||(s==='SCHEDULED'&&p.s==='FAILED')).map(card); return {title:t,count:l.length,posts:l,empty:l.length===0}; });
+    const days=this.DAYS.map((d,i)=>({label:d,posts:posts.filter(p=>p.day===i).sort((a,b)=>a.time<b.time?-1:1).map(card),
+      style:{background:'rgba(255,255,255,.03)',border:'1px solid '+(i===4?'rgba(246,188,3,.6)':'rgba(255,255,255,.1)'),borderRadius:6,padding:8,display:'flex',flexDirection:'column',gap:6,minHeight:260},
+      head:{font:'600 12px/1 var(--font-display)',letterSpacing:'.08em',textTransform:'uppercase',color:i===4?'#fbd23a':'#bbbcbe',padding:'2px 2px 6px'}}));
+    const sel=posts.find(p=>p.id===st.selId);
+    const tabs=[['cap','legenda'],['pr','prompts de imagem']];
+    const selPrompts=sel?sel.pr.map((p,i)=>({title:p.t,ar:p.ar,text:p.x,btn:st.copied===sel.id+i?'copiado':'copiar prompt',onCopy:()=>this.copy(p.x,sel.id+i)})):[];
+    const moves=[['DRAFT','rascunho'],['PROMPT_READY','prompt pronto'],['SCHEDULED','agendar']];
+
+    // inbox
+    const cur=ints.find(i=>i.id===st.intId)||ints[0];
+    const intList=ints.map(i=>({user:i.u,ini:i.u[0].toUpperCase(),time:i.time,snippet:i.c,type:ITY[i.t],status:IST[i.s][0],dot:dot(IST[i.s][1]),av:av(24,false),onClick:set({intId:i.id}),
+      style:{display:'flex',flexDirection:'column',gap:7,alignItems:'flex-start',padding:'10px 12px',background:cur&&cur.id===i.id?'rgba(246,188,3,.1)':'rgba(255,255,255,.04)',border:'1px solid '+(cur&&cur.id===i.id?'#f1a10b':'rgba(255,255,255,.14)'),borderRadius:6,color:'#fefefe',cursor:'pointer',width:'100%'}}));
+    const setInt=(s,msg)=>()=>{ this.setState({ints:st.ints.map(i=>i.id===cur.id?{...i,s}:i)}); this.toast(msg); };
+    const SENT={positivo:'#7bbf4a',neutro:'#bbbcbe',negativo:'#e8604f'};
+
+    // prompts studio
+    const studioPrompts=[]; posts.forEach(p=>p.pr.forEach((x,i)=>studioPrompts.push({title:x.t,ar:x.ar,text:x.x,post:p.topic,status:PS[p.s][0],btn:st.copied===p.id+'s'+i?'copiado':'copiar',onCopy:()=>this.copy(x.x,p.id+'s'+i)})));
+
+    // analytics
+    const m=this.METRICS[acc.id];
+
+    // accounts
+    const v=this.voice(acc.id);
+    const setV=k=>e=>{ const val=e.target.value; this.setState(s=>({voice:{...s.voice,[acc.id]:{...this.voice(acc.id),[k]:val}}})); };
+    const accCards=A.map(a=>({user:a.user,name:a.name,ini:a.ini,toneLabel:TONE[a.st][0],dot:dot(TONE[a.st][1]),av:av(40,a.id===acc.id),
+      bar:{display:'block',height:'100%',width:Math.round(a.days/60*100)+'%',background:TONE[a.st][1]},daysLabel:a.st==='erro'?'inválido':a.days+' de 60 dias',permsLabel:a.perms+'/4 concedidas',
+      whLabel:a.wh?'ativo':'falha na assinatura',whStyle:{color:a.wh?'#7bbf4a':'#e8604f',marginTop:12},
+      needsFix:a.st!=='ativo',fixNote:a.st==='erro'?'Token inválido e permissões ausentes.':'Token expira em '+a.days+' dias.',onFix:()=>this.toast('Redirecionando para o OAuth da Meta…'),
+      btnLabel:a.id===acc.id?'ativa':'usar contexto',onPick:set({activeId:a.id,selId:null,intId:null}),
+      btn:{height:28,padding:'0 12px',background:a.id===acc.id?'rgba(246,188,3,.16)':'rgba(255,255,255,.06)',border:'1px solid '+(a.id===acc.id?'#f1a10b':'rgba(255,255,255,.18)'),borderRadius:4,color:a.id===acc.id?'#fbd23a':'#fefefe',cursor:'pointer',fontSize:13},
+      style:{background:'rgba(255,255,255,.04)',border:'1px solid '+(a.id===acc.id?'rgba(246,188,3,.5)':'rgba(255,255,255,.14)'),borderRadius:6,padding:16,display:'flex',flexDirection:'column',gap:14}}));
+
+    // dock
+    const engineList=[['auto','auto'],['claude','Claude'],['codex','Codex'],['gemini','Gemini']].map(([k,l])=>({label:l,style:segBtn(engine===k),onClick:set({engine:k})}));
+    const f=this.filtered(), palOpen=f.length>0&&!st.palOff, palItems=[]; let lastG=0;
+    f.forEach((c,i)=>{ if(c.g!==lastG){ lastG=c.g; palItems.push({isHeader:true,isCmd:false,label:this.GROUPS[c.g]}); } palItems.push({isHeader:false,isCmd:true,cmd:c.c,args:c.a,desc:c.d,eng:c.e,onPick:()=>this.pick(c),onHover:()=>this.setState({selIdx:i}),style:{display:'flex',flexDirection:'column',gap:3,padding:'7px 8px',borderRadius:4,cursor:'pointer',background:Math.min(st.selIdx,f.length-1)===i?'rgba(246,188,3,.16)':'transparent'}}); });
+    const messages=st.messages.map(x=>({text:x.text,isSys:x.role==='sys',isUser:x.role==='user',isAi:x.role==='ai',engine:x.engine==='claude'?'Claude':x.engine==='codex'?'Codex':'Gemini',skill:x.skill,done:x.done,saveable:x.saveable,onCopy:()=>{ try{navigator.clipboard.writeText(x.text);}catch(e){} this.toast('Copiado'); },onSave:()=>this.saveDraft(x)}));
+    const chips=['/moderar-comentarios','/legenda-feed','/carrossel','/prompt-foto','/conta-status'].map(l=>({label:l,onClick:()=>this.prefill(l+' ')}));
+    const selStatusMove=sel?moves.map(([s,l])=>({label:l,style:{height:26,padding:'0 10px',borderRadius:999,border:'1px solid '+(sel.s===s?'#f1a10b':'rgba(255,255,255,.18)'),background:sel.s===s?'rgba(246,188,3,.16)':'transparent',color:sel.s===s?'#fbd23a':'#d4d4d4',fontSize:12.5,cursor:'pointer'},onClick:()=>this.setState({posts:st.posts.map(p=>p.id===sel.id?{...p,s,...(s==='SCHEDULED'&&p.day===null?{day:5,time:'18:00'}:{})}:p)})})):[];
+
+    return {
+      tenantName:'Codemix Studio',
+      avBig:av(34,true),accIni:acc.ini,accUser:acc.user,accToneLabel:tone[0].toLowerCase(),accDot:dot(tone[1]),
+      switcherOpen:st.switcherOpen,toggleSwitcher:()=>this.setState({switcherOpen:!st.switcherOpen}),accList,navList,
+      connectAccount:()=>{ this.setState({switcherOpen:false}); this.toast('Redirecionando para o OAuth da Meta…'); },
+      isContent:view==='content',isInbox:view==='inbox',isPrompts:view==='prompts',isAnalytics:view==='analytics',isAccounts:view==='accounts',
+      titleLead:TT[0],titleRest:TT[1],
+      modeList:[['kanban','kanban'],['calendar','calendário']].map(([k,l])=>({label:l,style:segBtn(mode===k),onClick:set({mode:k})})),
+      isKanban:mode==='kanban',isCalendar:mode==='calendar',cols,days,
+      newPost:openComp,
+      hasSel:!!sel,closeSel:set({selId:null}),
+      selType:sel?TY[sel.t]:'',selStatus:sel?PS[sel.s][0]:'',selDot:dot(sel?PS[sel.s][1]:'#fff'),selTopic:sel?sel.topic:'',
+      statusMoves:selStatusMove,
+      drawerTabs:tabs.map(([k,l])=>({label:l,onClick:set({tab:k}),style:{background:'transparent',border:0,borderBottom:'2px solid '+(st.tab===k?'#f6bc03':'transparent'),color:st.tab===k?'#fefefe':'#bbbcbe',padding:'8px 0',cursor:'pointer',fontSize:14,fontWeight:st.tab===k?500:400}})),
+      tabCaption:st.tab==='cap',tabPrompts:st.tab==='pr',
+      selCaption:sel?(st.caps[sel.id]!==undefined?st.caps[sel.id]:sel.cap):'',onCaption:e=>{ const val=e.target.value; this.setState(s=>({caps:{...s.caps,[sel.id]:val}})); },
+      selTags:sel?sel.tags:[],selAi:sel?sel.ai:'',selPrompts,noPrompts:!!sel&&sel.pr.length===0,
+      askPrompts:()=>this.prefill('/prompt-foto '+(sel?sel.topic:'')+' 4:5'),
+      uploadMedia:()=>this.toast('Upload simples: arte final vinculada em media_urls'),
+      // inbox
+      inboxEmpty:ints.length===0,inboxFull:ints.length>0,inboxEmptyNote:acc.st==='erro'?'Token com erro: reconecte a conta para receber webhooks.':'Nenhuma DM ou comentário recente.',
+      intList,curUser:cur?cur.u:'',curType:cur?ITY[cur.t]:'',curSent:cur?cur.sent:'',curSentStyle:{color:cur?SENT[cur.sent]:'#fff'},curStatus:cur?IST[cur.s][0]:'',
+      curHasMedia:!!(cur&&cur.media),curMedia:cur?cur.media:'',curContent:cur?cur.c:'',curAi:cur?cur.ai:'',curEngine:'Gemini 2.5 Flash',
+      curReply:cur?(st.replies[cur.id]||''):'',onReply:e=>{ const val=e.target.value; this.setState(s=>({replies:{...s.replies,[cur.id]:val}})); },
+      useAi:()=>this.setState(s=>({replies:{...s.replies,[cur.id]:cur.spam?'':cur.ai}})),
+      sendLabel:cur&&cur.spam?'ocultar comentário':'enviar resposta',
+      sendReply:()=>cur&&setInt('AI_REPLIED',cur.spam?'Comentário ocultado (hide=true)':'Resposta enviada via Graph API')(),
+      escalate:()=>cur&&setInt('HUMAN_ESCALATED','Escalado para atendimento humano')(),archive:()=>cur&&setInt('ARCHIVED','Arquivada')(),
+      // prompts
+      styleRef:st.styles[acc.id]!==undefined?st.styles[acc.id]:acc.style,onStyle:e=>{ const val=e.target.value; this.setState(s=>({styles:{...s.styles,[acc.id]:val}})); },
+      studioCmds:['/prompt-foto','/prompt-carrossel','/prompt-capa-reels','/prompt-estetico'].map(l=>({label:l,onClick:()=>this.prefill(l+' ')})),
+      studioPrompts,studioEmpty:studioPrompts.length===0,
+      // analytics
+      hasMetrics:!!m,noMetrics:!m,
+      kpis:m?m.k.map(k=>({label:k[0],value:k[1],delta:k[2]})):[],
+      formats:m?m.f.map(x=>({name:x[0],pct:x[1]+'%',bar:{display:'block',height:'100%',width:x[1]+'%',background:'var(--grad-brand)'}})):[],
+      bestHours:m?m.h:[],plan:m?m.p:[],askAudit:()=>this.prefill('/auditoria-perfil @'+acc.user),
+      // accounts
+      accCards,voiceTom:v.tom,voicePub:v.pub,voiceRegras:v.regras,onTom:setV('tom'),onPub:setV('pub'),onRegras:setV('regras'),
+      saveVoice:()=>this.toast('Tom de voz salvo em brand_voice_guidelines'),
+      // dock
+      dockStyle:{width:st.dockW,flex:'none',background:'#2b2b2b',borderLeft:'1px solid rgba(255,255,255,.14)',display:'flex',flexDirection:'column',position:'relative',zIndex:4},
+      startDrag:e=>{ e.preventDefault(); const sx=e.clientX,sw=st.dockW; const mv=ev=>this.setState({dockW:Math.min(560,Math.max(320,sw+sx-ev.clientX))}); const up=()=>{ window.removeEventListener('mousemove',mv); window.removeEventListener('mouseup',up); }; window.addEventListener('mousemove',mv); window.addEventListener('mouseup',up); },
+      engineList,engineNote:engine==='auto'?'roteamento automático por skill':this.ENG[engine]+' . '+(engine==='claude'?'copy & estratégia':engine==='codex'?'json & payloads':'contexto longo & visual'),
+      msgRef:this.msgRef,inputRef:this.inputRef,messages,showChips:st.messages.length<=2,chips,
+      palOpen,palItems,input:st.input,onInput:this.onInput,onKey:this.onKey,send:this.send,
+      hasToast:!!st.toast,toast:st.toast,
+      navGroups,tokBar,tokLabel:acc.st==='erro'?'inválido':acc.days+' de 60 dias',tokNeedsFix:acc.st!=='ativo',whLabel:acc.wh?'ativo':'falha',goAccounts:set({view:'accounts',switcherOpen:false}),openSearch:()=>this.prefill('/'),
+      isOverview:view==='overview',isComments:view==='comments',isSkills:view==='skills',
+      greeting:'sex, 30 out 2026 . resumo de @'+acc.user,attention:att,hasAttention:att.length>0,noAttention:att.length===0,agenda,hasAgenda:agenda.length>0,ovAccs,
+      cPosts,cFilters,cItems,cEmpty:cItems.length===0,spamBtn:'ocultar spam ('+spamOpen.length+')',replyBtn:'responder em lote ('+replyOpen.length+')',spamStyle:batchStyle(spamOpen.length),replyStyle:batchStyle(replyOpen.length),
+      hideSpam:()=>spamOpen.length&&upd(spamOpen.map(i=>i.id),{s:'ARCHIVED',hidden:true},spamOpen.length+' spam ocultado(s)'),replyAll:()=>replyOpen.length&&upd(replyOpen.map(i=>i.id),{s:'AI_REPLIED'},replyOpen.length+' resposta(s) publicada(s)'),modPrompt:()=>this.prefill('/moderar-comentarios '),
+      rules:accRules,noRules:accRules.length===0,newKw:st.newKw,newLink:st.newLink,onKw:e=>this.setState({newKw:e.target.value}),onLink:e=>this.setState({newLink:e.target.value}),
+      addRule:()=>{ const kw=st.newKw.trim(), link=st.newLink.trim(); if(!kw||!link){ this.toast('Informe palavra-chave e link de destino'); return; } this.setState(s=>({rules:[...s.rules,{id:'r'+(++this.seq),a:acc.id,kw:kw.toUpperCase(),link,post:cPostSel==='all'?'todos os posts':cPostSel,on:true}],newKw:'',newLink:''})); this.toast('Regra criada: webhook de comentários ativo'); },
+      skillList,skillQ:st.skillQ,onSkillQ:e=>this.setState({skillQ:e.target.value}),envs,events,syncAll:()=>this.toast('Skills sincronizadas em .claude, .gemini e .codex'),debugWh:()=>this.prefill('/debug-webhook '),
+      isTwin:view==='twin',twKpis:TW.kpi.map(([l,v])=>({label:l,value:v})),twSources,twNoSources:twSources.length===0,twPct:twPct+'%',twBar:{display:'block',height:'100%',width:twPct+'%',background:'var(--grad-brand)'},twModes,twStyles,twCh,twFields,twOut:TW.out,twOffers:TW.offers.map(o=>({name:o.n,kind:o.k,link:o.link,when:o.when})),twNoOffers:TW.offers.length===0,
+      addPosts:addSrc('POSTS','Últimos 30 posts do Instagram'),addPdf:addSrc('PDF','Material enviado.pdf'),addUrl:addSrc('SITE','Nova página do site'),addFaq:addSrc('FAQ','Perguntas do inbox (30 dias)'),retrain:()=>this.toast('Retreino iniciado · versão digital atualiza em minutos'),
+      pgPresets:TW.presets.map(q=>({label:q,onClick:()=>ask(q)})),pgInput:st.pgInput,onPgInput:e=>this.setState({pgInput:e.target.value}),pgAsk:()=>ask(st.pgInput),pgKey:e=>{ if(e.key==='Enter'){ e.preventDefault(); ask(st.pgInput); } },
+      pgHasQ:!!pgActive,pgNoQ:!pgActive,pgQ:st.pgQ,pgTyping:!!pgActive&&st.pgStage===1,pgDone:!!pgActive&&st.pgStage===2,pgGeneric:ans?ans.g:'',twMsgs,pgHasOffer:!!offer&&st.pgStage===2,offerName:offer?offer.n:'',offerKind:offer?offer.k:'',offerLink:offer?offer.link:'',
+      isAutomations:view==='automations',isAudience:view==='audience',hasFlow:!!flow,noFlow:!flow,flowList,flowTemplates,flowName:flow?flow.name:'',onFlowName:e=>{ const v=e.target.value; patchFlow(x=>({...x,name:v})); },flowOnLabel:flow&&flow.on?'ativa':'pausada',flowOnStyle:{height:28,padding:'0 12px',borderRadius:999,border:'1px solid '+(flow&&flow.on?'#7bbf4a':'rgba(255,255,255,.2)'),background:'transparent',color:flow&&flow.on?'#7bbf4a':'#bbbcbe',fontSize:13,cursor:'pointer'},toggleFlow:()=>patchFlow(x=>({...x,on:!x.on})),flowStats:flow?[['enviados',flow.stats.sent],['abertura',flow.stats.open],['cliques',flow.stats.clicks],['leads',flow.stats.leads]].map(([l,v])=>({label:l,value:v})):[],
+      nodeList,hasNode:!!nodeSel,noNode:!nodeSel,insTitle:nodeSel?NT[nodeSel.t][0]:'',insFields,kindChips,isTrigSel:!!nodeSel&&nodeSel.t==='trigger',canEditNode:!!nodeSel&&nodeSel.t!=='trigger',moveUp:moveNode(-1),moveDown:moveNode(1),delNode:()=>{ patchFlow(x=>({...x,nodes:x.nodes.filter(n=>n.id!==nodeSel.id)})); this.setState({nodeId:null}); },
+      sim,runSim,simEmpty:st.simN===0,
+      segList,ctList,ctEmpty:ctList.length===0,ctN:cts.length,leadN:cts.filter(c=>c.tags.includes('lead quente')).length,bcast:st.bcast,onBcast:e=>this.setState({bcast:e.target.value}),bcastBtn:'enviar para '+ctList.length+' contato(s)',sendBcast:()=>{ if(!st.bcast.trim()||!ctList.length){ this.toast('Escreva a mensagem e escolha um segmento'); return; } this.setState({bcast:''}); this.toast('Transmissão enviada · apenas contatos na janela de 24h'); },
+      compOpen:!!comp,compAccs,compTypes,compDays,compBest,hasBest:compBest.length>0,compTopic:comp?comp.topic:'',onCompTopic:e=>setC({topic:e.target.value}),compCap:comp?comp.cap:'',onCompCap:e=>setC({cap:e.target.value}),compTags:comp?comp.tags:'',onCompTags:e=>setC({tags:e.target.value}),compPr:comp?comp.pr:'',onCompPr:e=>setC({pr:e.target.value}),compTime:comp?comp.time:'',onCompTime:e=>setC({time:e.target.value}),compAi,closeComp:()=>this.setState({comp:null}),saveDraftC:compSave('DRAFT'),scheduleC:compSave('SCHEDULED'),
+      pvUser:cFirst.user,pvIni:cFirst.ini,pvType:comp?TY[comp.t]:'',pvCap:comp&&comp.cap?comp.cap:'A legenda aparece aqui conforme você escreve.',pvTags:comp?comp.tags:'',pvWhen:comp?this.DAYS[comp.day]+' . '+comp.time:'',pvMulti:comp&&comp.accs.length>1,pvCount:comp?comp.accs.length:0,
+      nsCmd:st.nsCmd,nsPrompt:st.nsPrompt,onNsCmd:e=>this.setState({nsCmd:e.target.value}),onNsPrompt:e=>this.setState({nsPrompt:e.target.value}),
+      addSkill:()=>{ const c=st.nsCmd.trim().replace(/^\//,'').toLowerCase().replace(/\s+/g,'-'), p=st.nsPrompt.trim(); if(!c||!p){ this.toast('Informe comando e system prompt'); return; } if(this.allCmds(true).some(x=>x.c===c)){ this.toast('Já existe uma skill /'+c); return; } this.setState(s=>({custom:[...s.custom,{g:5,c,a:'[entrada]',d:p.slice(0,90),e:'auto',sys:p}],nsCmd:'',nsPrompt:''})); this.toast('Skill /'+c+' criada no tenant'); }
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+:root{
+/* --- Brand: official vector gradient stops (assets/logo-codemix-white.svg) --- */
+--brand-yellow:#ffcb05;
+--brand-orange:#f58220;
+/* --- Brand: amber-to-orange scale sampled from the bitmap lockup --- */
+--amber-300:#fbd23a;
+--amber-400:#f6bc03;
+--amber-500:#f1a10b;
+--orange-500:#ee9c0a;
+--orange-600:#e98015;
+--orange-700:#c96a0c;
+/* --- Graphite: the wordmark grey and the dark UI chrome --- */
+--charcoal-950:#1f1f1f;
+--charcoal-900:#2b2b2b;
+--graphite-800:#363d3f;
+--slate-700:#44494c;
+--slate-600:#4b5054;
+--slate-500:#5d6367;
+/* --- Neutrals: the legacy site's light content band --- */
+--neutral-000:#ffffff;
+--neutral-050:#f6f6f6;
+--neutral-100:#ececec;
+--neutral-200:#e6e6e6;
+--neutral-300:#d4d4d4;
+--neutral-400:#c0c0c0;
+--neutral-500:#9a9a9a;
+--neutral-600:#808080;
+/* --- Semantic --- */
+--success-500:#5c9c2f;
+--danger-500:#c0392b;
+--info-500:#3d7ea6;
+
+/* --- Aliases: surfaces --- */
+--surface-page:var(--neutral-200);
+--surface-card:var(--neutral-000);
+--surface-card-dark:var(--slate-600);
+--surface-chrome:var(--slate-700);
+--surface-inverse:var(--charcoal-900);
+--surface-sunken:var(--neutral-300);
+--surface-highlight:var(--amber-400);
+
+/* --- Aliases: text --- */
+--text-body:var(--graphite-800);
+--text-muted:var(--neutral-600);
+--text-on-dark:#fefefe;
+--text-on-dark-muted:#bbbcbe;
+--text-accent:var(--orange-500);
+--text-heading:var(--graphite-800);
+--text-on-highlight:var(--charcoal-900);
+
+/* --- Aliases: lines + interaction --- */
+--border-subtle:#dcdcdc;
+--border-strong:#bfbfbf;
+--border-on-dark:rgba(255,255,255,.14);
+--focus-ring:var(--amber-500);
+--link:var(--orange-500);
+--link-hover:var(--orange-700);
+
+/* --- Signature gradients --- */
+--grad-brand:linear-gradient(180deg,var(--brand-yellow) 0%,var(--brand-orange) 100%); /* @kind color */
+--grad-highlight-bar:linear-gradient(180deg,#f6bf04 0%,#f1a10b 62%,#e08c07 100%); /* @kind color */
+--grad-chrome:linear-gradient(180deg,#404447 0%,#44494c 55%,#4a4f52 100%); /* @kind color */
+--grad-light-band:linear-gradient(180deg,#c9c9c9 0%,#e6e6e6 34%,#e6e6e6 100%); /* @kind color */
+}
