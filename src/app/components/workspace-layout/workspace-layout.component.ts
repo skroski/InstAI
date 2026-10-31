@@ -28,6 +28,7 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
       class="workspace"
       [class.left-collapsed]="state.isLeftCompact()"
       [class.right-closed]="!state.isRightOpen()"
+      [style]="state.themeVariables()"
       [style.--left-w.px]="state.leftWidth()"
       [style.--right-w.px]="state.rightWidth()">
 
@@ -43,19 +44,39 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
           <span class="brand-tag">insta-ai</span>
         </div>
 
-        <!-- Multi-Tenant Account Switcher -->
-        <app-account-switcher />
+        @if (!state.isLeftCompact()) {
+          <!-- Multi-Tenant Account Switcher -->
+          <app-account-switcher />
 
-        <!-- Primary CTA: Novo Post Multi-Conta -->
-        <div class="px-1 my-1">
-          <cm-button
-            variant="primary"
-            size="sm"
-            [fullWidth]="true"
-            (clicked)="state.openComposer()">
-            <span>+ novo post</span>
-          </cm-button>
-        </div>
+          <!-- Primary CTA: Novo Post Multi-Conta -->
+          <div class="px-1 my-1 w-full">
+            <cm-button
+              variant="primary"
+              size="sm"
+              [arrow]="true"
+              [fullWidth]="true"
+              (clicked)="state.openComposer()">
+              <span>novo post</span>
+            </cm-button>
+          </div>
+        } @else {
+          <button
+            type="button"
+            class="w-9 h-9 rounded-full flex items-center justify-center text-white mx-auto my-1 cursor-pointer border-0"
+            style="background: linear-gradient(135deg,#5d6367,#363d3f); font: 600 12px/1 var(--font-display); box-shadow: 0 0 0 2px var(--c-panel), 0 0 0 4px #f1a10b;"
+            [title]="'@' + state.activeAccount().user"
+            (click)="state.leftCompact.set(false)">
+            {{ state.activeAccount().ini }}
+          </button>
+          <button
+            type="button"
+            class="w-10 h-9 rounded-[4px] flex items-center justify-center mx-auto mb-1 cursor-pointer text-lg font-bold leading-none"
+            style="border: 1px solid #c96a0c; background: var(--grad-brand); color: #2b2b2b; box-shadow: var(--shadow-button);"
+            title="Novo post"
+            (click)="state.openComposer()">
+            +
+          </button>
+        }
 
         <!-- Navigation Menu -->
         <div class="flex-1 overflow-y-auto flex flex-col gap-0.5 pr-0.5">
@@ -185,12 +206,12 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
             }
 
             <span class="chip green hidden md:inline-flex" title="Projeto Supabase conectado: https://gmwdahnksiqukovcwwid.supabase.co">
-              <span class="w-1.5 h-1.5 rounded-full bg-[#10B981]"></span>
+              <span class="w-1.5 h-1.5 rounded-full bg-[var(--c-ok)]"></span>
               Supabase · {{ state.supabase.projectRef }}
             </span>
 
             <span class="chip cyan hidden sm:inline-flex">
-              <span class="w-1.5 h-1.5 rounded-full bg-[#00B4D8]"></span>
+              <span class="w-1.5 h-1.5 rounded-full bg-[var(--c-info)]"></span>
               Graph API v22.0
             </span>
 
@@ -200,7 +221,7 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
               [class.active]="state.isRightOpen() && state.rightTab() === 'copilot'"
               style="width: auto; padding: 0 11px; gap: 6px; font-size: 12px;"
               (click)="toggleRightDock('copilot')">
-              <span class="w-2 h-2 rounded-full bg-[#A855F7]"></span>
+              <span class="w-2 h-2 rounded-full bg-[#f6bc03]"></span>
               <span>ai copilot</span>
             </button>
 
@@ -210,7 +231,7 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
               [class.active]="state.isRightOpen() && state.rightTab() === 'activity'"
               style="width: auto; padding: 0 11px; gap: 6px; font-size: 12px;"
               (click)="toggleRightDock('activity')">
-              <span class="w-1.5 h-1.5 rounded-full bg-[#F77F00]"></span>
+              <span class="w-1.5 h-1.5 rounded-full bg-[#f1a10b]"></span>
               <span>atividade</span>
             </button>
           </div>
@@ -238,21 +259,21 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
                       <div class="card-title">pipeline editorial da semana</div>
                       <div class="card-sub">rascunhos, prompts prontos e agendados para &#64;{{ state.activeAccount().user }}</div>
                     </div>
-                    <cm-button variant="ghost" size="sm" (clicked)="state.setView('content')">ver estúdio →</cm-button>
+                    <cm-button variant="ghost" size="sm" (clicked)="state.setView('content')">ver estúdio »</cm-button>
                   </div>
                   <div class="flex flex-col gap-2">
                     @for (p of state.accountPosts().slice(0, 4); track p.id) {
-                      <div class="p-3 rounded-xl bg-[var(--c-bg-elev)] border border-[var(--c-border)] flex items-center justify-between gap-3">
+                      <div class="p-3 rounded-[6px] bg-[var(--c-bg-elev)] border border-[var(--c-border)] flex items-center justify-between gap-3">
                         <div class="min-w-0">
                           <div class="flex items-center gap-2 mb-1">
-                            <span class="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded bg-[var(--c-surface)] text-[#38BDF8]">{{ p.t }}</span>
+                            <span class="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded-[2px] bg-[var(--c-surface)] text-[var(--c-acc)]">{{ p.t }}</span>
                             <span class="text-xs font-semibold text-[var(--c-text)] truncate">{{ p.topic }}</span>
                           </div>
                           <div class="text-[11.5px] text-[var(--c-text-2)] truncate">{{ p.cap || 'Sem legenda definida' }}</div>
                         </div>
                         <div class="flex items-center gap-2 shrink-0">
                           <span class="text-[11px] font-mono text-[var(--c-text-muted)]">{{ p.time || 'rascunho' }}</span>
-                          <span class="chip cyan">{{ p.s }}</span>
+                          <span class="chip orange">{{ p.s }}</span>
                         </div>
                       </div>
                     }
@@ -271,30 +292,30 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
                   <div class="flex flex-col gap-2">
                     <button
                       type="button"
-                      class="p-2.5 rounded-xl bg-[var(--c-bg-elev)] border border-[var(--c-border)] hover:border-[#00B4D8] text-left transition-all cursor-pointer"
+                      class="p-2.5 rounded-[6px] bg-[var(--c-bg-elev)] border border-[var(--c-border)] hover:border-[#f1a10b] text-left transition-all cursor-pointer"
                       (click)="runSlashSkill('/calendario 7 topo-meio-fundo')">
-                      <div class="font-mono text-xs text-[#38BDF8] font-semibold">/calendario 7 dias</div>
+                      <div class="font-mono text-xs text-[var(--c-acc)] font-semibold">/calendario 7 dias</div>
                       <div class="text-[11px] text-[var(--c-text-2)] mt-0.5">Gerar matriz editorial completa para a semana</div>
                     </button>
                     <button
                       type="button"
-                      class="p-2.5 rounded-xl bg-[var(--c-bg-elev)] border border-[var(--c-border)] hover:border-[#00B4D8] text-left transition-all cursor-pointer"
+                      class="p-2.5 rounded-[6px] bg-[var(--c-bg-elev)] border border-[var(--c-border)] hover:border-[#f1a10b] text-left transition-all cursor-pointer"
                       (click)="runSlashSkill('/carrossel Agentes de IA em producao 7')">
-                      <div class="font-mono text-xs text-[#38BDF8] font-semibold">/carrossel 7 slides</div>
+                      <div class="font-mono text-xs text-[var(--c-acc)] font-semibold">/carrossel 7 slides</div>
                       <div class="text-[11px] text-[var(--c-text-2)] mt-0.5">Estruturar carrossel de retenção + legenda AIDA</div>
                     </button>
                     <button
                       type="button"
-                      class="p-2.5 rounded-xl bg-[var(--c-bg-elev)] border border-[var(--c-border)] hover:border-[#00B4D8] text-left transition-all cursor-pointer"
+                      class="p-2.5 rounded-[6px] bg-[var(--c-bg-elev)] border border-[var(--c-border)] hover:border-[#f1a10b] text-left transition-all cursor-pointer"
                       (click)="runSlashSkill('/prompt-foto Editorial minimalista Codemix 4:5')">
-                      <div class="font-mono text-xs text-[#38BDF8] font-semibold">/prompt-foto 4:5</div>
+                      <div class="font-mono text-xs text-[var(--c-acc)] font-semibold">/prompt-foto 4:5</div>
                       <div class="text-[11px] text-[var(--c-text-2)] mt-0.5">Gerar prompt técnico 4:5 para Midjourney v6 / Flux</div>
                     </button>
                     <button
                       type="button"
-                      class="p-2.5 rounded-xl bg-[var(--c-bg-elev)] border border-[var(--c-border)] hover:border-[#00B4D8] text-left transition-all cursor-pointer"
+                      class="p-2.5 rounded-[6px] bg-[var(--c-bg-elev)] border border-[var(--c-border)] hover:border-[#f1a10b] text-left transition-all cursor-pointer"
                       (click)="runSlashSkill('/auditoria-perfil')">
-                      <div class="font-mono text-xs text-[#38BDF8] font-semibold">/auditoria-perfil</div>
+                      <div class="font-mono text-xs text-[var(--c-acc)] font-semibold">/auditoria-perfil</div>
                       <div class="text-[11px] text-[var(--c-text-2)] mt-0.5">Diagnóstico de bio, destaques e mix com Gemini 2.5 Pro</div>
                     </button>
                   </div>
@@ -316,13 +337,10 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
                   @for (f of commentFilters; track f.id) {
                     <button
                       type="button"
-                      class="px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors cursor-pointer"
-                      [class.bg-[#00B4D8]/15]="state.cFilter() === f.id"
-                      [class.text-[#00B4D8]]="state.cFilter() === f.id"
-                      [class.border-[#00B4D8]/40]="state.cFilter() === f.id"
-                      [class.bg-[var(--c-card)]]="state.cFilter() !== f.id"
-                      [class.text-[var(--c-text-2)]]="state.cFilter() !== f.id"
-                      [class.border-[var(--c-border)]]="state.cFilter() !== f.id"
+                      class="px-3 py-1.5 rounded-full text-xs font-medium border transition-colors cursor-pointer"
+                      [style.background]="state.cFilter() === f.id ? 'rgba(246,188,3,.16)' : 'var(--c-card)'"
+                      [style.color]="state.cFilter() === f.id ? 'var(--c-acc)' : 'var(--c-text-2)'"
+                      [style.border-color]="state.cFilter() === f.id ? '#f1a10b' : 'var(--c-border)'"
                       (click)="state.cFilter.set(f.id)">
                       {{ f.label }}
                     </button>
@@ -355,9 +373,9 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
 
                       <div class="text-sm text-[var(--c-text)]">{{ c.c }}</div>
 
-                      <div class="p-2.5 rounded-lg bg-[rgba(114,9,183,0.1)] border border-[#7209B7]/30 flex items-center justify-between gap-3">
+                      <div class="p-2.5 rounded-[6px] bg-[rgba(246,188,3,0.06)] border border-[#f1a10b]/45 flex items-center justify-between gap-3">
                         <div class="text-xs text-[var(--c-text-2)]">
-                          <strong class="text-[#C084FC] font-mono">Sugestão IA:</strong> {{ c.ai }}
+                          <strong class="text-[var(--c-acc)] font-mono">Sugestão IA:</strong> {{ c.ai }}
                         </div>
                         @if (c.s === 'UNREAD') {
                           <cm-button
@@ -382,12 +400,12 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
                   </div>
                   <div class="flex flex-col gap-2">
                     @for (r of accountRules(); track r.id) {
-                      <div class="p-3 rounded-xl bg-[var(--c-bg-elev)] border border-[var(--c-border)]">
+                      <div class="p-3 rounded-[6px] bg-[var(--c-bg-elev)] border border-[var(--c-border)]">
                         <div class="flex items-center justify-between mb-1">
-                          <span class="font-mono text-xs font-bold text-[#00B4D8]">palavra: "{{ r.kw }}"</span>
+                          <span class="font-mono text-xs font-bold text-[var(--c-acc)]">palavra: "{{ r.kw }}"</span>
                           <input
                             type="checkbox"
-                            class="toggle toggle-xs toggle-info"
+                            class="toggle toggle-xs toggle-primary"
                             [checked]="r.on"
                             (change)="state.toggleRule(r.id)" />
                         </div>
@@ -400,13 +418,13 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
                   <div class="pt-2 border-t border-[var(--c-border)] flex flex-col gap-2">
                     <input
                       type="text"
-                      class="w-full px-2.5 py-1.5 rounded-lg bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs text-[var(--c-text)]"
+                      class="w-full px-2.5 py-1.5 rounded-[6px] bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs text-[var(--c-text)] cm-input-focus"
                       placeholder="Palavra-chave (ex: AGENTE)"
                       [ngModel]="state.newKw()"
                       (ngModelChange)="state.newKw.set($event)" />
                     <input
                       type="text"
-                      class="w-full px-2.5 py-1.5 rounded-lg bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs text-[var(--c-text)]"
+                      class="w-full px-2.5 py-1.5 rounded-[6px] bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs text-[var(--c-text)] cm-input-focus"
                       placeholder="Link para enviar por DM"
                       [ngModel]="state.newLink()"
                       (ngModelChange)="state.newLink.set($event)" />
@@ -438,7 +456,7 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
 
                 <div class="grid grid-cols-2 gap-2">
                   @for (metric of activeTwin().kpi; track metric[0]) {
-                    <div class="p-2.5 rounded-xl bg-[var(--c-bg-elev)] border border-[var(--c-border)]">
+                    <div class="p-2.5 rounded-[6px] bg-[var(--c-bg-elev)] border border-[var(--c-border)]">
                       <div class="text-[10px] font-mono uppercase text-[var(--c-text-muted)]">{{ metric[0] }}</div>
                       <div class="text-base font-bold text-[var(--c-text)] mt-0.5">{{ metric[1] }}</div>
                     </div>
@@ -449,7 +467,7 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
                   <div class="text-xs font-semibold mb-2">domínios autorizados de resposta</div>
                   <div class="flex flex-wrap gap-1.5">
                     @for (f of state.getTwinSettings().fields; track f.l) {
-                      <span class="chip" [class.cyan]="f.on" [class.orange]="!f.on">
+                      <span class="chip" [class.green]="f.on" [class.orange]="!f.on">
                         {{ f.l }} ({{ f.on ? 'ativo' : 'bloqueado' }})
                       </span>
                     }
@@ -460,9 +478,9 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
                   <div class="text-xs font-semibold mb-2">fontes de treinamento sincronizadas</div>
                   <div class="flex flex-col gap-1.5">
                     @for (src of activeTwin().sources; track src[1]) {
-                      <div class="p-2.5 rounded-lg bg-[var(--c-bg-elev)] border border-[var(--c-border)] flex items-center justify-between text-xs">
+                      <div class="p-2.5 rounded-[6px] bg-[var(--c-bg-elev)] border border-[var(--c-border)] flex items-center justify-between text-xs">
                         <div>
-                          <span class="font-mono text-[10px] text-[#38BDF8] mr-2">{{ src[0] }}</span>
+                          <span class="font-mono text-[10px] text-[var(--c-acc)] mr-2">{{ src[0] }}</span>
                           <span class="text-[var(--c-text)]">{{ src[1] }}</span>
                         </div>
                         <span class="chip green">{{ src[2] }}</span>
@@ -485,7 +503,7 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
                   @for (p of activeTwin().presets; track p) {
                     <button
                       type="button"
-                      class="px-2.5 py-1 rounded-lg text-xs bg-[var(--c-bg-elev)] border border-[var(--c-border)] hover:border-[#00B4D8] text-[var(--c-text-2)] cursor-pointer"
+                      class="px-2.5 py-1 rounded-[4px] text-xs bg-[var(--c-bg-elev)] border border-[var(--c-border)] hover:border-[#f1a10b] text-[var(--c-text-2)] cursor-pointer"
                       (click)="state.askTwinPlayground(p)">
                       {{ p }}
                     </button>
@@ -494,14 +512,14 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
 
                 @if (state.pgQ()) {
                   @let ans = state.getTwinAnswer(state.activeAccount(), state.pgQ());
-                  <div class="p-3 rounded-xl bg-[#EF4444]/10 border border-[#EF4444]/30">
-                    <div class="text-[10px] font-mono uppercase text-[#F87171] mb-1">IA Genérica (Sem Brand Voice)</div>
+                  <div class="p-3 rounded-[6px] bg-[#e8604f]/10 border border-[#e8604f]/35">
+                    <div class="text-[10px] font-mono uppercase text-[var(--c-err)] mb-1">IA Genérica (Sem Brand Voice)</div>
                     <div class="text-xs text-[var(--c-text-2)]">{{ ans.g }}</div>
                   </div>
-                  <div class="p-3 rounded-xl bg-[#10B981]/10 border border-[#10B981]/30 flex flex-col gap-2">
-                    <div class="text-[10px] font-mono uppercase text-[#34D399]">✓ Sua Versão Digital (&#64;{{ state.activeAccount().user }})</div>
+                  <div class="p-3 rounded-[6px] bg-[#7bbf4a]/10 border border-[#7bbf4a]/35 flex flex-col gap-2">
+                    <div class="text-[10px] font-mono uppercase text-[var(--c-ok)]">✓ Sua Versão Digital (&#64;{{ state.activeAccount().user }})</div>
                     @for (step of ans.t; track step) {
-                      <div class="text-xs text-[var(--c-text)] p-2 rounded bg-[var(--c-bg-elev)]">{{ step }}</div>
+                      <div class="text-xs text-[var(--c-text)] p-2 rounded-[4px] bg-[var(--c-bg-elev)]">{{ step }}</div>
                     }
                   </div>
                 }
@@ -510,12 +528,12 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
                   <div class="text-xs font-semibold mb-2">ofertas e links de conversão no Direct</div>
                   <div class="flex flex-col gap-2">
                     @for (o of activeTwin().offers; track o.n) {
-                      <div class="p-2.5 rounded-lg bg-[var(--c-bg-elev)] border border-[var(--c-border)] flex items-center justify-between">
+                      <div class="p-2.5 rounded-[6px] bg-[var(--c-bg-elev)] border border-[var(--c-border)] flex items-center justify-between">
                         <div>
                           <div class="text-xs font-semibold text-[var(--c-text)]">{{ o.n }}</div>
                           <div class="text-[11px] text-[var(--c-text-muted)]">Quando: {{ o.when }} → {{ o.link }}</div>
                         </div>
-                        <span class="chip cyan">{{ o.k }}</span>
+                        <span class="chip orange">{{ o.k }}</span>
                       </div>
                     }
                   </div>
@@ -531,7 +549,7 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
                 @for (fl of accountFlows(); track fl.id) {
                   <div
                     class="card-p cursor-pointer transition-all"
-                    [class.border-[#00B4D8]]="state.currentFlow()?.id === fl.id"
+                    [style.border-color]="state.currentFlow()?.id === fl.id ? '#f1a10b' : 'var(--c-border)'"
                     (click)="state.flowId.set(fl.id)">
                     <div class="flex items-center justify-between mb-1">
                       <span class="text-xs font-semibold text-[var(--c-text)]">{{ fl.name }}</span>
@@ -553,7 +571,7 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
                         <div class="text-[10px] text-[var(--c-text-muted)]">cliques</div>
                       </div>
                       <div>
-                        <div class="text-xs font-bold text-[#34D399]">{{ fl.stats.leads }}</div>
+                        <div class="text-xs font-bold text-[var(--c-ok)]">{{ fl.stats.leads }}</div>
                         <div class="text-[10px] text-[var(--c-text-muted)]">leads</div>
                       </div>
                     </div>
@@ -581,15 +599,15 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
 
                   <div class="flex flex-col gap-2.5">
                     @for (node of flow.nodes; track node.id; let i = $index) {
-                      <div class="p-3.5 rounded-xl bg-[var(--c-bg-elev)] border border-[var(--c-border)] flex items-start gap-3">
-                        <div class="w-7 h-7 rounded-lg bg-[#00B4D8]/15 text-[#00B4D8] font-mono text-xs font-bold flex items-center justify-center shrink-0">
+                      <div class="p-3.5 rounded-[6px] bg-[var(--c-bg-elev)] border border-[var(--c-border)] flex items-start gap-3">
+                        <div class="w-7 h-7 rounded-[4px] bg-[#f6bc03]/15 text-[var(--c-acc)] font-mono text-xs font-bold flex items-center justify-center shrink-0">
                           {{ i + 1 }}
                         </div>
                         <div class="flex-1">
                           <div class="flex items-center justify-between">
                             <span class="text-xs font-semibold text-[var(--c-text)] uppercase font-mono">{{ node.t }}</span>
                             @if (node.kind) {
-                              <span class="chip cyan">{{ node.kind }}</span>
+                              <span class="chip orange">{{ node.kind }}</span>
                             }
                           </div>
                           <div class="text-xs text-[var(--c-text)] mt-1">{{ node.text }}</div>
@@ -635,7 +653,7 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
                         <td class="py-2.5 px-3">
                           <div class="flex flex-wrap gap-1">
                             @for (t of ct.tags; track t) {
-                              <span class="chip cyan">{{ t }}</span>
+                              <span class="chip orange">{{ t }}</span>
                             }
                           </div>
                         </td>
@@ -662,7 +680,7 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
 
                 <textarea
                   rows="5"
-                  class="w-full p-3 rounded-xl bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs font-mono text-[var(--c-text)]"
+                  class="w-full p-3 rounded-[10px] bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs font-mono text-[var(--c-text)] cm-input-focus"
                   [ngModel]="state.activeStyleRef()"
                   (ngModelChange)="updateStyleRef($event)"></textarea>
 
@@ -686,21 +704,21 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                   @for (p of state.accountPosts(); track p.id) {
                     @for (pr of p.pr; track pr.t) {
-                      <div class="p-3 rounded-xl bg-[var(--c-bg-elev)] border border-[var(--c-border)] flex flex-col justify-between gap-2">
+                      <div class="p-3 rounded-[6px] bg-[var(--c-bg-elev)] border border-[var(--c-border)] flex flex-col justify-between gap-2">
                         <div>
                           <div class="flex items-center justify-between mb-1">
                             <span class="text-xs font-semibold text-[var(--c-text)] truncate">{{ p.topic }}</span>
                             <span class="chip purple">{{ pr.ar }}</span>
                           </div>
                           <div class="text-[11px] text-[var(--c-text-muted)] mb-1">{{ pr.t }}</div>
-                          <div class="font-mono text-[11px] text-[var(--c-text-2)] bg-[var(--c-bg)] p-2.5 rounded-lg border border-[var(--c-border)] select-all">
+                          <div class="font-mono text-[11px] text-[var(--c-text-2)] bg-[var(--c-bg)] p-2.5 rounded-[4px] border border-[var(--c-border)] select-all">
                             {{ pr.x }}
                           </div>
                         </div>
                         <div class="flex justify-end">
                           <button
                             type="button"
-                            class="text-[11px] font-mono text-[#00B4D8] hover:underline cursor-pointer"
+                            class="text-[11px] font-mono text-[var(--c-link)] hover:underline cursor-pointer"
                             (click)="state.copyText(pr.x, p.id + pr.t)">
                             {{ state.copied() === p.id + pr.t ? 'copiado!' : 'copiar prompt' }}
                           </button>
@@ -722,15 +740,15 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
                     <div class="card-title">catálogo unificado de Skills & Slash Commands (/)</div>
                     <div class="card-sub">compartilhado entre o Chat da UI, Claude Code (.claude/commands), Gemini (.gemini/skills) e Codex (.codex/skills.yaml)</div>
                   </div>
-                  <span class="chip cyan">{{ state.allCommands(true).length }} skills</span>
+                  <span class="chip orange">{{ state.allCommands(true).length }} skills</span>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                   @for (sk of state.allCommands(true); track sk.c) {
-                    <div class="p-3.5 rounded-xl bg-[var(--c-bg-elev)] border border-[var(--c-border)] hover:border-[#00B4D8] transition-all flex flex-col justify-between gap-2.5">
+                    <div class="p-3.5 rounded-[6px] bg-[var(--c-bg-elev)] border border-[var(--c-border)] hover:border-[#f1a10b] transition-all flex flex-col justify-between gap-2.5">
                       <div>
                         <div class="flex items-center justify-between gap-2 mb-1">
-                          <span class="font-mono text-xs font-bold text-[#38BDF8]">/{{ sk.c }}</span>
+                          <span class="font-mono text-xs font-bold text-[var(--c-acc)]">/{{ sk.c }}</span>
                           <span class="chip purple">{{ sk.e }}</span>
                         </div>
                         <div class="text-[11px] text-[var(--c-text-2)] mt-1">{{ sk.d }}</div>
@@ -739,9 +757,9 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
                         <span class="text-[10px] font-mono text-[var(--c-text-muted)] truncate">{{ sk.a || 'sem argumentos' }}</span>
                         <button
                           type="button"
-                          class="text-[11px] font-mono text-[#00B4D8] hover:underline shrink-0 cursor-pointer"
+                          class="text-[11px] font-mono text-[var(--c-link)] hover:underline shrink-0 cursor-pointer"
                           (click)="runSlashSkill('/' + sk.c + ' ')">
-                          executar →
+                          executar »
                         </button>
                       </div>
                     </div>
@@ -760,13 +778,13 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                   <input
                     type="text"
-                    class="px-3 py-2 rounded-lg bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs font-mono text-[var(--c-text)]"
+                    class="px-3 py-2 rounded-[6px] bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs font-mono text-[var(--c-text)] cm-input-focus"
                     placeholder="/minha-skill"
                     [ngModel]="state.nsCmd()"
                     (ngModelChange)="state.nsCmd.set($event)" />
                   <input
                     type="text"
-                    class="md:col-span-2 px-3 py-2 rounded-lg bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs text-[var(--c-text)]"
+                    class="md:col-span-2 px-3 py-2 rounded-[6px] bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs text-[var(--c-text)] cm-input-focus"
                     placeholder="System prompt da skill..."
                     [ngModel]="state.nsPrompt()"
                     (ngModelChange)="state.nsPrompt.set($event)" />
@@ -806,10 +824,10 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
                       <div>
                         <div class="flex justify-between text-xs mb-1">
                           <span>{{ fmt[0] }}</span>
-                          <span class="font-mono text-[#38BDF8]">{{ fmt[1] }}%</span>
+                          <span class="font-mono text-[var(--c-acc)]">{{ fmt[1] }}%</span>
                         </div>
-                        <div class="h-2 rounded-full bg-[var(--c-bg-elev)] overflow-hidden">
-                          <div class="h-full bg-gradient-to-r from-[#0077B6] to-[#00B4D8]" [style.width.%]="fmt[1]"></div>
+                        <div class="h-2.5 rounded-[2px] bg-[var(--c-bg-elev)] overflow-hidden">
+                          <div class="h-full" style="background: var(--grad-brand);" [style.width.%]="fmt[1]"></div>
                         </div>
                       </div>
                     }
@@ -828,8 +846,8 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
                   </div>
                   <div class="flex flex-col gap-2">
                     @for (step of activeMetrics().p; track step; let idx = $index) {
-                      <div class="p-3 rounded-xl bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs text-[var(--c-text)]">
-                        <strong class="text-[#38BDF8] font-mono mr-1.5">{{ idx + 1 }}.</strong> {{ step }}
+                      <div class="p-3 rounded-[6px] bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs text-[var(--c-text)]">
+                        <strong class="text-[var(--c-acc)] font-mono mr-1.5">{{ idx + 1 }}.</strong> {{ step }}
                       </div>
                     }
                   </div>
@@ -857,7 +875,7 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
     <!-- ==================== MODAL: COMPOSER MULTI-CONTA ==================== -->
     @if (state.comp(); as comp) {
       <div class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="w-full max-w-3xl rounded-2xl bg-[var(--c-panel)] border border-[var(--c-border-strong)] shadow-2xl overflow-hidden grid grid-cols-1 md:grid-cols-5">
+        <div class="w-full max-w-3xl rounded-[10px] bg-[var(--c-panel)] border border-[var(--c-border-strong)] shadow-2xl overflow-hidden grid grid-cols-1 md:grid-cols-5">
           <div class="p-5 md:col-span-3 flex flex-col gap-3">
             <div class="flex items-center justify-between">
               <h3 class="text-sm font-bold text-[var(--c-text)]">Novo Post Multi-Conta · Graph API v22.0</h3>
@@ -868,7 +886,7 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
               <div>
                 <label class="text-[11px] font-mono text-[var(--c-text-muted)] block mb-1">Formato</label>
                 <select
-                  class="w-full px-2.5 py-1.5 rounded-lg bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs text-[var(--c-text)]"
+                  class="w-full px-2.5 py-1.5 rounded-[6px] bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs text-[var(--c-text)] cm-input-focus"
                   [ngModel]="comp.t"
                   (ngModelChange)="setComposerFormat($event)">
                   <option value="CAROUSEL">CARROSSEL</option>
@@ -881,7 +899,7 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
                 <label class="text-[11px] font-mono text-[var(--c-text-muted)] block mb-1">Horário</label>
                 <input
                   type="text"
-                  class="w-full px-2.5 py-1.5 rounded-lg bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs text-[var(--c-text)]"
+                  class="w-full px-2.5 py-1.5 rounded-[6px] bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs text-[var(--c-text)] cm-input-focus"
                   [ngModel]="comp.time"
                   (ngModelChange)="state.patchComposer({ time: $event })" />
               </div>
@@ -891,7 +909,7 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
               <label class="text-[11px] font-mono text-[var(--c-text-muted)] block mb-1">Tópico / Hook Principal</label>
               <input
                 type="text"
-                class="w-full px-3 py-1.5 rounded-lg bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs text-[var(--c-text)]"
+                class="w-full px-3 py-1.5 rounded-[6px] bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs text-[var(--c-text)] cm-input-focus"
                 placeholder="Ex: 3 sinais de que seu produto precisa de um agente de IA"
                 [ngModel]="comp.topic"
                 (ngModelChange)="state.patchComposer({ topic: $event })" />
@@ -902,14 +920,14 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
                 <label class="text-[11px] font-mono text-[var(--c-text-muted)]">Legenda</label>
                 <button
                   type="button"
-                  class="text-[11px] font-mono text-[#00B4D8] hover:underline cursor-pointer"
+                  class="text-[11px] font-mono text-[var(--c-link)] hover:underline cursor-pointer"
                   (click)="state.generateComposerCaptionWithAi()">
-                  ✨ gerar com Claude
+                  gerar com Claude »
                 </button>
               </div>
               <textarea
                 rows="4"
-                class="w-full px-3 py-2 rounded-lg bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs text-[var(--c-text)]"
+                class="w-full px-3 py-2 rounded-[10px] bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs text-[var(--c-text)] cm-input-focus"
                 placeholder="Digite a legenda com CTA..."
                 [ngModel]="comp.cap"
                 (ngModelChange)="state.patchComposer({ cap: $event })"></textarea>
@@ -919,7 +937,7 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
               <label class="text-[11px] font-mono text-[var(--c-text-muted)] block mb-1">Prompt Visual (Midjourney / Flux)</label>
               <input
                 type="text"
-                class="w-full px-3 py-1.5 rounded-lg bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs font-mono text-[var(--c-text)]"
+                class="w-full px-3 py-1.5 rounded-[6px] bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs font-mono text-[var(--c-text)] cm-input-focus"
                 placeholder="--ar 4:5 --style raw --v 6"
                 [ngModel]="comp.pr"
                 (ngModelChange)="state.patchComposer({ pr: $event })" />
@@ -927,7 +945,7 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
 
             <div class="flex items-center justify-end gap-2 pt-2">
               <cm-button variant="ghost" size="sm" (clicked)="state.saveComposerPosts('DRAFT')">salvar rascunho</cm-button>
-              <cm-button variant="primary" size="sm" (clicked)="state.saveComposerPosts('SCHEDULED')">agendar publicação</cm-button>
+              <cm-button variant="primary" size="sm" [arrow]="true" (clicked)="state.saveComposerPosts('SCHEDULED')">agendar publicação</cm-button>
             </div>
           </div>
 
@@ -935,8 +953,8 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
           <div class="p-5 bg-[var(--c-bg-elev)] border-l border-[var(--c-border)] md:col-span-2 flex flex-col justify-between">
             <div>
               <div class="text-[10px] font-mono uppercase text-[var(--c-text-muted)] mb-2">Preview 4:5 · &#64;{{ state.activeAccount().user }}</div>
-              <div class="aspect-[4/5] rounded-xl bg-gradient-to-br from-[#0B0F19] via-[#111827] to-[#0077B6]/40 border border-[var(--c-border)] p-4 flex flex-col justify-between">
-                <div class="flex items-center justify-between text-[10px] font-mono text-[#38BDF8]">
+              <div class="aspect-[4/5] rounded-[6px] bg-gradient-to-br from-[#2b2b2b] via-[#1f1f1f] to-[#f1a10b]/25 border border-[var(--c-border)] p-4 flex flex-col justify-between">
+                <div class="flex items-center justify-between text-[10px] font-mono text-[#fbd23a]">
                   <span>{{ comp.t }}</span>
                   <span>&#64;{{ state.activeAccount().user }}</span>
                 </div>
@@ -958,8 +976,8 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
 
     <!-- ==================== TOAST NOTIFICATION ==================== -->
     @if (state.toastMsg()) {
-      <div class="fixed bottom-5 right-5 z-50 px-4 py-2.5 rounded-xl bg-[#0B0F19] border border-[#00B4D8] text-xs font-medium text-[#F8FAFC] shadow-2xl flex items-center gap-2">
-        <span class="w-2 h-2 rounded-full bg-[#00B4D8]"></span>
+      <div class="fixed bottom-5 right-5 z-50 px-4 py-2.5 rounded-[6px] bg-[var(--c-pop)] border border-[#f6bc03]/60 text-xs font-medium text-[var(--c-text)] shadow-2xl flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-[#f6bc03]"></span>
         <span>{{ state.toastMsg() }}</span>
       </div>
     }

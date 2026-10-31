@@ -15,37 +15,46 @@ module.exports = {
     themes: [
       {
         "codemix-dark": {
-          "primary": "#00B4D8",          // Cyan Tecnológico Codemix (HSL 190)
-          "primary-content": "#04161C",
-          "secondary": "#F77F00",        // Laranja de Ação/Destaque (HSL 28)
-          "secondary-content": "#1A0D00",
-          "accent": "#7209B7",           // Roxo IA / Copilot
-          "neutral": "#1E293B",          // Slate estrutural
-          "base-100": "#0B0F19",         // Fundo principal (Deep Space)
-          "base-200": "#111827",         // Cards e Sidebar
-          "base-300": "#1F2937",         // Bordas e Hover states
-          "base-content": "#F8FAFC",     // Texto primário
-          "info": "#38BDF8",
-          "success": "#10B981",
-          "warning": "#F59E0B",
-          "error": "#EF4444",
-          "--rounded-box": "0.75rem",
-          "--rounded-btn": "0.5rem",
-          "--tab-radius": "0.5rem",
+          "primary": "#f6bc03",
+          "primary-content": "#2b2b2b",
+          "secondary": "#f1a10b",
+          "secondary-content": "#2b2b2b",
+          "accent": "#fbd23a",
+          "accent-content": "#2b2b2b",
+          "neutral": "#44494c",
+          "neutral-content": "#fefefe",
+          "base-100": "#2b2b2b",
+          "base-200": "#1f1f1f",
+          "base-300": "#363d3f",
+          "base-content": "#fefefe",
+          "info": "#6fb0d6",
+          "success": "#7bbf4a",
+          "warning": "#f1a10b",
+          "error": "#e8604f",
+          "--rounded-box": "0.375rem",
+          "--rounded-btn": "0.25rem",
+          "--tab-radius": "0.25rem",
         },
         "codemix-light": {
-          "primary": "#0077B6",
-          "secondary": "#EA580C",
-          "accent": "#6D28D9",
-          "neutral": "#334155",
-          "base-100": "#FFFFFF",
-          "base-200": "#F8FAFC",
-          "base-300": "#E2E8F0",
-          "base-content": "#0F172A",
+          "primary": "#f1a10b",
+          "primary-content": "#2b2b2b",
+          "secondary": "#e98015",
+          "secondary-content": "#ffffff",
+          "accent": "#a85808",
+          "accent-content": "#ffffff",
+          "neutral": "#44494c",
+          "neutral-content": "#ffffff",
+          "base-100": "#ffffff",
+          "base-200": "#ececec",
+          "base-300": "#f4f4f4",
+          "base-content": "#2b2b2b",
+          "info": "#2d6f96",
+          "success": "#3f7a1c",
+          "warning": "#b5620b",
+          "error": "#b53a2c",
         }
       }
     ],
     darkTheme: "codemix-dark",
   },
 };
-

@@ -19,7 +19,7 @@ import { SkillCommand } from '../../data/seed-data';
               class="flex-1 flex items-center justify-center gap-1.5"
               [class.active]="state.rightTab() === 'copilot'"
               (click)="state.rightTab.set('copilot')">
-              <span class="w-2 h-2 rounded-full bg-[#A855F7] shadow-[0_0_8px_#A855F7]"></span>
+              <span class="w-2 h-2 rounded-full bg-[#f6bc03]"></span>
               <span>ai copilot</span>
             </button>
             <button
@@ -57,17 +57,16 @@ import { SkillCommand } from '../../data/seed-data';
           </div>
 
           <!-- Engine Selector -->
-          <div class="grid grid-cols-4 gap-1 bg-[var(--c-bg-elev)] p-1 rounded-lg border border-[var(--c-border)]">
+          <div class="grid grid-cols-4 gap-1 bg-[var(--c-bg-elev)] p-1 rounded-[6px] border border-[var(--c-border)]">
             @for (eng of engines; track eng.id) {
               <button
                 type="button"
-                class="py-1 px-1.5 rounded-md text-[11px] font-medium transition-all flex items-center justify-center gap-1 cursor-pointer"
-                [class.bg-[var(--c-card)]]="ai.engine() === eng.id"
-                [class.text-[var(--c-text)]]="ai.engine() === eng.id"
-                [class.shadow-sm]="ai.engine() === eng.id"
-                [class.text-[var(--c-text-muted)]]="ai.engine() !== eng.id"
+                class="py-1 px-1.5 rounded-[4px] text-[11px] font-medium transition-all flex items-center justify-center gap-1 cursor-pointer"
+                [style.background]="ai.engine() === eng.id ? '#f6bc03' : 'transparent'"
+                [style.color]="ai.engine() === eng.id ? '#2b2b2b' : 'var(--c-text-2)'"
+                [style.font-weight]="ai.engine() === eng.id ? '600' : '400'"
                 (click)="ai.engine.set(eng.id)">
-                <span class="w-1.5 h-1.5 rounded-full" [style.background]="eng.dot"></span>
+                <span class="w-1.5 h-1.5 rounded-full" [style.background]="ai.engine() === eng.id ? '#2b2b2b' : eng.dot"></span>
                 <span>{{ eng.label }}</span>
               </button>
             }
@@ -85,27 +84,25 @@ import { SkillCommand } from '../../data/seed-data';
               </div>
             } @else {
               <div
-                class="p-3 rounded-xl text-[12.5px] leading-relaxed border transition-all"
-                [class.bg-[var(--c-card)]]="m.role === 'ai'"
-                [class.border-[var(--c-border)]]="m.role === 'ai'"
-                [class.bg-[rgba(114,9,183,0.12)]]="m.role === 'user'"
-                [class.border-[rgba(168,85,247,0.35)]]="m.role === 'user'"
+                class="p-3 rounded-[8px] text-[12.5px] leading-relaxed border transition-all"
+                [style.background]="m.role === 'ai' ? 'var(--c-card)' : 'rgba(246,188,3,0.1)'"
+                [style.border-color]="m.role === 'ai' ? 'var(--c-border)' : 'rgba(241,161,11,0.4)'"
                 [class.ml-5]="m.role === 'user'">
                 <div class="flex items-center justify-between gap-2 mb-1.5 text-[10px] font-mono text-[var(--c-text-muted)]">
                   <span class="flex items-center gap-1.5">
                     @if (m.role === 'ai') {
-                      <span class="px-1.5 py-0.5 rounded bg-[#7209B7]/25 text-[#D8B4FE] uppercase font-semibold">
+                      <span class="px-1.5 py-0.5 rounded-[2px] bg-[rgba(246,188,3,0.16)] text-[var(--c-acc)] uppercase font-semibold">
                         {{ m.engine || 'claude' }}
                       </span>
                       @if (m.skill) {
-                        <span class="text-[#00B4D8]">{{ m.skill }}</span>
+                        <span class="text-[var(--c-link)]">{{ m.skill }}</span>
                       }
                     } @else {
                       <span class="text-[var(--c-text-2)]">você · &#64;{{ state.activeAccount().user }}</span>
                     }
                   </span>
                   @if (m.role === 'ai' && !m.done) {
-                    <span class="text-[#A855F7]">gerando...</span>
+                    <span class="text-[var(--c-acc)]">gerando...</span>
                   }
                 </div>
 
@@ -115,14 +112,14 @@ import { SkillCommand } from '../../data/seed-data';
                   <div class="flex items-center gap-1.5 mt-2.5 pt-2 border-t border-[var(--c-border)]">
                     <button
                       type="button"
-                      class="text-[11px] px-2 py-0.5 rounded bg-[var(--c-surface)] hover:bg-[var(--c-surface-hover)] text-[var(--c-text-2)] transition-colors cursor-pointer"
+                      class="text-[11px] px-2 py-0.5 rounded-[4px] bg-[var(--c-surface)] hover:bg-[var(--c-surface-hover)] text-[var(--c-text-2)] transition-colors cursor-pointer"
                       (click)="state.copyText(m.full || m.text, m.id)">
                       {{ state.copied() === m.id ? 'copiado!' : 'copiar' }}
                     </button>
                     @if (m.saveable) {
                       <button
                         type="button"
-                        class="text-[11px] px-2 py-0.5 rounded bg-[#00B4D8]/15 hover:bg-[#00B4D8]/25 text-[#00B4D8] transition-colors cursor-pointer"
+                        class="text-[11px] px-2 py-0.5 rounded-[4px] bg-[rgba(246,188,3,0.14)] hover:bg-[rgba(246,188,3,0.22)] text-[var(--c-acc)] transition-colors cursor-pointer"
                         (click)="ai.saveMessageAsDraft(m)">
                         salvar como rascunho
                       </button>
@@ -139,7 +136,7 @@ import { SkillCommand } from '../../data/seed-data';
           @for (chip of quickSkills; track chip) {
             <button
               type="button"
-              class="px-2 py-0.5 rounded-full text-[11px] font-mono bg-[var(--c-card)] hover:bg-[var(--c-surface-hover)] text-[#38BDF8] border border-[var(--c-border)] whitespace-nowrap transition-colors cursor-pointer"
+              class="px-2 py-0.5 rounded-full text-[11px] font-mono bg-[var(--c-card)] hover:bg-[var(--c-surface-hover)] text-[var(--c-acc)] border border-[var(--c-border)] whitespace-nowrap transition-colors cursor-pointer"
               (click)="ai.prefill(chip + ' ')">
               {{ chip }}
             </button>
@@ -149,7 +146,7 @@ import { SkillCommand } from '../../data/seed-data';
         <!-- Composer with Floating "/" Slash Command Palette -->
         <div class="p-3 border-t border-[var(--c-border)] relative">
           @if (ai.isPaletteOpen()) {
-            <div class="absolute bottom-full left-3 right-3 mb-2 max-h-64 overflow-y-auto rounded-xl bg-[var(--c-bg-elev)] border border-[var(--c-border-strong)] shadow-2xl z-30 p-1.5">
+            <div class="absolute bottom-full left-3 right-3 mb-2 max-h-64 overflow-y-auto rounded-[6px] bg-[var(--c-pop)] border border-[var(--c-border-strong)] shadow-2xl z-30 p-1.5">
               <div class="px-2.5 py-1 text-[10px] font-mono uppercase tracking-wider text-[var(--c-text-muted)] flex items-center justify-between">
                 <span>Catálogo de Skills ({{ ai.filteredCommands().length }})</span>
                 <span>↑↓ navegar · Enter inserir</span>
@@ -157,33 +154,23 @@ import { SkillCommand } from '../../data/seed-data';
               @for (s of ai.filteredCommands(); track s.c; let idx = $index) {
                 <button
                   type="button"
-                  class="w-full text-left px-2.5 py-2 rounded-lg flex items-start justify-between gap-2 transition-colors cursor-pointer"
-                  [class.bg-[#00B4D8]/15]="idx === ai.selIdx()"
-                  [class.hover:bg-[var(--c-surface)]]="idx !== ai.selIdx()"
+                  class="w-full text-left px-2.5 py-2 rounded-[4px] flex items-start justify-between gap-2 transition-colors cursor-pointer"
+                  [style.background]="idx === ai.selIdx() ? 'rgba(246,188,3,0.16)' : 'transparent'"
                   (click)="ai.pickCommand(s)">
                   <div class="min-w-0">
                     <div class="flex items-center gap-1.5">
-                      <span class="font-mono text-xs font-semibold text-[#38BDF8]">/{{ s.c }}</span>
+                      <span class="font-mono text-xs font-semibold text-[var(--c-acc)]">/{{ s.c }}</span>
                       <span class="text-[10.5px] font-mono text-[var(--c-text-muted)] truncate">{{ s.a }}</span>
                     </div>
                     <div class="text-[11px] text-[var(--c-text-2)] truncate mt-0.5">{{ s.d }}</div>
                   </div>
-                  <span
-                    class="px-1.5 py-0.5 rounded text-[10px] font-mono uppercase shrink-0"
-                    [class.bg-[#F77F00]/20]="s.e === 'claude'"
-                    [class.text-[#FDBA74]]="s.e === 'claude'"
-                    [class.bg-[#10B981]/20]="s.e === 'codex'"
-                    [class.text-[#6EE7B7]]="s.e === 'codex'"
-                    [class.bg-[#38BDF8]/20]="s.e === 'gemini'"
-                    [class.text-[#7DD3FC]]="s.e === 'gemini'">
-                    {{ s.e }}
-                  </span>
+                  <span class="chip orange shrink-0">{{ s.e }}</span>
                 </button>
               }
             </div>
           }
 
-          <div class="flex flex-col gap-2 bg-[var(--c-bg-elev)] border border-[var(--c-border-strong)] rounded-xl p-2.5 focus-within:border-[#00B4D8]">
+          <div class="flex flex-col gap-2 bg-[var(--c-bg-elev)] border border-[var(--c-border-strong)] rounded-[10px] p-2.5 focus-within:border-[#f1a10b]">
             <textarea
               rows="2"
               class="w-full bg-transparent text-xs text-[var(--c-text)] placeholder-[var(--c-text-muted)] focus:outline-none resize-none font-sans"
@@ -195,7 +182,7 @@ import { SkillCommand } from '../../data/seed-data';
               <div class="flex items-center gap-1.5">
                 <button
                   type="button"
-                  class="px-2 py-0.5 rounded text-[11px] font-mono bg-[var(--c-surface)] hover:bg-[var(--c-surface-hover)] text-[#38BDF8] cursor-pointer"
+                  class="px-2 py-0.5 rounded-[4px] text-[11px] font-mono bg-[var(--c-surface)] hover:bg-[var(--c-surface-hover)] text-[var(--c-acc)] cursor-pointer"
                   (click)="ai.onInputChange('/')">
                   / skills
                 </button>
@@ -205,7 +192,8 @@ import { SkillCommand } from '../../data/seed-data';
               </div>
               <button
                 type="button"
-                class="px-3 py-1 rounded-lg text-xs font-semibold bg-gradient-to-r from-[#0077B6] to-[#00B4D8] text-[#04161C] hover:brightness-110 transition-all cursor-pointer disabled:opacity-40"
+                class="px-3 py-1 rounded-[4px] text-xs font-semibold border border-[#c96a0c] text-[#2b2b2b] hover:brightness-105 transition-all cursor-pointer disabled:opacity-40"
+                style="background: var(--grad-brand); box-shadow: var(--shadow-button);"
                 [disabled]="!ai.input().trim()"
                 (click)="ai.send()">
                 enviar ↵
@@ -227,7 +215,7 @@ import { SkillCommand } from '../../data/seed-data';
             <div class="flex flex-col gap-2">
               <button
                 type="button"
-                class="w-full text-left p-2.5 rounded-lg bg-[var(--c-bg-elev)] border border-[var(--c-border)] hover:border-[#00B4D8] transition-colors flex items-center justify-between cursor-pointer"
+                class="w-full text-left p-2.5 rounded-[6px] bg-[var(--c-bg-elev)] border border-[var(--c-border)] hover:border-[#f1a10b] transition-colors flex items-center justify-between cursor-pointer"
                 (click)="state.setView('inbox')">
                 <div>
                   <div class="text-xs font-semibold text-[var(--c-text)]">DMs aguardando resposta</div>
@@ -237,7 +225,7 @@ import { SkillCommand } from '../../data/seed-data';
               </button>
               <button
                 type="button"
-                class="w-full text-left p-2.5 rounded-lg bg-[var(--c-bg-elev)] border border-[var(--c-border)] hover:border-[#00B4D8] transition-colors flex items-center justify-between cursor-pointer"
+                class="w-full text-left p-2.5 rounded-[6px] bg-[var(--c-bg-elev)] border border-[var(--c-border)] hover:border-[#f1a10b] transition-colors flex items-center justify-between cursor-pointer"
                 (click)="state.setView('comments')">
                 <div>
                   <div class="text-xs font-semibold text-[var(--c-text)]">Comentários sem resposta</div>
@@ -258,26 +246,15 @@ import { SkillCommand } from '../../data/seed-data';
             </div>
             <div class="flex flex-col gap-2">
               @for (post of state.accountPosts().slice(0, 4); track post.id) {
-                <div class="p-2.5 rounded-lg bg-[var(--c-bg-elev)] border border-[var(--c-border)] flex items-start justify-between gap-2">
+                <div class="p-2.5 rounded-[6px] bg-[var(--c-bg-elev)] border border-[var(--c-border)] flex items-start justify-between gap-2">
                   <div class="min-w-0">
                     <div class="flex items-center gap-1.5 mb-0.5">
-                      <span class="text-[10px] font-mono uppercase px-1.5 py-0.2 rounded bg-[var(--c-surface)] text-[#38BDF8]">{{ post.t }}</span>
+                      <span class="text-[10px] font-mono uppercase px-1.5 py-0.2 rounded-[2px] bg-[var(--c-surface)] text-[var(--c-acc)]">{{ post.t }}</span>
                       <span class="text-[10px] font-mono text-[var(--c-text-muted)]">{{ post.time || 'rascunho' }}</span>
                     </div>
                     <div class="text-xs font-medium text-[var(--c-text)] truncate">{{ post.topic }}</div>
                   </div>
-                  <span
-                    class="text-[10px] font-mono px-1.5 py-0.5 rounded shrink-0"
-                    [class.bg-[#10B981]/15]="post.s === 'PUBLISHED'"
-                    [class.text-[#34D399]]="post.s === 'PUBLISHED'"
-                    [class.bg-[#38BDF8]/15]="post.s === 'SCHEDULED'"
-                    [class.text-[#38BDF8]]="post.s === 'SCHEDULED'"
-                    [class.bg-[#A855F7]/15]="post.s === 'PROMPT_READY'"
-                    [class.text-[#C084FC]]="post.s === 'PROMPT_READY'"
-                    [class.bg-[var(--c-surface)]]="post.s === 'DRAFT'"
-                    [class.text-[var(--c-text-muted)]]="post.s === 'DRAFT'">
-                    {{ post.s }}
-                  </span>
+                  <span class="chip orange shrink-0">{{ post.s }}</span>
                 </div>
               }
             </div>
@@ -287,14 +264,14 @@ import { SkillCommand } from '../../data/seed-data';
           <div class="card-p">
             <div class="card-head">
               <div class="card-title text-xs">saúde da integração Meta</div>
-              <span class="w-2 h-2 rounded-full bg-[#10B981]"></span>
+              <span class="w-2 h-2 rounded-full bg-[var(--c-ok)]"></span>
             </div>
             <div class="flex flex-col gap-2 text-xs">
-              <div class="p-2 rounded-lg bg-[var(--c-bg-elev)] border border-[var(--c-border)]">
+              <div class="p-2 rounded-[6px] bg-[var(--c-bg-elev)] border border-[var(--c-border)]">
                 <div class="font-medium text-[var(--c-text)]">Token OAuth · {{ state.activeAccount().st }}</div>
                 <div class="text-[11px] text-[var(--c-text-muted)] mt-0.5">{{ state.activeAccount().days }} dias restantes · {{ state.activeAccount().perms }}/4 escopos ativos</div>
               </div>
-              <div class="p-2 rounded-lg bg-[var(--c-bg-elev)] border border-[var(--c-border)]">
+              <div class="p-2 rounded-[6px] bg-[var(--c-bg-elev)] border border-[var(--c-border)]">
                 <div class="font-medium text-[var(--c-text)]">Webhook X-Hub-Signature-256</div>
                 <div class="text-[11px] text-[var(--c-text-muted)] mt-0.5">{{ state.activeAccount().wh ? 'Ativo e recebendo eventos em tempo real' : 'Reconexão necessária' }}</div>
               </div>

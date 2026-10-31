@@ -82,9 +82,11 @@ export class AccountStateService {
     loader: async () => {
       try {
         await this.supabase.checkConnectionAndLoadSkills();
-        const res = await fetch('/.ai-skills/registry.json');
-        if (!res.ok) return null;
-        return await res.json();
+        const res = await fetch('/ai-skills/registry.json');
+        if (res.ok) return await res.json();
+        const fallback = await fetch('/.ai-skills/registry.json');
+        if (!fallback.ok) return null;
+        return await fallback.json();
       } catch {
         return null;
       }
