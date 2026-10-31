@@ -86,7 +86,7 @@ export class SupabaseService {
   }
 
   async invokeEdgeFunction<T>(
-    functionName: 'ai-router' | 'meta-oauth' | 'meta-webhook' | 'ig-publisher',
+    functionName: 'ai-router' | 'meta-oauth' | 'meta-webhook' | 'ig-publisher' | 'meta-marketing-api',
     payload: Record<string, unknown>
   ): Promise<T | null> {
     if (typeof fetch === 'undefined') return null;

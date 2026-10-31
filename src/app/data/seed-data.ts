@@ -110,6 +110,58 @@ export interface ContactItem {
   tags: string[];
   src: string;
   last: string;
+  email?: string;
+  phone?: string;
+  metaSynced?: boolean;
+}
+
+export interface MetaAdAccount {
+  id: string; // Ex: 'act_1029384756'
+  a: string; // id da conta ig vinculada
+  name: string;
+  currency: string;
+  status: 'ACTIVE' | 'DISABLED' | 'PENDING';
+  balance: number; // R$
+  timezone: string;
+  pixelId: string;
+}
+
+export type MetaAudienceType = 'CUSTOM_LIST' | 'LOOKALIKE' | 'IG_ENGAGEMENT';
+
+export interface MetaAudience {
+  id: string;
+  a: string;
+  name: string;
+  type: MetaAudienceType;
+  size: number;
+  status: 'READY' | 'SYNCING' | 'ERROR';
+  lookalikeRatio?: number; // 1 = 1%, 2 = 2%, etc.
+  originAudienceName?: string;
+  country?: string;
+  lastSync: string;
+}
+
+export type MetaCampaignObjective = 'OUTCOME_LEADS' | 'OUTCOME_ENGAGEMENT' | 'OUTCOME_TRAFFIC' | 'OUTCOME_SALES';
+export type MetaCampaignStatus = 'ACTIVE' | 'PAUSED' | 'ARCHIVED';
+
+export interface MetaCampaign {
+  id: string;
+  a: string;
+  name: string;
+  objective: MetaCampaignObjective;
+  status: MetaCampaignStatus;
+  audienceId: string;
+  audienceName: string;
+  isLookalike: boolean;
+  dailyBudget: number; // R$
+  spend: number;
+  impressions: number;
+  clicks: number;
+  leads: number;
+  cpa: number; // R$ por lead
+  roas: number;
+  startDate: string;
+  connectedPostId?: string;
 }
 
 export type InteractionType = 'DM' | 'COMMENT' | 'STORY_MENTION';
@@ -713,15 +765,15 @@ export const SEED_FLOWS: FlowItem[] = [
 ];
 
 export const SEED_CONTACTS: ContactItem[] = [
-  { id: 'c1', a: 'a1', u: 'marina.lopes.dev', tags: ['lead quente'], src: 'AGENTE . Reels', last: 'hoje 09:12' },
-  { id: 'c2', a: 'a1', u: 'lucas.prod', tags: ['lead quente', 'novo'], src: 'AGENTE . Reels', last: 'hoje 05:55' },
-  { id: 'c3', a: 'a1', u: 'clinica.horizonte', tags: ['cliente'], src: 'menção de story', last: 'ontem' },
-  { id: 'c4', a: 'a1', u: 'rafa.tech', tags: ['novo'], src: 'comentário', last: 'hoje 08:40' },
-  { id: 'c5', a: 'a1', u: 'dev.carla', tags: ['novo'], src: 'comentário', last: 'hoje 07:30' },
-  { id: 'c6', a: 'a3', u: 'tutor.bia', tags: ['cliente'], src: 'dm', last: 'hoje 10:03' },
-  { id: 'c7', a: 'a3', u: 'petshop.sol', tags: ['lead quente'], src: 'AGENDA . Reels', last: 'hoje 09:30' },
-  { id: 'c8', a: 'a3', u: 'clinica.pet.sul', tags: ['lead quente', 'novo'], src: 'comentário', last: 'hoje 08:05' },
-  { id: 'c9', a: 'a2', u: 'loja.centro', tags: ['lead quente'], src: 'dm', last: 'hoje 11:20' },
+  { id: 'c1', a: 'a1', u: 'marina.lopes.dev', email: 'marina.dev@gmail.com', phone: '+5511987654321', tags: ['lead quente'], src: 'AGENTE . Reels', last: 'hoje 09:12', metaSynced: true },
+  { id: 'c2', a: 'a1', u: 'lucas.prod', email: 'lucas.product@techsaas.com', phone: '+5511976543210', tags: ['lead quente', 'novo'], src: 'AGENTE . Reels', last: 'hoje 05:55', metaSynced: true },
+  { id: 'c3', a: 'a1', u: 'clinica.horizonte', email: 'contato@clinicahorizonte.med.br', phone: '+5521998877665', tags: ['cliente'], src: 'menção de story', last: 'ontem', metaSynced: true },
+  { id: 'c4', a: 'a1', u: 'rafa.tech', email: 'rafael.tecnologia@outlook.com', phone: '+5531988776655', tags: ['novo'], src: 'comentário', last: 'hoje 08:40', metaSynced: false },
+  { id: 'c5', a: 'a1', u: 'dev.carla', email: 'carla.costa.eng@gmail.com', phone: '+5541999881122', tags: ['novo'], src: 'comentário', last: 'hoje 07:30', metaSynced: false },
+  { id: 'c6', a: 'a3', u: 'tutor.bia', email: 'beatriz.vet@hotmail.com', phone: '+5519987651234', tags: ['cliente'], src: 'dm', last: 'hoje 10:03', metaSynced: true },
+  { id: 'c7', a: 'a3', u: 'petshop.sol', email: 'financeiro@petshopsol.com.br', phone: '+5511991234567', tags: ['lead quente'], src: 'AGENDA . Reels', last: 'hoje 09:30', metaSynced: true },
+  { id: 'c8', a: 'a3', u: 'clinica.pet.sul', email: 'adm@petsul.com.br', phone: '+5551981223344', tags: ['lead quente', 'novo'], src: 'comentário', last: 'hoje 08:05', metaSynced: false },
+  { id: 'c9', a: 'a2', u: 'loja.centro', email: 'comercial@lojacentrosp.com.br', phone: '+5511971112233', tags: ['lead quente'], src: 'dm', last: 'hoje 11:20', metaSynced: true },
 ];
 
 export const SEED_INTS: InteractionItem[] = [
@@ -899,4 +951,176 @@ export const SEED_RULES: KeywordRule[] = [
     on: true,
   },
 ];
+
+export const SEED_AD_ACCOUNTS: MetaAdAccount[] = [
+  {
+    id: 'act_1029384756',
+    a: 'a1',
+    name: 'Codemix Hub — Principal Ads',
+    currency: 'BRL',
+    status: 'ACTIVE',
+    balance: 1450.0,
+    timezone: 'America/Sao_Paulo',
+    pixelId: 'px_8372910482910',
+  },
+  {
+    id: 'act_2938471029',
+    a: 'a2',
+    name: 'Duplo D Moda & Estilo Ads',
+    currency: 'BRL',
+    status: 'ACTIVE',
+    balance: 890.0,
+    timezone: 'America/Sao_Paulo',
+    pixelId: 'px_9482019482012',
+  },
+  {
+    id: 'act_8392019481',
+    a: 'a3',
+    name: 'VetBots Automações Ads',
+    currency: 'BRL',
+    status: 'ACTIVE',
+    balance: 2310.0,
+    timezone: 'America/Sao_Paulo',
+    pixelId: 'px_1029384820193',
+  },
+];
+
+export const SEED_AUDIENCES: MetaAudience[] = [
+  {
+    id: 'aud_1',
+    a: 'a1',
+    name: 'Lookalike 1% Brasil — Leads Quentes de DMs & Comentários',
+    type: 'LOOKALIKE',
+    size: 1650000,
+    status: 'READY',
+    lookalikeRatio: 1,
+    originAudienceName: 'Lista VIP — Leads Inbox & Palavra "AGENTE"',
+    country: 'BR',
+    lastSync: 'hoje às 06:30',
+  },
+  {
+    id: 'aud_2',
+    a: 'a1',
+    name: 'Lista VIP — Leads Inbox & Palavra "AGENTE"',
+    type: 'CUSTOM_LIST',
+    size: 420,
+    status: 'READY',
+    country: 'BR',
+    lastSync: 'hoje às 06:15',
+  },
+  {
+    id: 'aud_3',
+    a: 'a1',
+    name: 'Engajamento IG 90 Dias — Comentários & Directs',
+    type: 'IG_ENGAGEMENT',
+    size: 24500,
+    status: 'READY',
+    country: 'BR',
+    lastSync: 'ontem às 23:00',
+  },
+  {
+    id: 'aud_4',
+    a: 'a1',
+    name: 'Lookalike 2% Brasil — Engajadores de Reels & Carrosséis',
+    type: 'LOOKALIKE',
+    size: 3300000,
+    status: 'READY',
+    lookalikeRatio: 2,
+    originAudienceName: 'Engajamento IG 90 Dias — Comentários & Directs',
+    country: 'BR',
+    lastSync: 'ontem às 23:45',
+  },
+  {
+    id: 'aud_5',
+    a: 'a3',
+    name: 'Lookalike 1% Brasil — Donos de Clínicas Veterinárias & Pet Shops',
+    type: 'LOOKALIKE',
+    size: 1620000,
+    status: 'READY',
+    lookalikeRatio: 1,
+    originAudienceName: 'Leads Capturados — Automação Palavra "AGENDA"',
+    country: 'BR',
+    lastSync: 'hoje às 04:00',
+  },
+];
+
+export const SEED_CAMPAIGNS: MetaCampaign[] = [
+  {
+    id: 'cmp_1',
+    a: 'a1',
+    name: 'LAL 1% BR | Agentes de IA para SaaS e Negócios Web',
+    objective: 'OUTCOME_LEADS',
+    status: 'ACTIVE',
+    audienceId: 'aud_1',
+    audienceName: 'Lookalike 1% Brasil — Leads Quentes de DMs & Comentários',
+    isLookalike: true,
+    dailyBudget: 60.0,
+    spend: 420.5,
+    impressions: 18450,
+    clicks: 684,
+    leads: 48,
+    cpa: 8.76,
+    roas: 4.85,
+    startDate: '24/10/2026',
+    connectedPostId: 'p1',
+  },
+  {
+    id: 'cmp_2',
+    a: 'a1',
+    name: 'Remarketing | Lista de Contatos Capturados nas DMs',
+    objective: 'OUTCOME_SALES',
+    status: 'ACTIVE',
+    audienceId: 'aud_2',
+    audienceName: 'Lista VIP — Leads Inbox & Palavra "AGENTE"',
+    isLookalike: false,
+    dailyBudget: 35.0,
+    spend: 210.0,
+    impressions: 4890,
+    clicks: 312,
+    leads: 29,
+    cpa: 7.24,
+    roas: 6.2,
+    startDate: '26/10/2026',
+    connectedPostId: 'p2',
+  },
+  {
+    id: 'cmp_3',
+    a: 'a1',
+    name: 'Escala LAL 2% | Reels Top Engajamento 3 Sinais',
+    objective: 'OUTCOME_ENGAGEMENT',
+    status: 'PAUSED',
+    audienceId: 'aud_4',
+    audienceName: 'Lookalike 2% Brasil — Engajadores de Reels & Carrosséis',
+    isLookalike: true,
+    dailyBudget: 100.0,
+    spend: 950.0,
+    impressions: 42100,
+    clicks: 1420,
+    leads: 62,
+    cpa: 15.32,
+    roas: 3.1,
+    startDate: '15/10/2026',
+    connectedPostId: 'p1',
+  },
+  {
+    id: 'cmp_4',
+    a: 'a3',
+    name: 'LAL 1% Clínicas | Confirmação de Consulta via IA',
+    objective: 'OUTCOME_LEADS',
+    status: 'ACTIVE',
+    audienceId: 'aud_5',
+    audienceName: 'Lookalike 1% Brasil — Donos de Clínicas Veterinárias & Pet Shops',
+    isLookalike: true,
+    dailyBudget: 50.0,
+    spend: 350.0,
+    impressions: 14900,
+    clicks: 530,
+    leads: 38,
+    cpa: 9.21,
+    roas: 5.1,
+    startDate: '20/10/2026',
+    connectedPostId: 'p4',
+  },
+];
+
 

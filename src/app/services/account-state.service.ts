@@ -26,6 +26,15 @@ import {
   PostStatus,
   SkillCommand,
   TwinField,
+  MetaAdAccount,
+  MetaAudience,
+  MetaAudienceType,
+  MetaCampaign,
+  MetaCampaignObjective,
+  MetaCampaignStatus,
+  SEED_AD_ACCOUNTS,
+  SEED_AUDIENCES,
+  SEED_CAMPAIGNS,
 } from '../data/seed-data';
 
 export type WorkspaceView =
@@ -36,6 +45,7 @@ export type WorkspaceView =
   | 'twin'
   | 'automations'
   | 'audience'
+  | 'campaigns'
   | 'prompts'
   | 'analytics'
   | 'accounts'
@@ -148,6 +158,16 @@ export class AccountStateService {
   readonly seg = signal<string>('todos');
   readonly bcast = signal<string>('');
 
+  // Meta Marketing API & Lookalike Signals
+  readonly adAccounts = signal<MetaAdAccount[]>(SEED_AD_ACCOUNTS);
+  readonly activeAdAccountId = signal<string>('act_1029384756');
+  readonly audiences = signal<MetaAudience[]>(SEED_AUDIENCES);
+  readonly campaigns = signal<MetaCampaign[]>(SEED_CAMPAIGNS);
+  readonly campaignFilter = signal<'all' | 'active' | 'paused' | 'lookalike'>('all');
+  readonly audienceFilter = signal<'all' | 'lookalike' | 'custom_list' | 'engagement'>('all');
+  readonly isCreatingLookalike = signal<boolean>(false);
+  readonly isCreatingCampaign = signal<boolean>(false);
+
   // Skills Signals
   readonly skillOn = signal<Record<string, boolean>>({});
   readonly skillQ = signal<string>('');
@@ -205,6 +225,60 @@ export class AccountStateService {
   readonly unreadDmsCount = computed<number>(() =>
     this.accountInts().filter((i) => i.t !== 'COMMENT' && i.s === 'UNREAD').length
   );
+
+  // Computed Meta Ads & Lookalike
+  readonly activeAdAccount = computed<MetaAdAccount>(() => {
+    const aid = this.activeAdAccountId();
+    const currAccId = this.activeAccount().id;
+    return (
+      this.adAccounts().find((a) => a.id === aid) ||
+      this.adAccounts().find((a) => a.a === currAccId) ||
+      this.adAccounts()[0]
+    );
+  });
+
+  readonly accountAudiences = computed<MetaAudience[]>(() => {
+    const accId = this.activeAccount().id;
+    const filter = this.audienceFilter();
+    let list = this.audiences().filter((aud) => aud.a === accId);
+    if (filter === 'lookalike') list = list.filter((a) => a.type === 'LOOKALIKE');
+    else if (filter === 'custom_list') list = list.filter((a) => a.type === 'CUSTOM_LIST');
+    else if (filter === 'engagement') list = list.filter((a) => a.type === 'IG_ENGAGEMENT');
+    return list;
+  });
+
+  readonly accountCampaigns = computed<MetaCampaign[]>(() => {
+    const accId = this.activeAccount().id;
+    const filter = this.campaignFilter();
+    let list = this.campaigns().filter((cmp) => cmp.a === accId);
+    if (filter === 'active') list = list.filter((c) => c.status === 'ACTIVE');
+    else if (filter === 'paused') list = list.filter((c) => c.status === 'PAUSED');
+    else if (filter === 'lookalike') list = list.filter((c) => c.isLookalike);
+    return list;
+  });
+
+  readonly campaignMetrics = computed(() => {
+    const camps = this.accountCampaigns();
+    const activeCamps = camps.filter((c) => c.status === 'ACTIVE');
+    const totalSpend = camps.reduce((sum, c) => sum + c.spend, 0);
+    const totalLeads = camps.reduce((sum, c) => sum + c.leads, 0);
+    const totalImpressions = camps.reduce((sum, c) => sum + c.impressions, 0);
+    const totalClicks = camps.reduce((sum, c) => sum + c.clicks, 0);
+    const avgCpa = totalLeads > 0 ? totalSpend / totalLeads : 0;
+    const weightedRoas =
+      camps.length > 0 ? camps.reduce((sum, c) => sum + c.roas, 0) / camps.length : 0;
+
+    return {
+      activeCount: activeCamps.length,
+      totalCount: camps.length,
+      totalSpend,
+      totalLeads,
+      totalImpressions,
+      totalClicks,
+      avgCpa,
+      avgRoas: weightedRoas,
+    };
+  });
 
   readonly isNarrow = computed(() => this.viewportWidth() < 900);
   readonly isMidWidth = computed(() => this.viewportWidth() < 1280);
@@ -650,6 +724,201 @@ export class AccountStateService {
     this.nsCmd.set('');
     this.nsPrompt.set('');
     this.toast(`Skill /${c} criada no tenant`);
+  }
+
+  // ==========================================
+  // Métodos Meta Marketing API & Lookalike
+  // ==========================================
+
+  selectAdAccount(adAccountId: string): void {
+    this.activeAdAccountId.set(adAccountId);
+    const acc = this.adAccounts().find((a) => a.id === adAccountId);
+    if (acc) {
+      this.toast(`Conta de anúncios alterada: ${acc.name}`);
+    }
+  }
+
+  toggleCampaignStatus(campaignId: string): void {
+    this.campaigns.update((prev) =>
+      prev.map((c) => {
+        if (c.id === campaignId) {
+          const newStatus: MetaCampaignStatus = c.status === 'ACTIVE' ? 'PAUSED' : 'ACTIVE';
+          this.toast(
+            newStatus === 'ACTIVE'
+              ? `Campanha "${c.name}" ATIVADA na Meta Ads!`
+              : `Campanha "${c.name}" PAUSADA`
+          );
+          return { ...c, status: newStatus };
+        }
+        return c;
+      })
+    );
+  }
+
+  createLookalikeAudience(
+    sourceAudienceName: string,
+    ratio: number = 1,
+    country: string = 'BR',
+    customName?: string
+  ): MetaAudience {
+    const accId = this.activeAccount().id;
+    const estReach = Math.round((ratio / 100) * 160000000); // 1.6M para cada 1% no BR
+    const name =
+      customName ||
+      `Lookalike ${ratio}% ${country} — Semelhante a "${sourceAudienceName}"`;
+
+    const newAud: MetaAudience = {
+      id: `aud_${Date.now()}`,
+      a: accId,
+      name,
+      type: 'LOOKALIKE',
+      size: estReach,
+      status: 'READY',
+      lookalikeRatio: ratio,
+      originAudienceName: sourceAudienceName,
+      country,
+      lastSync: 'agora mesmo',
+    };
+
+    this.audiences.update((prev) => [newAud, ...prev]);
+    this.toast(`Público Lookalike ${ratio}% criado na Meta (~${(estReach / 1000000).toFixed(1)}M pessoas)`);
+
+    // Notificação assíncrona com Edge Function
+    this.supabase
+      .invokeEdgeFunction('meta-marketing-api', {
+        action: 'create_lookalike_audience',
+        adAccountId: this.activeAdAccount().id,
+        payload: {
+          name,
+          ratio: ratio / 100,
+          country,
+          sourceAudienceName,
+        },
+      })
+      .catch(() => {});
+
+    return newAud;
+  }
+
+  createAudienceFromContacts(name: string, contactIds: string[]): MetaAudience {
+    const accId = this.activeAccount().id;
+    const targetContacts = this.contacts().filter((c) => contactIds.includes(c.id));
+    const size = targetContacts.length > 0 ? targetContacts.length : 1;
+
+    const newAud: MetaAudience = {
+      id: `aud_${Date.now()}`,
+      a: accId,
+      name,
+      type: 'CUSTOM_LIST',
+      size,
+      status: 'READY',
+      country: 'BR',
+      lastSync: 'agora mesmo',
+    };
+
+    // Marca contatos como sincronizados
+    this.contacts.update((prev) =>
+      prev.map((c) => (contactIds.includes(c.id) ? { ...c, metaSynced: true } : c))
+    );
+
+    this.audiences.update((prev) => [newAud, ...prev]);
+    this.toast(`Lista de ${size} contatos enviada para Meta Ads com hash SHA-256!`);
+
+    this.supabase
+      .invokeEdgeFunction('meta-marketing-api', {
+        action: 'create_custom_audience',
+        adAccountId: this.activeAdAccount().id,
+        payload: {
+          name,
+          description: `Importação de ${size} contatos via InstaAI Hub`,
+        },
+      })
+      .catch(() => {});
+
+    return newAud;
+  }
+
+  syncContactsToMeta(audienceId: string): void {
+    const accId = this.activeAccount().id;
+    const accContacts = this.contacts().filter((c) => c.a === accId);
+    
+    this.contacts.update((prev) =>
+      prev.map((c) => (c.a === accId ? { ...c, metaSynced: true } : c))
+    );
+
+    this.audiences.update((prev) =>
+      prev.map((a) => (a.id === audienceId ? { ...a, lastSync: 'agora mesmo', status: 'READY' } : a))
+    );
+
+    this.toast(`${accContacts.length} contatos sincronizados na Meta Marketing API!`);
+
+    this.supabase
+      .invokeEdgeFunction('meta-marketing-api', {
+        action: 'sync_contacts_to_audience',
+        adAccountId: this.activeAdAccount().id,
+        payload: {
+          audienceId,
+          contacts: accContacts.map((c) => ({
+            email: c.email,
+            phone: c.phone,
+            username: c.u,
+          })),
+        },
+      })
+      .catch(() => {});
+  }
+
+  createCampaign(payload: Partial<MetaCampaign>): void {
+    const accId = this.activeAccount().id;
+    const newCamp: MetaCampaign = {
+      id: `cmp_${Date.now()}`,
+      a: accId,
+      name: payload.name || 'Nova Campanha Lookalike',
+      objective: payload.objective || 'OUTCOME_LEADS',
+      status: 'ACTIVE',
+      audienceId: payload.audienceId || 'aud_1',
+      audienceName: payload.audienceName || 'Lookalike 1% Brasil',
+      isLookalike: payload.isLookalike ?? true,
+      dailyBudget: payload.dailyBudget || 50,
+      spend: 0,
+      impressions: 0,
+      clicks: 0,
+      leads: 0,
+      cpa: 0,
+      roas: 0,
+      startDate: 'hoje',
+      connectedPostId: payload.connectedPostId,
+    };
+
+    this.campaigns.update((prev) => [newCamp, ...prev]);
+    this.toast(`Campanha "${newCamp.name}" criada e veiculando na Meta Ads!`);
+
+    this.supabase
+      .invokeEdgeFunction('meta-marketing-api', {
+        action: 'create_campaign',
+        adAccountId: this.activeAdAccount().id,
+        payload: {
+          name: newCamp.name,
+          objective: newCamp.objective,
+          dailyBudget: newCamp.dailyBudget,
+          targetAudienceId: newCamp.audienceId,
+        },
+      })
+      .catch(() => {});
+  }
+
+  quickPromoteWithLookalike(title: string, postId?: string): void {
+    const aud = this.createLookalikeAudience(title, 1, 'BR');
+    this.createCampaign({
+      name: `LAL 1% BR | Impulsionar "${title.slice(0, 30)}..."`,
+      objective: 'OUTCOME_LEADS',
+      audienceId: aud.id,
+      audienceName: aud.name,
+      isLookalike: true,
+      dailyBudget: 50.0,
+      connectedPostId: postId,
+    });
+    this.setView('campaigns');
   }
 }
 

@@ -9,6 +9,7 @@ import { ContentStudioComponent } from '../content-studio/content-studio.compone
 import { UnifiedInboxComponent } from '../unified-inbox/unified-inbox.component';
 import { AccountsManagerComponent } from '../accounts-manager/accounts-manager.component';
 import { AiCopilotChatComponent } from '../ai-copilot-chat/ai-copilot-chat.component';
+import { MetaCampaignsComponent } from '../meta-campaigns/meta-campaigns.component';
 import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
 
 @Component({
@@ -22,6 +23,7 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
     UnifiedInboxComponent,
     AccountsManagerComponent,
     AiCopilotChatComponent,
+    MetaCampaignsComponent,
   ],
   template: `
     <div
@@ -127,6 +129,12 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
             <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
             <span class="nav-txt">audiência</span>
             <span class="nav-badge">{{ accountContacts().length }}</span>
+          </button>
+
+          <button type="button" class="nav-item" [class.active]="state.view() === 'campaigns'" (click)="state.setView('campaigns')">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+            <span class="nav-txt">campanhas & meta ads</span>
+            <span class="nav-badge" [class.ai]="state.campaignMetrics().activeCount > 0">{{ state.campaignMetrics().activeCount }} ativas</span>
           </button>
 
           <button type="button" class="nav-item" [class.active]="state.view() === 'prompts'" (click)="state.setView('prompts')">
@@ -346,7 +354,10 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
                     </button>
                   }
                 </div>
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <cm-button variant="ghost" size="sm" (clicked)="state.quickPromoteWithLookalike('Pessoas que comentaram nos posts')">
+                    <span>🎯 criar lookalike 1%</span>
+                  </cm-button>
                   <cm-button variant="ghost" size="sm" (clicked)="hideSpamComments()">
                     ocultar spam
                   </cm-button>
@@ -626,14 +637,30 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
           <!-- 7. AUDIÊNCIA & CRM SOCIAL -->
           @if (state.view() === 'audience') {
             <div class="card-p">
-              <div class="card-head">
+              <div class="card-head flex-wrap gap-2">
                 <div>
                   <div class="card-title">base de leads qualificados via Direct & Comentários</div>
                   <div class="card-sub">contatos capturados pelas automações de &#64;{{ state.activeAccount().user }}</div>
                 </div>
-                <cm-button variant="primary" size="sm" (clicked)="state.toast('Disparo enviado para contatos na janela de 24h!')">
-                  disparo janela 24h
-                </cm-button>
+                <div class="flex items-center gap-2 flex-wrap">
+                  <cm-button
+                    variant="ghost"
+                    size="sm"
+                    (clicked)="state.quickPromoteWithLookalike('Leads Qualificados via Direct e Comentários')"
+                  >
+                    <span>🎯 criar lookalike 1% na meta</span>
+                  </cm-button>
+                  <cm-button
+                    variant="ghost"
+                    size="sm"
+                    (clicked)="state.syncContactsToMeta('aud_2')"
+                  >
+                    <span>📤 sincronizar no meta ads</span>
+                  </cm-button>
+                  <cm-button variant="primary" size="sm" (clicked)="state.toast('Disparo enviado para contatos na janela de 24h!')">
+                    disparo janela 24h
+                  </cm-button>
+                </div>
               </div>
 
               <div class="overflow-x-auto">
@@ -641,8 +668,10 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
                   <thead>
                     <tr class="border-b border-[var(--c-border)] text-[11px] font-mono uppercase text-[var(--c-text-muted)]">
                       <th class="py-2.5 px-3">Usuário</th>
+                      <th class="py-2.5 px-3">E-mail</th>
                       <th class="py-2.5 px-3">Tags</th>
                       <th class="py-2.5 px-3">Origem</th>
+                      <th class="py-2.5 px-3">Meta Ads</th>
                       <th class="py-2.5 px-3">Última Interação</th>
                     </tr>
                   </thead>
@@ -650,6 +679,7 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
                     @for (ct of accountContacts(); track ct.id) {
                       <tr class="border-b border-[var(--c-border)] hover:bg-[var(--c-surface)]">
                         <td class="py-2.5 px-3 font-mono font-semibold text-[var(--c-text)]">&#64;{{ ct.u }}</td>
+                        <td class="py-2.5 px-3 font-mono text-[11px] text-[var(--c-text-muted)]">{{ ct.email || '—' }}</td>
                         <td class="py-2.5 px-3">
                           <div class="flex flex-wrap gap-1">
                             @for (t of ct.tags; track t) {
@@ -658,6 +688,13 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
                           </div>
                         </td>
                         <td class="py-2.5 px-3 text-[var(--c-text-2)]">{{ ct.src }}</td>
+                        <td class="py-2.5 px-3 whitespace-nowrap">
+                          @if (ct.metaSynced) {
+                            <span class="text-[10px] font-mono text-emerald-400">● Sincronizado</span>
+                          } @else {
+                            <span class="text-[10px] font-mono text-amber-500">○ Pendente</span>
+                          }
+                        </td>
                         <td class="py-2.5 px-3 font-mono text-[var(--c-text-muted)]">{{ ct.last }}</td>
                       </tr>
                     }
@@ -665,6 +702,11 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
                 </table>
               </div>
             </div>
+          }
+
+          <!-- 8. CAMPANHAS, LOOKALIKES & META ADS MANAGER -->
+          @if (state.view() === 'campaigns') {
+            <app-meta-campaigns />
           }
 
           <!-- 8. PROMPT STUDIO (ENGENHARIA DE PROMPTS VISUAIS) -->
@@ -1030,6 +1072,7 @@ export class WorkspaceLayoutComponent {
     twin: { l: 'sua ', b: 'versão digital' },
     automations: { l: 'automações ', b: 'de direct' },
     audience: { l: 'audiência ', b: '& crm social' },
+    campaigns: { l: 'campanhas ', b: '& meta ads' },
     prompts: { l: 'prompt ', b: 'studio' },
     analytics: { l: 'analytics ', b: '& insights' },
     skills: { l: 'skills ', b: '& comandos /' },
