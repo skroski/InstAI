@@ -1,4 +1,5 @@
 import { Injectable, inject, signal, computed, resource } from '@angular/core';
+import { environment } from '../../environments/environment';
 import { SupabaseService } from './supabase.service';
 import { LiveApiService } from './live-api.service';
 import {
@@ -110,6 +111,10 @@ export class AccountStateService {
     },
   });
 
+  constructor() {
+    this.syncWithLiveApiAndVaryData().catch(() => {});
+  }
+
   // Layout & Theme Signals
   readonly theme = signal<ThemeMode>('dark');
   readonly view = signal<WorkspaceView>('overview');
@@ -171,7 +176,7 @@ export class AccountStateService {
 
   // Meta Marketing API & Lookalike Signals
   readonly adAccounts = signal<MetaAdAccount[]>(SEED_AD_ACCOUNTS);
-  readonly activeAdAccountId = signal<string>('act_1029384756');
+  readonly activeAdAccountId = signal<string>(environment.metaAdAccountId || 'act_1124982890873935');
   readonly audiences = signal<MetaAudience[]>(SEED_AUDIENCES);
   readonly campaigns = signal<MetaCampaign[]>(SEED_CAMPAIGNS);
   readonly campaignFilter = signal<'all' | 'active' | 'paused' | 'lookalike'>('all');
@@ -484,6 +489,30 @@ export class AccountStateService {
               : acc
           )
         );
+      }
+
+      // 1.1 Consulta campanhas reais na Meta Marketing API
+      const liveCamps = await this.liveApi.fetchLiveCampaigns(this.activeAdAccountId());
+      if (liveCamps && liveCamps.length > 0) {
+        const mappedCamps: MetaCampaign[] = liveCamps.map((lc) => ({
+          id: lc.id,
+          a: this.activeAccount().id,
+          name: lc.name,
+          objective: (lc.objective as MetaCampaignObjective) || 'OUTCOME_LEADS',
+          status: (lc.status as MetaCampaignStatus) || 'PAUSED',
+          audienceId: 'aud_meta_live',
+          audienceName: 'Público Meta Ads',
+          isLookalike: false,
+          dailyBudget: lc.daily_budget ? Number(lc.daily_budget) / 100 : 50,
+          spend: lc.spend ? Number(lc.spend) : (lc.insights?.data?.[0]?.spend ? Number(lc.insights.data[0].spend) : 0),
+          impressions: lc.insights?.data?.[0]?.impressions ? Number(lc.insights.data[0].impressions) : 0,
+          clicks: lc.insights?.data?.[0]?.clicks ? Number(lc.insights.data[0].clicks) : 0,
+          leads: 0,
+          cpa: 0,
+          roas: 0,
+          startDate: new Date().toISOString().slice(0, 10),
+        }));
+        this.campaigns.set(mappedCamps);
       }
 
       // 2. Varia dados ricos para a conta ativa
