@@ -1364,11 +1364,11 @@ export class WorkspaceLayoutComponent {
   );
 
   readonly activeTwin = computed(
-    () => TWINS[this.state.activeAccount().id] || TWINS['a1']
+    () => TWINS[this.state.activeAccount().id] || TWINS['a_amaral']
   );
 
   readonly activeMetrics = computed(
-    () => METRICS[this.state.activeAccount().id] || METRICS['a1']
+    () => METRICS[this.state.activeAccount().id] || METRICS['a_amaral']
   );
 
   readonly currentBreadcrumb = computed(() => {

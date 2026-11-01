@@ -135,7 +135,7 @@ export class AccountStateService {
 
   // Multi-Tenant Accounts Signals
   readonly accounts = signal<Account[]>(ACCS);
-  readonly activeId = signal<string>('a1');
+  readonly activeId = signal<string>('a_amaral');
   readonly switcherOpen = signal<boolean>(false);
   readonly voiceOverrides = signal<Record<string, BrandVoice>>({});
   readonly styleOverrides = signal<Record<string, string>>({});

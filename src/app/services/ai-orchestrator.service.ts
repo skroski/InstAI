@@ -30,7 +30,7 @@ export class AiOrchestratorService {
   readonly palOff = signal<boolean>(false);
 
   readonly messages = signal<CopilotMessage[]>([
-    { id: 'm1', role: 'sys', text: 'sessão iniciada . contexto @codemix.web' },
+    { id: 'm1', role: 'sys', text: 'sessão iniciada . contexto @amaralnatacao' },
     {
       id: 'm2',
       role: 'ai',
@@ -363,7 +363,7 @@ export class AiOrchestratorService {
                 `@${x.user} · ${x.st} · ${x.days} dias · ${x.perms}/4 permissões · webhook ${x.wh ? 'ok' : 'falha'}`
             )
             .join('\n') +
-          `\n\nAção sugerida: renovar @duplod.oficial e reconectar @eagency.design.`
+          `\n\nTodas as contas conectadas e operacionais via Meta Graph API v22.0.`
         );
 
       case 'auditoria-perfil': {
