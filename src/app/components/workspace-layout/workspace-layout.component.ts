@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AccountStateService, WorkspaceView } from '../../services/account-state.service';
@@ -42,12 +42,15 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
       <aside class="sidebar">
         <!-- Brand Header -->
         <div class="brand">
-          <div class="brand-logo">
-            <img class="logo-full logo-dark" src="assets/logo-codemix-white.svg" alt="Codemix" />
-            <img class="logo-full logo-light" src="assets/logo-codemix-color.png" alt="Codemix" />
-            <img class="logo-mark" src="assets/mark-codemix-color.png" alt="Codemix" />
+          <div class="brand-logo flex items-center gap-2">
+            <div class="w-7 h-7 rounded-[7px] bg-gradient-to-br from-[#f1a10b] via-[#e1306c] to-[#833ab4] flex items-center justify-center text-white font-black text-[13px] shadow-sm shrink-0">
+              ⚡
+            </div>
+            <div class="logo-full flex items-baseline tracking-tight">
+              <span class="text-[17px] font-bold text-[var(--c-text)] font-display">Inst<span class="text-[#f1a10b]">AI</span></span>
+            </div>
           </div>
-          <span class="brand-tag">insta-ai</span>
+          <span class="brand-tag">Hub</span>
         </div>
 
         @if (!state.isLeftCompact()) {
@@ -179,9 +182,9 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
         <!-- Sidebar Footer -->
         <div class="sidebar-foot">
           <div class="user-row">
-            <div class="user-ava">CM</div>
+            <div class="user-ava font-bold">IA</div>
             <div class="user-info">
-              <div class="user-name">Codemix Studio</div>
+              <div class="user-name">InstAI Studio</div>
               <div class="user-role">{{ state.accounts().length }} contas conectadas</div>
             </div>
             <button
@@ -375,6 +378,20 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
                 <button
                   type="button"
                   class="subnav-btn"
+                  [class.active]="state.contentSubTab() === 'grid'"
+                  (click)="setContentTab('grid')">
+                  <span>Grid de Mídia</span>
+                </button>
+                <button
+                  type="button"
+                  class="subnav-btn"
+                  [class.active]="state.contentSubTab() === 'feed'"
+                  (click)="setContentTab('feed')">
+                  <span>Feed 3x3</span>
+                </button>
+                <button
+                  type="button"
+                  class="subnav-btn"
                   [class.active]="state.contentSubTab() === 'calendar'"
                   (click)="setContentTab('calendar')">
                   <span>Calendário Semanal</span>
@@ -388,8 +405,8 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
                 </button>
               </div>
 
-              <!-- View do Kanban / Calendário -->
-              @if (state.contentSubTab() === 'kanban' || state.contentSubTab() === 'calendar') {
+              <!-- View do Content Studio (Kanban, Grid, Feed, Calendário) -->
+              @if (state.contentSubTab() === 'kanban' || state.contentSubTab() === 'grid' || state.contentSubTab() === 'feed' || state.contentSubTab() === 'calendar') {
                 <app-content-studio />
               }
 
@@ -962,51 +979,166 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
 
     <!-- ==================== MODAL: COMPOSER ==================== -->
     @if (state.comp(); as comp) {
-      <div class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-3 md:p-6 overflow-y-auto">
-        <div class="w-full max-w-4xl max-h-[92vh] rounded-[10px] bg-[var(--c-panel)] border border-[var(--c-border-strong)] shadow-2xl overflow-y-auto grid grid-cols-1 md:grid-cols-5 my-auto">
-          <div class="p-5 md:col-span-3 flex flex-col gap-3">
-            <div class="flex items-center justify-between">
-              <h3 class="text-sm font-bold text-[var(--c-text)]">Novo Post Multi-Conta</h3>
-              <button type="button" class="text-xs text-[var(--c-text-muted)] hover:text-[var(--c-text)] cursor-pointer" (click)="state.closeComposer()">fechar ✕</button>
+      <div
+        class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-3 md:p-6 overflow-y-auto animate-cm-fade"
+        (click)="state.closeComposer()">
+        <div
+          class="w-full max-w-4xl max-h-[92vh] rounded-2xl bg-[var(--c-panel)] border border-[var(--c-border-strong)] shadow-2xl overflow-y-auto grid grid-cols-1 md:grid-cols-5 my-auto animate-cm-scale"
+          (click)="$event.stopPropagation()">
+          <div class="p-5 md:col-span-3 flex flex-col gap-3.5">
+            <!-- Modal Header com Botão Fechar Premium -->
+            <div class="flex items-center justify-between pb-3 border-b border-[var(--c-border)]">
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-[#ffcb05] to-[#f58220] flex items-center justify-center text-[#1f1f1f] shadow-md font-bold text-base">
+                  <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"/>
+                    <line x1="5" y1="12" x2="19" y2="12"/>
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="text-sm font-bold text-[var(--c-text)] leading-tight flex items-center gap-2">
+                    <span>Novo Post Multi-Conta</span>
+                    <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[rgba(246,188,3,0.15)] text-[var(--c-acc)] border border-[rgba(241,161,11,0.3)]">
+                      Meta Graph v22
+                    </span>
+                  </h3>
+                  <p class="text-[11px] text-[var(--c-text-muted)] font-mono">Agendamento inteligente & mídias com IA</p>
+                </div>
+              </div>
+
+              <!-- BOTÃO FECHAR MODERNO COM SVG E ANIMAÇÃO -->
+              <button
+                type="button"
+                class="modal-close-btn"
+                title="Fechar modal (ESC)"
+                aria-label="Fechar modal"
+                (click)="state.closeComposer()">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"/>
+                  <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+              </button>
             </div>
 
-            <div class="grid grid-cols-2 gap-2">
-              <div>
-                <label class="text-[11px] font-mono text-[var(--c-text-muted)] block mb-1">Formato</label>
-                <select
-                  class="w-full px-2.5 py-1.5 rounded-[6px] bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs text-[var(--c-text)] cm-input-focus"
-                  [ngModel]="comp.t"
-                  (ngModelChange)="setComposerFormat($event)">
-                  <option value="CAROUSEL">CARROSSEL (Fotos e Vídeos)</option>
-                  <option value="REELS">REELS (Vídeo 9:16)</option>
-                  <option value="IMAGE">IMAGEM FEED 4:5</option>
-                  <option value="STORIES">STORIES (9:16)</option>
-                </select>
+            <!-- Contas de Destino (Multi-Tenant) -->
+            <div>
+              <label class="text-[11px] font-mono text-[var(--c-text-muted)] block mb-1.5">
+                Contas de Destino (Publicação Cruzada)
+              </label>
+              <div class="flex items-center gap-1.5 flex-wrap">
+                @for (acc of state.accounts(); track acc.id) {
+                  <button
+                    type="button"
+                    class="px-2.5 py-1 rounded-full text-xs font-mono transition-all flex items-center gap-1.5 cursor-pointer"
+                    [style.background]="isAccountSelectedInComposer(acc.id) ? 'rgba(246,188,3,0.18)' : 'var(--c-surface)'"
+                    [style.border]="isAccountSelectedInComposer(acc.id) ? '1px solid #f1a10b' : '1px solid var(--c-border)'"
+                    [style.color]="isAccountSelectedInComposer(acc.id) ? 'var(--c-acc)' : 'var(--c-text2)'"
+                    (click)="toggleComposerAccount(acc.id)">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[var(--c-acc)]"></span>
+                    <span>&#64;{{ acc.user }}</span>
+                    @if (isAccountSelectedInComposer(acc.id)) {
+                      <span class="text-[10px] font-bold">✓</span>
+                    }
+                  </button>
+                }
               </div>
-              <div>
-                <label class="text-[11px] font-mono text-[var(--c-text-muted)] block mb-1">Horário</label>
+            </div>
+
+            <!-- Formato (Segmented Visual Cards) -->
+            <div>
+              <label class="text-[11px] font-mono text-[var(--c-text-muted)] block mb-1.5">Formato de Publicação</label>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <button
+                  type="button"
+                  class="px-2 py-2 rounded-lg text-xs font-medium transition-all flex flex-col items-center gap-1 cursor-pointer"
+                  [style.background]="comp.t === 'CAROUSEL' ? 'rgba(246,188,3,0.16)' : 'var(--c-bg-elev)'"
+                  [style.border]="comp.t === 'CAROUSEL' ? '1px solid #f1a10b' : '1px solid var(--c-border)'"
+                  [style.color]="comp.t === 'CAROUSEL' ? 'var(--c-acc)' : 'var(--c-text2)'"
+                  (click)="setComposerFormat('CAROUSEL')">
+                  <span class="text-base">🗂</span>
+                  <span class="font-semibold text-[11.5px]">Carrossel</span>
+                  <span class="text-[9.5px] opacity-75 font-mono">4:5 até 10 fotos</span>
+                </button>
+                <button
+                  type="button"
+                  class="px-2 py-2 rounded-lg text-xs font-medium transition-all flex flex-col items-center gap-1 cursor-pointer"
+                  [style.background]="comp.t === 'REELS' ? 'rgba(246,188,3,0.16)' : 'var(--c-bg-elev)'"
+                  [style.border]="comp.t === 'REELS' ? '1px solid #f1a10b' : '1px solid var(--c-border)'"
+                  [style.color]="comp.t === 'REELS' ? 'var(--c-acc)' : 'var(--c-text2)'"
+                  (click)="setComposerFormat('REELS')">
+                  <span class="text-base">🎬</span>
+                  <span class="font-semibold text-[11.5px]">Reels</span>
+                  <span class="text-[9.5px] opacity-75 font-mono">9:16 até 90s</span>
+                </button>
+                <button
+                  type="button"
+                  class="px-2 py-2 rounded-lg text-xs font-medium transition-all flex flex-col items-center gap-1 cursor-pointer"
+                  [style.background]="comp.t === 'IMAGE' ? 'rgba(246,188,3,0.16)' : 'var(--c-bg-elev)'"
+                  [style.border]="comp.t === 'IMAGE' ? '1px solid #f1a10b' : '1px solid var(--c-border)'"
+                  [style.color]="comp.t === 'IMAGE' ? 'var(--c-acc)' : 'var(--c-text2)'"
+                  (click)="setComposerFormat('IMAGE')">
+                  <span class="text-base">📸</span>
+                  <span class="font-semibold text-[11.5px]">Imagem Feed</span>
+                  <span class="text-[9.5px] opacity-75 font-mono">4:5 ou 1:1</span>
+                </button>
+                <button
+                  type="button"
+                  class="px-2 py-2 rounded-lg text-xs font-medium transition-all flex flex-col items-center gap-1 cursor-pointer"
+                  [style.background]="comp.t === 'STORIES' ? 'rgba(246,188,3,0.16)' : 'var(--c-bg-elev)'"
+                  [style.border]="comp.t === 'STORIES' ? '1px solid #f1a10b' : '1px solid var(--c-border)'"
+                  [style.color]="comp.t === 'STORIES' ? 'var(--c-acc)' : 'var(--c-text2)'"
+                  (click)="setComposerFormat('STORIES')">
+                  <span class="text-base">⚡</span>
+                  <span class="font-semibold text-[11.5px]">Stories</span>
+                  <span class="text-[9.5px] opacity-75 font-mono">9:16 24 horas</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Horário com atalhos rápidos -->
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label class="text-[11px] font-mono text-[var(--c-text-muted)]">Horário de Disparo</label>
+                <span class="text-[10px] font-mono text-[var(--c-dim)]">UTC-3 (Brasília)</span>
+              </div>
+              <div class="flex items-center gap-2">
                 <input
                   type="text"
-                  class="w-full px-2.5 py-1.5 rounded-[6px] bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs text-[var(--c-text)] cm-input-focus"
+                  class="w-28 px-3 py-1.5 rounded-lg bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs text-[var(--c-text)] font-mono cm-input-focus"
+                  placeholder="18:00"
                   [ngModel]="comp.time"
                   (ngModelChange)="state.patchComposer({ time: $event })" />
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <button type="button" class="text-[11px] font-mono px-2 py-1 rounded bg-[var(--c-surface)] hover:bg-[var(--c-surface-hover)] text-[var(--c-text2)] cursor-pointer transition-all" (click)="setQuickSchedule('12:00')">12:00</button>
+                  <button type="button" class="text-[11px] font-mono px-2 py-1 rounded bg-[var(--c-surface)] hover:bg-[var(--c-surface-hover)] text-[var(--c-text2)] cursor-pointer transition-all" (click)="setQuickSchedule('18:00')">18:00</button>
+                  <button type="button" class="text-[11px] font-mono px-2 py-1 rounded bg-[var(--c-surface)] hover:bg-[var(--c-surface-hover)] text-[var(--c-text2)] cursor-pointer transition-all" (click)="setQuickSchedule('20:30')">20:30 (Pico)</button>
+                </div>
               </div>
             </div>
 
+            <!-- Tópico com botão IA -->
             <div>
-              <label class="text-[11px] font-mono text-[var(--c-text-muted)] block mb-1">Tópico / Hook Principal</label>
+              <div class="flex items-center justify-between mb-1">
+                <label class="text-[11px] font-mono text-[var(--c-text-muted)]">Tópico / Hook Principal</label>
+                <button
+                  type="button"
+                  class="text-[11px] font-mono text-[var(--c-link)] hover:underline flex items-center gap-1 cursor-pointer"
+                  (click)="suggestHook()">
+                  <span>🪄 Sugerir hook com IA</span>
+                </button>
+              </div>
               <input
                 type="text"
-                class="w-full px-3 py-1.5 rounded-[6px] bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs text-[var(--c-text)] cm-input-focus"
-                placeholder="Ex: 3 sinais de que seu produto precisa de IA"
+                class="w-full px-3 py-2 rounded-lg bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs text-[var(--c-text)] cm-input-focus font-medium"
+                placeholder="Ex: 3 sinais silenciosos de que sua operação precisa de IA"
                 [ngModel]="comp.topic"
                 (ngModelChange)="state.patchComposer({ topic: $event })" />
             </div>
 
-            <!-- Módulo de Upload de Mídias (Imagens e Vídeos) -->
+            <!-- Módulo de Upload de Mídias -->
             <div>
               <label class="text-[11px] font-mono text-[var(--c-text-muted)] block mb-1">
-                Mídias (Fotos ou Vídeos)
+                Mídias do Post (Fotos e Vídeos)
               </label>
               <app-media-uploader
                 [mediaList]="comp.media || []"
@@ -1018,110 +1150,171 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
               />
             </div>
 
+            <!-- Legenda com contador e IA -->
             <div>
               <div class="flex items-center justify-between mb-1">
-                <label class="text-[11px] font-mono text-[var(--c-text-muted)]">Legenda</label>
+                <div class="flex items-center gap-2">
+                  <label class="text-[11px] font-mono text-[var(--c-text-muted)]">Legenda & Copywriting</label>
+                  <span class="text-[10px] font-mono text-[var(--c-dim)]">
+                    {{ comp.cap ? comp.cap.length : 0 }} / 2.200 caracteres
+                  </span>
+                </div>
                 <button
                   type="button"
-                  class="text-[11px] font-mono text-[var(--c-link)] hover:underline cursor-pointer"
+                  class="text-[11px] font-mono text-[var(--c-link)] hover:underline flex items-center gap-1 cursor-pointer"
                   (click)="state.generateComposerCaptionWithAi()">
-                  gerar com Claude »
+                  <span>✨ Gerar com Claude 3.5</span>
                 </button>
               </div>
               <textarea
                 rows="3"
-                class="w-full px-3 py-2 rounded-[10px] bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs text-[var(--c-text)] cm-input-focus"
-                placeholder="Digite a legenda..."
+                class="w-full px-3 py-2 rounded-lg bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs text-[var(--c-text)] leading-relaxed cm-input-focus"
+                placeholder="Escreva a legenda ou gere com IA respeitando a Brand Voice..."
                 [ngModel]="comp.cap"
                 (ngModelChange)="state.patchComposer({ cap: $event })"></textarea>
             </div>
 
-            <div class="flex items-center justify-end gap-2 pt-1 border-t border-[rgba(var(--ov),.1)]">
-              <cm-button variant="ghost" size="sm" (clicked)="state.saveComposerPosts('DRAFT')">salvar rascunho</cm-button>
-              <cm-button variant="primary" size="sm" [arrow]="true" (clicked)="state.saveComposerPosts('SCHEDULED')">agendar publicação</cm-button>
+            <!-- Rodapé de Ações do Modal -->
+            <div class="flex items-center justify-between pt-3 border-t border-[rgba(var(--ov),.1)]">
+              <button
+                type="button"
+                class="px-3 py-1.5 rounded-lg text-xs font-mono text-[var(--c-text-muted)] hover:text-[var(--c-text)] cursor-pointer transition-colors"
+                (click)="state.closeComposer()">
+                cancelar
+              </button>
+              <div class="flex items-center gap-2">
+                <cm-button variant="secondary" size="sm" (clicked)="state.saveComposerPosts('DRAFT')">
+                  salvar rascunho
+                </cm-button>
+                <cm-button variant="primary" size="sm" [arrow]="true" (clicked)="state.saveComposerPosts('SCHEDULED')">
+                  agendar publicação
+                </cm-button>
+              </div>
             </div>
           </div>
 
-          <!-- Preview Realista da Mídia e Post -->
+          <!-- Preview Realista do Instagram Phone Mockup -->
           <div class="p-5 bg-[var(--c-bg-elev)] border-l border-[var(--c-border)] md:col-span-2 flex flex-col justify-between gap-3">
             <div>
-              <div class="flex items-center justify-between text-[10px] font-mono uppercase text-[var(--c-text-muted)] mb-2">
-                <span>Preview · &#64;{{ state.activeAccount().user }}</span>
-                <span class="text-[#fbd23a] font-bold">{{ comp.t }}</span>
+              <div class="flex items-center justify-between text-[10px] font-mono uppercase text-[var(--c-text-muted)] mb-2.5 pb-1 border-b border-[var(--c-border)]">
+                <span class="flex items-center gap-1.5 font-bold text-[var(--c-text)]">
+                  <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  Live Preview
+                </span>
+                <span class="text-[#fbd23a] font-bold px-1.5 py-0.5 rounded bg-[rgba(246,188,3,0.12)]">{{ comp.t }}</span>
               </div>
 
-              @if ((comp.media.length || 0) > 0) {
-                <div class="relative rounded-[6px] overflow-hidden border border-[var(--c-border)] bg-black/60 flex items-center justify-center"
-                     [ngClass]="comp.t === 'REELS' || comp.t === 'STORIES' ? 'aspect-[9/16] max-h-[380px] mx-auto' : 'aspect-[4/5] max-h-[320px] mx-auto'">
-                  @let currentMedia = comp.media![composerActiveSlide() % comp.media!.length];
-                  @if (currentMedia.type === 'video') {
-                    <video
-                      [src]="currentMedia.url"
-                      controls
-                      playsinline
-                      autoplay
-                      muted
-                      loop
-                      class="w-full h-full object-contain"
-                    ></video>
-                    <span class="absolute top-2 left-2 px-1.5 py-0.5 rounded bg-black/80 text-[10px] text-white font-mono">
-                      ▶ Vídeo
-                    </span>
-                  } @else {
-                    <img
-                      [src]="currentMedia.url"
-                      [alt]="currentMedia.name"
-                      class="w-full h-full object-cover"
-                    />
-                  }
+              <!-- Instagram Phone Mockup Container -->
+              <div class="rounded-xl overflow-hidden border border-[var(--c-border)] bg-[var(--c-panel)] shadow-xl">
+                <!-- Mockup Header -->
+                <div class="flex items-center justify-between p-2.5 border-b border-[var(--c-border)]">
+                  <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded-full bg-gradient-to-tr from-amber-500 to-orange-500 p-[1.5px]">
+                      <div class="w-full h-full rounded-full bg-[var(--c-panel)] flex items-center justify-center text-[10px] font-bold text-white">
+                        {{ state.activeAccount().user.charAt(0).toUpperCase() }}
+                      </div>
+                    </div>
+                    <div class="leading-tight">
+                      <div class="text-[11px] font-bold text-[var(--c-text)] truncate max-w-[120px]">
+                        &#64;{{ state.activeAccount().user }}
+                      </div>
+                      <div class="text-[9px] text-[var(--c-dim)] font-mono">São Paulo, Brasil</div>
+                    </div>
+                  </div>
+                  <div class="text-[var(--c-dim)] text-xs">•••</div>
+                </div>
 
-                  <!-- Controles de Slide do Carrossel no Preview -->
-                  @if (comp.media!.length > 1) {
-                    <button
-                      type="button"
-                      class="absolute left-1.5 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-black/70 hover:bg-black/90 text-white flex items-center justify-center text-xs cursor-pointer border border-white/20"
-                      (click)="prevComposerSlide(comp.media!.length)"
-                    >
-                      ‹
-                    </button>
-                    <button
-                      type="button"
-                      class="absolute right-1.5 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-black/70 hover:bg-black/90 text-white flex items-center justify-center text-xs cursor-pointer border border-white/20"
-                      (click)="nextComposerSlide(comp.media!.length)"
-                    >
-                      ›
-                    </button>
-                    <span class="absolute bottom-2 right-2 px-2 py-0.5 rounded-full bg-black/80 text-[10px] font-mono text-white">
-                      {{ (composerActiveSlide() % comp.media!.length) + 1 }} / {{ comp.media!.length }}
-                    </span>
-                  }
+                <!-- Mockup Media -->
+                @if ((comp.media.length || 0) > 0) {
+                  <div class="relative overflow-hidden bg-black flex items-center justify-center"
+                       [ngClass]="comp.t === 'REELS' || comp.t === 'STORIES' ? 'aspect-[9/16] max-h-[340px] mx-auto' : 'aspect-[4/5] max-h-[290px] mx-auto'">
+                    @let currentMedia = comp.media![composerActiveSlide() % comp.media!.length];
+                    @if (currentMedia.type === 'video') {
+                      <video
+                        [src]="currentMedia.url"
+                        controls
+                        playsinline
+                        autoplay
+                        muted
+                        loop
+                        class="w-full h-full object-contain"
+                      ></video>
+                      <span class="absolute top-2 left-2 px-1.5 py-0.5 rounded bg-black/80 text-[10px] text-white font-mono">
+                        ▶ Vídeo
+                      </span>
+                    } @else {
+                      <img
+                        [src]="currentMedia.url"
+                        [alt]="currentMedia.name"
+                        class="w-full h-full object-cover"
+                      />
+                    }
+
+                    <!-- Controles de Slide do Carrossel no Preview -->
+                    @if (comp.media!.length > 1) {
+                      <button
+                        type="button"
+                        class="absolute left-1.5 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-black/70 hover:bg-black/90 text-white flex items-center justify-center text-xs cursor-pointer border border-white/20 transition-all hover:scale-110"
+                        (click)="prevComposerSlide(comp.media!.length)">
+                        ‹
+                      </button>
+                      <button
+                        type="button"
+                        class="absolute right-1.5 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-black/70 hover:bg-black/90 text-white flex items-center justify-center text-xs cursor-pointer border border-white/20 transition-all hover:scale-110"
+                        (click)="nextComposerSlide(comp.media!.length)">
+                        ›
+                      </button>
+                      <span class="absolute bottom-2 right-2 px-2 py-0.5 rounded-full bg-black/80 text-[9.5px] font-mono text-white border border-white/10">
+                        {{ (composerActiveSlide() % comp.media!.length) + 1 }} / {{ comp.media!.length }}
+                      </span>
+                    }
+                  </div>
+                } @else {
+                  <div class="aspect-[4/5] bg-gradient-to-br from-[#2b2b2b] via-[#222] to-[#f1a10b]/20 p-4 flex flex-col justify-between">
+                    <div class="text-[10px] font-mono text-[#fbd23a] flex items-center gap-1">
+                      <span>📸</span>
+                      <span>{{ comp.t }} · Sem mídia anexada</span>
+                    </div>
+                    <div class="text-sm font-bold text-white leading-snug">
+                      {{ comp.topic || 'Seu título aparecerá em destaque aqui' }}
+                    </div>
+                    <div class="text-[10.5px] text-white/60 italic">
+                      Faça upload de fotos ou vídeos ao lado para ativar o preview real
+                    </div>
+                    <div class="text-[10px] font-mono text-white/50">
+                      &#64;{{ state.activeAccount().user }}
+                    </div>
+                  </div>
+                }
+
+                <!-- Mockup Action Icons Bar -->
+                <div class="p-2 flex items-center justify-between text-[var(--c-text)]">
+                  <div class="flex items-center gap-2.5">
+                    <span class="cursor-pointer hover:text-red-500 transition-colors">♥</span>
+                    <span class="cursor-pointer hover:text-[var(--c-acc)] transition-colors">💬</span>
+                    <span class="cursor-pointer hover:text-[var(--c-acc)] transition-colors">↗</span>
+                  </div>
+                  <span class="cursor-pointer hover:text-[var(--c-acc)] transition-colors">☖</span>
                 </div>
-              } @else {
-                <div class="aspect-[4/5] rounded-[6px] bg-gradient-to-br from-[#2b2b2b] via-[#1f1f1f] to-[#f1a10b]/25 border border-[var(--c-border)] p-4 flex flex-col justify-between">
-                  <div class="text-[10px] font-mono text-[#fbd23a]">
-                    {{ comp.t }} · Sem mídia anexada
+
+                <!-- Mockup Caption -->
+                <div class="px-2.5 pb-2.5 flex flex-col gap-1 text-[11px]">
+                  <div class="text-[10.5px] font-bold text-[var(--c-text)]">482 curtidas</div>
+                  <div class="text-[var(--c-text-2)] leading-relaxed line-clamp-2">
+                    <strong class="text-[var(--c-text)] mr-1">&#64;{{ state.activeAccount().user }}</strong>
+                    {{ comp.cap || comp.topic || 'A legenda da publicação aparecerá aqui...' }}
                   </div>
-                  <div class="text-sm font-bold text-white leading-snug">
-                    {{ comp.topic || 'Seu título aparecerá em destaque aqui' }}
-                  </div>
-                  <div class="text-[10.5px] text-white/70 italic">
-                    Arraste imagens ou vídeos ao lado para ver o preview real
-                  </div>
-                  <div class="text-[10px] font-mono text-white/60">
-                    &#64;{{ state.activeAccount().user }}
+                  <div class="text-[9.5px] font-mono text-[var(--c-dim)] uppercase mt-0.5">
+                    {{ comp.time ? 'Agendado para ' + comp.time : 'Hoje' }}
                   </div>
                 </div>
-              }
+              </div>
             </div>
 
-            <!-- Mini legenda simulando a visualização no Instagram -->
-            <div class="p-2.5 rounded-[6px] bg-[rgba(var(--ov),.04)] border border-[rgba(var(--ov),.08)] flex flex-col gap-1 text-[11.5px]">
-              <div class="font-bold text-[var(--c-text)]">
-                &#64;{{ state.activeAccount().user }}
-              </div>
-              <div class="text-[var(--c-text-muted)] line-clamp-2 leading-relaxed">
-                {{ comp.cap || comp.topic || 'A legenda da publicação aparecerá aqui...' }}
-              </div>
+            <!-- Dica de Publicação -->
+            <div class="p-2.5 rounded-lg bg-[rgba(var(--ov),.04)] border border-[rgba(var(--ov),.08)] flex items-center gap-2 text-[11px] text-[var(--c-text-muted)]">
+              <span class="text-base">🚀</span>
+              <span>Publicação automática via Instagram Graph API v22.0 com suporte a carrossel de até 10 mídias.</span>
             </div>
           </div>
         </div>
@@ -1184,7 +1377,16 @@ export class WorkspaceLayoutComponent {
     if (v === 'overview') return { l: 'visão ', b: 'geral', sub: `@${acc}` };
     if (v === 'content') {
       const sub = this.state.contentSubTab();
-      const subName = sub === 'calendar' ? 'calendário' : sub === 'prompts' ? 'prompts de imagem' : 'kanban';
+      const subName =
+        sub === 'calendar'
+          ? 'calendário'
+          : sub === 'prompts'
+            ? 'prompts de imagem'
+            : sub === 'grid'
+              ? 'grid de mídia'
+              : sub === 'feed'
+                ? 'feed 3x3'
+                : 'kanban';
       return { l: 'estúdio de ', b: 'conteúdo', sub: subName };
     }
     if (v === 'inbox') {
@@ -1222,11 +1424,59 @@ export class WorkspaceLayoutComponent {
     return { l: 'visão ', b: 'geral', sub: `@${acc}` };
   });
 
-  setContentTab(tab: 'kanban' | 'calendar' | 'prompts'): void {
+  setContentTab(tab: 'kanban' | 'grid' | 'feed' | 'calendar' | 'prompts'): void {
     this.state.contentSubTab.set(tab);
-    if (tab === 'kanban' || tab === 'calendar') {
+    if (tab === 'kanban' || tab === 'grid' || tab === 'feed' || tab === 'calendar') {
       this.state.contentMode.set(tab);
     }
+  }
+
+  @HostListener('window:keydown.escape')
+  onEscapeKey(): void {
+    if (this.state.comp()) {
+      this.state.closeComposer();
+    }
+  }
+
+  toggleComposerAccount(accId: string): void {
+    const comp = this.state.comp();
+    if (!comp) return;
+    const exists = comp.accs.includes(accId);
+    let updated: string[];
+    if (exists) {
+      if (comp.accs.length === 1) {
+        this.state.toast('Selecione pelo menos uma conta de destino');
+        return;
+      }
+      updated = comp.accs.filter((id) => id !== accId);
+    } else {
+      updated = [...comp.accs, accId];
+    }
+    this.state.patchComposer({ accs: updated });
+  }
+
+  isAccountSelectedInComposer(accId: string): boolean {
+    const comp = this.state.comp();
+    return comp ? comp.accs.includes(accId) : false;
+  }
+
+  setQuickSchedule(timeStr: string): void {
+    this.state.patchComposer({ time: timeStr });
+    this.state.toast(`Horário definido para ${timeStr}`);
+  }
+
+  suggestHook(): void {
+    const hooks = [
+      '3 sinais silenciosos de que sua operação precisa de IA urgente',
+      'Como aumentamos o engajamento em 400% sem gastar com anúncios',
+      'O maior erro no Instagram que coaches e agências ainda cometem',
+      'Pare de postar todo dia: o framework de 3 passos para retenção',
+      'Por que a automação no Direct é a maior máquina de vendas de 2026',
+      'Case Real: do zero a R$ 50k em vendas com carrossel técnico',
+    ];
+    const picked = hooks[Math.floor(Math.random() * hooks.length)];
+    this.state.patchComposer({ topic: picked });
+    this.state.toast('Hook sugerido aplicado!');
   }
 
   toggleRightDock(tab: 'copilot' | 'activity'): void {

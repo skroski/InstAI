@@ -60,7 +60,7 @@ export type WorkspaceView =
   | 'accounts'
   | 'skills';
 
-export type ContentMode = 'kanban' | 'calendar';
+export type ContentMode = 'kanban' | 'grid' | 'feed' | 'calendar';
 export type ThemeMode = 'dark' | 'light';
 export type RightTabMode = 'copilot' | 'activity';
 
@@ -122,7 +122,7 @@ export class AccountStateService {
   readonly theme = signal<ThemeMode>('dark');
   readonly view = signal<WorkspaceView>('overview');
   readonly contentMode = signal<ContentMode>('kanban');
-  readonly contentSubTab = signal<'kanban' | 'calendar' | 'prompts'>('kanban');
+  readonly contentSubTab = signal<'kanban' | 'grid' | 'feed' | 'calendar' | 'prompts'>('kanban');
   readonly inboxSubTab = signal<'dms' | 'comments' | 'triggers' | 'audience'>('dms');
   readonly campaignSubTab = signal<'campaigns' | 'audiences' | 'icp' | 'sync'>('campaigns');
   readonly automationSubTab = signal<'twin' | 'flows' | 'skills' | 'analytics'>('twin');
@@ -589,12 +589,12 @@ export class AccountStateService {
     }
   }
 
-  openComposer(): void {
+  openComposer(initialFormat: PostFormat = 'IMAGE', initialTopic = ''): void {
     const acc = this.activeAccount();
     this.comp.set({
       accs: [acc.id],
-      t: 'IMAGE',
-      topic: '',
+      t: initialFormat,
+      topic: initialTopic,
       cap: '',
       tags: '',
       pr: '',
@@ -765,6 +765,53 @@ export class AccountStateService {
           : p
       )
     );
+  }
+
+  movePostStatus(postId: string, newStatus: PostStatus): void {
+    this.posts.update((list) =>
+      list.map((p) =>
+        p.id === postId
+          ? {
+              ...p,
+              s: newStatus,
+              ...(newStatus === 'SCHEDULED' && p.day === null
+                ? { day: 5, time: '18:00' }
+                : {}),
+            }
+          : p
+      )
+    );
+    const map: Record<PostStatus, string> = {
+      DRAFT: 'Rascunho',
+      PROMPT_READY: 'Prompt Pronto',
+      SCHEDULED: 'Agendado',
+      PUBLISHED: 'Publicado',
+      FAILED: 'Falha',
+    };
+    this.toast(`Post movido para ${map[newStatus] || newStatus}`);
+  }
+
+  deletePost(postId: string): void {
+    this.posts.update((list) => list.filter((p) => p.id !== postId));
+    if (this.selId() === postId) {
+      this.selId.set(null);
+    }
+    this.toast('Post removido');
+  }
+
+  duplicatePost(postId: string): void {
+    const orig = this.posts().find((p) => p.id === postId);
+    if (!orig) return;
+    const dup: PostItem = {
+      ...orig,
+      id: this.nextId('dup'),
+      topic: `${orig.topic} (Cópia)`,
+      s: 'DRAFT',
+      media: orig.media ? [...orig.media] : [],
+      pr: orig.pr ? [...orig.pr] : [],
+    };
+    this.posts.update((list) => [dup, ...list]);
+    this.toast('Post duplicado como rascunho');
   }
 
   generatePromptForSelectedPost(): void {

@@ -730,10 +730,15 @@ type MetaSubTab = 'campaigns' | 'audiences' | 'sync' | 'ai-assistant';
               <h3 class="text-base font-bold text-[var(--c-text)]">Criar Campanha Meta Ads</h3>
               <button
                 type="button"
-                class="text-lg text-[var(--c-muted)] hover:text-[var(--c-text)] cursor-pointer"
+                class="modal-close-btn"
+                title="Fechar modal"
+                aria-label="Fechar"
                 (click)="showCampaignModal.set(false)"
               >
-                ✕
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"/>
+                  <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
               </button>
             </div>
 

@@ -61,10 +61,13 @@ import { MediaUploadService } from '../../services/media-upload.service';
               <button
                 type="button"
                 title="Remover mídia"
-                class="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/75 hover:bg-red-900/90 text-white flex items-center justify-center text-sm cursor-pointer border border-white/20 transition-all opacity-90 hover:scale-105"
+                class="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/80 hover:bg-red-600 text-white flex items-center justify-center cursor-pointer border border-white/25 transition-all shadow-md hover:scale-110 active:scale-95"
                 (click)="onRemoveMedia(media.id)"
               >
-                ✕
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"/>
+                  <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
               </button>
 
               <!-- Navegação do carrossel (quando há mais de 1 mídia) -->
@@ -125,10 +128,14 @@ import { MediaUploadService } from '../../services/media-upload.service';
                   </span>
                   <button
                     type="button"
-                    class="absolute top-0.5 right-0.5 w-3.5 h-3.5 rounded-full bg-red-600/90 text-[8px] text-white flex items-center justify-center cursor-pointer"
+                    title="Remover miniatura"
+                    class="absolute top-0.5 right-0.5 w-4 h-4 rounded-full bg-red-600/90 hover:bg-red-600 text-white flex items-center justify-center cursor-pointer transition-transform hover:scale-110 shadow-sm"
                     (click)="$event.stopPropagation(); onRemoveMedia(m.id)"
                   >
-                    ×
+                    <svg class="w-2.5 h-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round">
+                      <line x1="18" y1="6" x2="6" y2="18"/>
+                      <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
                   </button>
                 </div>
               }

@@ -1,6 +1,6 @@
 export const environment = {
   production: false,
-  appName: 'Codemix InstaAI Hub',
+  appName: 'InstAI',
   supabaseUrl: 'https://your-project.supabase.co',
   supabasePublishableKey: '',
   functionsBaseUrl: 'https://your-project.supabase.co/functions/v1',
