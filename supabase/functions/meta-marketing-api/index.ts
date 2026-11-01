@@ -4,13 +4,12 @@
 // todas as contas de anúncio delas via /me/businesses.
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.48.1';
+import { withCors } from '../_shared/cors.ts';
 
-const ALLOWED_ORIGIN = Deno.env.get('APP_URL') || 'http://localhost:4200';
 const GRAPH_VERSION = Deno.env.get('META_GRAPH_API_VERSION') || 'v22.0';
 const GRAPH_BASE_URL = `https://graph.facebook.com/${GRAPH_VERSION}`;
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': ALLOWED_ORIGIN,
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'X-Content-Type-Options': 'nosniff',
@@ -205,7 +204,7 @@ async function setCampaignStatus(campaignId: string, status: string) {
 
 // --- Handler ------------------------------------------------------------------
 
-Deno.serve(async (req: Request) => {
+Deno.serve(withCors(async (req: Request) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { status: 204, headers: corsHeaders });
   }
@@ -252,4 +251,4 @@ Deno.serve(async (req: Request) => {
     const msg = err instanceof Error ? err.message : 'Erro interno';
     return json({ success: false, error: msg }, 500);
   }
-});
+}));

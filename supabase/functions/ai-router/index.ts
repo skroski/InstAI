@@ -2,10 +2,9 @@
 // Roteador Multi-LLM (Claude 3.7 Sonnet, OpenAI Codex/GPT-4o e Gemini 2.5 Pro/Flash)
 // Injeta automaticamente brand_voice_guidelines da conta ativa no system prompt da Skill
 
-const ALLOWED_ORIGIN = Deno.env.get('APP_URL') || 'http://localhost:4200';
+import { withCors } from '../_shared/cors.ts';
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': ALLOWED_ORIGIN,
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'X-Content-Type-Options': 'nosniff',
@@ -62,7 +61,7 @@ function buildSystemPrompt(req: RouterRequest): string {
     .join('\n');
 }
 
-Deno.serve(async (req: Request) => {
+Deno.serve(withCors(async (req: Request) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { status: 204, headers: corsHeaders });
   }
@@ -183,5 +182,4 @@ Deno.serve(async (req: Request) => {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
-});
-
+}));

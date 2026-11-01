@@ -2,19 +2,18 @@
 // Fluxo OAuth da Meta Graph API v22.0 + troca por Long-Lived Token (60 dias) e refresh automático
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.48.1';
+import { withCors } from '../_shared/cors.ts';
 
-const ALLOWED_ORIGIN = Deno.env.get('APP_URL') || 'http://localhost:4200';
 const GRAPH_VERSION = Deno.env.get('META_GRAPH_API_VERSION') || 'v22.0';
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': ALLOWED_ORIGIN,
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'X-Content-Type-Options': 'nosniff',
   'X-Frame-Options': 'DENY',
 };
 
-Deno.serve(async (req: Request) => {
+Deno.serve(withCors(async (req: Request) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { status: 204, headers: corsHeaders });
   }
@@ -120,5 +119,4 @@ Deno.serve(async (req: Request) => {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
-});
-
+}));
