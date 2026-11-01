@@ -1,5 +1,6 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { AccountStateService } from './account-state.service';
+import { LiveApiService } from './live-api.service';
 import { Account, ENG, METRICS, PostFormat, SkillCommand } from '../data/seed-data';
 
 export type EngineChoice = 'auto' | 'claude' | 'codex' | 'gemini';
@@ -20,6 +21,7 @@ export interface CopilotMessage {
 @Injectable({ providedIn: 'root' })
 export class AiOrchestratorService {
   private readonly state = inject(AccountStateService);
+  private readonly liveApi = inject(LiveApiService);
   private timers: Record<string, ReturnType<typeof setInterval>> = {};
 
   readonly engine = signal<EngineChoice>('auto');
@@ -94,7 +96,7 @@ export class AiOrchestratorService {
     this.palOff.set(false);
   }
 
-  send(): void {
+  async send(): Promise<void> {
     const raw = this.input().trim();
     if (!raw) return;
 
@@ -121,8 +123,6 @@ export class AiOrchestratorService {
     let full = '';
     if (raw.startsWith('/') && !def) {
       full = `Skill "/${cmd}" não encontrada ou inativa. Digite / para ver o catálogo.`;
-    } else if (!def) {
-      full = `Posso ajudar com isso para @${acc.user}. Para respostas estruturadas com o Brand Voice da conta, digite / e escolha uma skill.`;
     } else if (cmd === 'conta-trocar') {
       const targetUser = args.replace('@', '').trim();
       const targetAcc = this.state.accounts().find((x) => x.user === targetUser);
@@ -137,7 +137,23 @@ export class AiOrchestratorService {
           .join(', ')}.`;
       }
     } else {
-      full = this.generateSkillOutput(cmd, args, acc);
+      // 1. Tenta resposta rica e variada ao vivo com OpenAI GPT-4o-mini
+      const v = this.state.voiceOverrides()[acc.id] || acc.voice;
+      const sysPrompt = `Você é o Copiloto de IA para a conta Instagram @${acc.user} (${acc.name}). Tom de voz: ${v.tom}. Regras: ${v.regras}. Responda em português com alta qualidade estratégica e criativa.`;
+      const promptToUse = def
+        ? `Execute o comando /${cmd} com os parâmetros: "${args || 'tema do nicho'}". Crie conteúdo pronto e variado para Instagram.`
+        : raw;
+
+      try {
+        const liveAiResponse = await this.liveApi.generateWithOpenAi(promptToUse, sysPrompt);
+        if (liveAiResponse && liveAiResponse.length > 20) {
+          full = liveAiResponse;
+        } else {
+          full = this.generateSkillOutput(cmd, args, acc);
+        }
+      } catch {
+        full = this.generateSkillOutput(cmd, args, acc);
+      }
     }
 
     // Side effects for moderation & keyword automation skills

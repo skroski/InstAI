@@ -741,3 +741,127 @@ a:hover {
 .cm-grip:hover {
   background: rgba(241, 161, 11, 0.18) !important;
 }
+
+/* ==================== CLEAN SAAS & SUBNAV HELPERS ==================== */
+.sync-api-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 32px;
+  padding: 0 13px;
+  border-radius: 6px;
+  border: 1px solid rgba(241, 161, 11, 0.4);
+  background: rgba(246, 188, 3, 0.12);
+  color: var(--c-acc);
+  font-family: var(--font-display, "Oswald", sans-serif);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+.sync-api-btn:hover {
+  background: rgba(246, 188, 3, 0.22);
+  border-color: #f1a10b;
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.sync-api-btn:active {
+  transform: translateY(0);
+}
+
+.sync-api-btn.loading {
+  opacity: 0.75;
+  cursor: wait;
+}
+
+.live-status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(123, 191, 74, 0.25);
+  background: rgba(123, 191, 74, 0.08);
+  color: #7bbf4a;
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.live-status-chip .live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #7bbf4a;
+  box-shadow: 0 0 8px #7bbf4a;
+  animation: pulse 2s infinite;
+}
+
+.live-sync-time {
+  color: var(--c-dim);
+  font-size: 10px;
+}
+
+.subnav-bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  background: rgba(var(--ov), 0.04);
+  border: 1px solid var(--c-border);
+  border-radius: 8px;
+  width: fit-content;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.subnav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 14px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--c-text-2);
+  font-family: var(--font-sans, "Jost", sans-serif);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 120ms ease;
+}
+
+.subnav-btn:hover {
+  background: rgba(var(--ov), 0.07);
+  color: var(--c-text);
+}
+
+.subnav-btn.active {
+  background: var(--c-panel);
+  border-color: rgba(var(--ov), 0.14);
+  color: var(--c-acc);
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16);
+}
+
+.subnav-badge {
+  font-size: 10.5px;
+  font-family: var(--font-mono, monospace);
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: rgba(var(--ov), 0.1);
+  color: var(--c-muted);
+}
+
+.subnav-btn.active .subnav-badge {
+  background: rgba(246, 188, 3, 0.2);
+  color: var(--c-acc);
+}
