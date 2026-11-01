@@ -70,11 +70,37 @@ export class LiveApiService {
   async fetchLivePagePosts(pageId: string, accountId: string): Promise<PostItem[] | null> {
     if (!pageId) return null;
     try {
-      const res = await this.supabase.callMetaApi<{ data: any[] }>('list_page_posts', { payload: { pageId } });
-      const json = { data: res.data };
-      if (!json.data || !Array.isArray(json.data)) return null;
+      // 1. Tenta buscar direto via Graph API com attachments ricos caso haja token de página
+      const pageKey = pageId === '185387824832414' ? 'amaral' : pageId === '184846338220933' ? 'duplod' : null;
+      const pageToken = pageKey ? (environment.metaPages as any)?.[pageKey]?.token : null;
 
-      return json.data.map((rawPost: any) => {
+      let rawPosts: any[] = [];
+
+      if (pageToken) {
+        try {
+          const fields = 'id,message,created_time,permalink_url,status_type,attachments{media,type,url,subattachments}';
+          const directRes = await fetch(`https://graph.facebook.com/v22.0/${pageId}/posts?fields=${fields}&limit=10&access_token=${pageToken}`);
+          if (directRes.ok) {
+            const dj = await directRes.json();
+            if (dj.data && Array.isArray(dj.data)) {
+              rawPosts = dj.data;
+            }
+          }
+        } catch {
+          // fallback para edge function
+        }
+      }
+
+      if (rawPosts.length === 0) {
+        const res = await this.supabase.callMetaApi<{ data: any[] }>('list_page_posts', { payload: { pageId } });
+        if (res?.data && Array.isArray(res.data)) {
+          rawPosts = res.data;
+        }
+      }
+
+      if (rawPosts.length === 0) return null;
+
+      return rawPosts.map((rawPost: any) => {
         const msg = rawPost.message || '';
         const lines = msg.split('\n').filter((l: string) => l.trim().length > 0);
         const topic = lines[0]?.slice(0, 70) || `Publicação Meta #${rawPost.id.slice(-6)}`;
@@ -82,10 +108,40 @@ export class LiveApiService {
         const dateObj = rawPost.created_time ? new Date(rawPost.created_time) : new Date();
         const dayIdx = dateObj.getDay();
 
+        const media: any[] = [];
+        const att = rawPost.attachments?.data?.[0];
+        if (att) {
+          if (att.subattachments?.data && att.subattachments.data.length > 0) {
+            att.subattachments.data.forEach((sub: any, sIdx: number) => {
+              if (sub.media?.image?.src) {
+                media.push({
+                  id: `med_${rawPost.id}_${sIdx}`,
+                  type: 'image',
+                  url: sub.media.image.src,
+                  name: `slide_${sIdx + 1}.jpg`,
+                  aspectRatio: sub.media.image.height > sub.media.image.width ? '4:5' : '1:1',
+                });
+              }
+            });
+          } else if (att.media?.image?.src) {
+            media.push({
+              id: `med_${rawPost.id}_0`,
+              type: 'image',
+              url: att.media.image.src,
+              name: 'foto_principal.jpg',
+              aspectRatio: att.media.image.height > att.media.image.width ? '4:5' : '1:1',
+            });
+          }
+        }
+
+        const isReels = rawPost.permalink_url?.includes('/reel/') || false;
+        const isCarousel = media.length > 1 || msg.includes('Arrasta') || msg.includes('Slide');
+        const format: any = isReels ? 'REELS' : isCarousel ? 'CAROUSEL' : 'IMAGE';
+
         return {
           id: `live_${rawPost.id}`,
           a: accountId,
-          t: msg.includes('Arrasta pro lado') || msg.includes('Slide') ? 'CAROUSEL' : 'IMAGE',
+          t: format,
           s: 'PUBLISHED' as const,
           topic,
           cap: msg,
@@ -93,13 +149,14 @@ export class LiveApiService {
           pr: [
             {
               t: 'Mídia Meta Oficial',
-              ar: '4:5',
+              ar: format === 'REELS' ? '9:16' : '4:5',
               x: `Publicação real sincronizada via Meta Graph API em ${rawPost.created_time}. Link: ${rawPost.permalink_url || ''}`,
             },
           ],
           day: dayIdx,
           time: dateObj.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
           ai: 'Meta Graph API v22.0',
+          media,
         };
       });
     } catch {

@@ -1,3 +1,5 @@
+import { REAL_META_POSTS } from './real-posts';
+
 export type AccountStatus = 'ativo' | 'expirando' | 'erro';
 
 export interface BrandVoice {
@@ -381,6 +383,26 @@ export const ENG: Record<string, string> = {
 export const DAYS = ['seg 26', 'ter 27', 'qua 28', 'qui 29', 'sex 30', 'sáb 31', 'dom 01'];
 
 export const METRICS: Record<string, AccountMetrics> = {
+  a_amaral: {
+    k: [
+      ['seguidores', '11,4 mil', '11.380'],
+      ['alcance 30d', '94,6 mil', '+18%'],
+      ['engajamento', '5,2%', '+0,8 pp'],
+      ['salvamentos', '1.820', '+24%'],
+    ],
+    f: [
+      ['Carrossel', 78],
+      ['Reels', 62],
+      ['Imagem', 41],
+      ['Stories', 35],
+    ],
+    h: ['qui 20h', 'qua 18h', 'sáb 10h'],
+    p: [
+      'Carrosséis educativos sobre técnica de nado e adaptação infantil geram 78% mais salvamentos.',
+      'Concentrar posts de família e rotina às quintas e sextas.',
+      'Reforçar o convite para aula experimental gratuita via WhatsApp (41) 98516-9970.',
+    ],
+  },
   a1: {
     k: [
       ['engajamento', '4,8%', '+0,6 pp'],
@@ -403,22 +425,22 @@ export const METRICS: Record<string, AccountMetrics> = {
   },
   a2: {
     k: [
-      ['engajamento', '3,1%', '+0,2 pp'],
-      ['alcance 30d', '24,8 mil', '+4%'],
-      ['seguidores', '5,9 mil', '+84'],
-      ['salvamentos', '410', '+7%'],
+      ['seguidores', '614', '614'],
+      ['alcance 30d', '18,4 mil', '+6%'],
+      ['engajamento', '4,3%', '+0,5 pp'],
+      ['salvamentos', '390', '+11%'],
     ],
     f: [
-      ['Reels', 64],
-      ['Carrossel', 49],
+      ['Carrossel', 71],
+      ['Reels', 54],
       ['Imagem', 38],
-      ['Stories', 27],
+      ['Stories', 22],
     ],
-    h: ['qua 20h', 'sex 12h', 'dom 11h'],
+    h: ['sex 19h', 'ter 18h', 'dom 11h'],
     p: [
-      'Priorizar Reels de lookbook: 64% de retenção.',
-      'Renovar o token em até 6 dias para não pausar o agendamento.',
-      'Usar caixinhas nos Stories para alimentar o calendário.',
+      'Carrosséis técnicos sobre grids, tipografia e design visual retêm 71% dos leitores.',
+      'Publicar estudos de caso práticos de código e design.',
+      'Manter estilo visual consistente de acordo com o Brand Voice.',
     ],
   },
   a3: {
@@ -444,6 +466,7 @@ export const METRICS: Record<string, AccountMetrics> = {
 };
 
 export const SEED_POSTS: PostItem[] = [
+  ...REAL_META_POSTS,
   // --- CODEMIX WEB (@codemix.web - B2B SaaS & IA) ---
   {
     id: 'p1',
