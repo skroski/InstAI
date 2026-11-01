@@ -1,3 +1,5 @@
+// Modelo para desenvolvimento local: copie para environment.development.ts
+// (fora do Git) e preencha. Usado por ng serve / build de development.
 export const environment = {
   production: false,
   appName: 'InstAI',

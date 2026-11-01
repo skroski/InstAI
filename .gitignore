@@ -12,3 +12,4 @@ dist/
 # Angular environments
 src/environments/*
 !src/environments/environment.example.ts
+!src/environments/environment.ts
