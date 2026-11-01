@@ -2,8 +2,9 @@ import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AccountStateService } from '../../services/account-state.service';
+import { SupabaseService } from '../../services/supabase.service';
 import { CodemixButtonComponent } from '../codemix-button.component';
-import { MetaCampaign, MetaAudience, MetaCampaignObjective } from '../../data/seed-data';
+import { MetaAdAccount, MetaCampaign, MetaAudience, MetaCampaignObjective } from '../../data/seed-data';
 
 type MetaSubTab = 'campaigns' | 'audiences' | 'sync' | 'ai-assistant';
 
@@ -12,6 +13,64 @@ type MetaSubTab = 'campaigns' | 'audiences' | 'sync' | 'ai-assistant';
   imports: [CommonModule, FormsModule, CodemixButtonComponent],
   template: `
     <div class="flex flex-col gap-5">
+      <!-- LOGIN: alterações na Meta exigem usuário autorizado -->
+      @if (!auth.session()) {
+        <div
+          class="rounded-[8px] p-4 flex flex-col gap-3"
+          style="background: var(--c-panel); border: 1px solid rgba(var(--ov), .1);"
+        >
+          <div class="text-sm font-semibold text-[var(--c-text)]">Entrar para criar e alterar campanhas</div>
+          <p class="text-xs text-[var(--c-muted)]">
+            Enviamos um código de 6 dígitos para o seu e-mail. Sem login, o módulo mostra os dados mas não altera nada na Meta.
+          </p>
+          @if (!codeSent()) {
+            <div class="flex items-center gap-2 flex-wrap">
+              <input
+                type="email"
+                autocomplete="email"
+                placeholder="seu@email.com"
+                class="h-8 px-2.5 rounded-[4px] text-xs font-mono"
+                style="background: rgba(var(--ov), .06); border: 1px solid rgba(var(--ov), .15); color: var(--c-text);"
+                [ngModel]="loginEmail()"
+                (ngModelChange)="loginEmail.set($event)"
+              />
+              <cm-button variant="ghost" size="sm" (clicked)="sendCode()">
+                <span>{{ loginBusy() ? 'enviando...' : 'enviar código' }}</span>
+              </cm-button>
+            </div>
+          } @else {
+            <div class="flex items-center gap-2 flex-wrap">
+              <input
+                inputmode="numeric"
+                autocomplete="one-time-code"
+                maxlength="6"
+                placeholder="código de 6 dígitos"
+                class="h-8 px-2.5 rounded-[4px] text-xs font-mono w-44"
+                style="background: rgba(var(--ov), .06); border: 1px solid rgba(var(--ov), .15); color: var(--c-text);"
+                [ngModel]="loginCode()"
+                (ngModelChange)="loginCode.set($event)"
+              />
+              <cm-button variant="ghost" size="sm" (clicked)="verifyCode()">
+                <span>{{ loginBusy() ? 'verificando...' : 'entrar' }}</span>
+              </cm-button>
+              <cm-button variant="ghost" size="sm" (clicked)="codeSent.set(false)">
+                <span>trocar e-mail</span>
+              </cm-button>
+            </div>
+          }
+          @if (loginError()) {
+            <p class="text-xs text-red-400">{{ loginError() }}</p>
+          }
+        </div>
+      } @else {
+        <div class="flex items-center justify-between text-xs text-[var(--c-muted)]">
+          <span>Logado como {{ auth.session()?.email }}</span>
+          <cm-button variant="ghost" size="sm" (clicked)="auth.signOut()">
+            <span>sair</span>
+          </cm-button>
+        </div>
+      }
+
       <!-- HEADER DO MÓDULO META MARKETING API -->
       <div
         class="rounded-[8px] p-5 flex flex-col md:flex-row md:items-center justify-between gap-4"
@@ -51,10 +110,14 @@ type MetaSubTab = 'campaigns' | 'audiences' | 'sync' | 'ai-assistant';
               [value]="state.activeAdAccount().id"
               (change)="onAdAccountChange($event)"
             >
-              @for (acc of state.adAccounts(); track acc.id) {
-                <option [value]="acc.id" style="background: #2b2b2b; color: #fefefe;">
-                  {{ acc.name }} ({{ acc.id }})
-                </option>
+              @for (group of portfolioGroups(); track group.name) {
+                <optgroup [label]="group.name" style="background: #2b2b2b; color: #fefefe;">
+                  @for (acc of group.accounts; track acc.id) {
+                    <option [value]="acc.id" style="background: #2b2b2b; color: #fefefe;">
+                      {{ acc.name }} ({{ acc.id }})
+                    </option>
+                  }
+                </optgroup>
               }
             </select>
           </div>
@@ -956,6 +1019,43 @@ export class MetaCampaignsComponent {
   readonly activeTab = signal<MetaSubTab>('campaigns');
   readonly showCampaignModal = signal<boolean>(false);
 
+  // Login por e-mail com código (Supabase Auth)
+  readonly auth = inject(SupabaseService);
+  readonly loginEmail = signal('');
+  readonly loginCode = signal('');
+  readonly codeSent = signal(false);
+  readonly loginBusy = signal(false);
+  readonly loginError = signal('');
+
+  async sendCode(): Promise<void> {
+    const email = this.loginEmail().trim();
+    if (!email) return;
+    this.loginBusy.set(true);
+    this.loginError.set('');
+    try {
+      await this.auth.sendLoginCode(email);
+      this.codeSent.set(true);
+    } catch (err) {
+      this.loginError.set((err as Error).message);
+    } finally {
+      this.loginBusy.set(false);
+    }
+  }
+
+  async verifyCode(): Promise<void> {
+    this.loginBusy.set(true);
+    this.loginError.set('');
+    try {
+      await this.auth.verifyLoginCode(this.loginEmail().trim(), this.loginCode().trim());
+      this.loginCode.set('');
+      this.codeSent.set(false);
+    } catch (err) {
+      this.loginError.set((err as Error).message);
+    } finally {
+      this.loginBusy.set(false);
+    }
+  }
+
   // Formulário Lookalike
   newLookalikeSource = 'Lista VIP — Leads Inbox & Palavra "AGENTE"';
   lookalikeRatio = 1;
@@ -973,6 +1073,16 @@ export class MetaCampaignsComponent {
 
   readonly unsyncedCount = computed(() => {
     return this.currentAccountContacts().filter((c) => !c.metaSynced).length;
+  });
+
+  // Contas agrupadas por Business Portfolio, para escolher entre campanhas de portfólios diferentes
+  readonly portfolioGroups = computed(() => {
+    const groups = new Map<string, MetaAdAccount[]>();
+    for (const acc of this.state.adAccounts()) {
+      const key = acc.portfolioName || 'Sem portfólio';
+      groups.set(key, [...(groups.get(key) ?? []), acc]);
+    }
+    return [...groups.entries()].map(([name, accounts]) => ({ name, accounts }));
   });
 
   onAdAccountChange(e: Event): void {

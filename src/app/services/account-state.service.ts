@@ -474,24 +474,33 @@ export class AccountStateService {
   async syncWithLiveApiAndVaryData(): Promise<void> {
     this.liveApi.isSyncing.set(true);
     try {
-      // 1. Conecta diretamente na Meta Graph API v22.0/v26.0
-      const liveAd = await this.liveApi.fetchLiveAdAccount();
-      if (liveAd) {
-        this.adAccounts.update((prev) =>
-          prev.map((acc) =>
-            acc.id === liveAd.id
-              ? {
-                  ...acc,
-                  name: liveAd.name || acc.name,
-                  currency: liveAd.currency || acc.currency,
-                  status: liveAd.account_status === 1 ? 'ACTIVE' : acc.status,
-                }
-              : acc
-          )
+      // 1. Lista as contas de anúncio de todas as Business Portfolios acessíveis
+      const portfolios = await this.liveApi.fetchPortfolios();
+      if (portfolios) {
+        const accId = this.activeAccount().id;
+        const liveAccounts: MetaAdAccount[] = portfolios.flatMap((p) =>
+          p.adAccounts.map((acc) => ({
+            id: acc.id.startsWith('act_') ? acc.id : `act_${acc.id}`,
+            a: accId,
+            name: acc.name,
+            currency: acc.currency,
+            status: acc.account_status === 1 ? 'ACTIVE' : 'DISABLED',
+            balance: acc.balance ?? 0,
+            timezone: acc.timezone_name,
+            pixelId: '',
+            portfolioId: p.id,
+            portfolioName: p.name,
+          }))
         );
+        if (liveAccounts.length > 0) {
+          this.adAccounts.set(liveAccounts);
+          if (!liveAccounts.some((a) => a.id === this.activeAdAccountId())) {
+            this.activeAdAccountId.set(liveAccounts[0].id);
+          }
+        }
       }
 
-      // 1.1 Consulta campanhas reais na Meta Marketing API
+      // 1.1 Consulta campanhas reais da conta de anúncio ativa
       const liveCamps = await this.liveApi.fetchLiveCampaigns(this.activeAdAccountId());
       if (liveCamps && liveCamps.length > 0) {
         const mappedCamps: MetaCampaign[] = liveCamps.map((lc) => ({
@@ -518,12 +527,8 @@ export class AccountStateService {
       // 1.2 Busca publicações reais para as páginas Meta conectadas (Amaral Natação e Duplo D)
       const metaPages = (environment as any).metaPages;
       if (metaPages) {
-        if (metaPages.amaral?.id && metaPages.amaral?.token) {
-          const amaralPosts = await this.liveApi.fetchLivePagePosts(
-            metaPages.amaral.id,
-            metaPages.amaral.token,
-            'a_amaral'
-          );
+        if (metaPages.amaral?.id) {
+          const amaralPosts = await this.liveApi.fetchLivePagePosts(metaPages.amaral.id, 'a_amaral');
           if (amaralPosts && amaralPosts.length > 0) {
             this.posts.update((prev) => {
               const existingIds = new Set(prev.map((p) => p.id));
@@ -533,12 +538,8 @@ export class AccountStateService {
           }
         }
 
-        if (metaPages.duplod?.id && metaPages.duplod?.token) {
-          const duploPosts = await this.liveApi.fetchLivePagePosts(
-            metaPages.duplod.id,
-            metaPages.duplod.token,
-            'a2'
-          );
+        if (metaPages.duplod?.id) {
+          const duploPosts = await this.liveApi.fetchLivePagePosts(metaPages.duplod.id, 'a2');
           if (duploPosts && duploPosts.length > 0) {
             this.posts.update((prev) => {
               const existingIds = new Set(prev.map((p) => p.id));
@@ -928,21 +929,27 @@ export class AccountStateService {
     }
   }
 
-  toggleCampaignStatus(campaignId: string): void {
-    this.campaigns.update((prev) =>
-      prev.map((c) => {
-        if (c.id === campaignId) {
-          const newStatus: MetaCampaignStatus = c.status === 'ACTIVE' ? 'PAUSED' : 'ACTIVE';
-          this.toast(
-            newStatus === 'ACTIVE'
-              ? `Campanha "${c.name}" ATIVADA na Meta Ads!`
-              : `Campanha "${c.name}" PAUSADA`
-          );
-          return { ...c, status: newStatus };
-        }
-        return c;
-      })
-    );
+  /**
+   * Ativa/pausa a campanha na Meta. A interface só muda depois da confirmação do servidor;
+   * em caso de falha, o estado anterior é mantido e o erro é exibido.
+   */
+  async toggleCampaignStatus(campaignId: string): Promise<void> {
+    const current = this.campaigns().find((c) => c.id === campaignId);
+    if (!current) return;
+    const newStatus: MetaCampaignStatus = current.status === 'ACTIVE' ? 'PAUSED' : 'ACTIVE';
+
+    try {
+      await this.supabase.callMetaApi('set_campaign_status', {
+        payload: { campaignId, status: newStatus },
+        userToken: this.userToken(),
+      });
+      this.campaigns.update((prev) => prev.map((c) => (c.id === campaignId ? { ...c, status: newStatus } : c)));
+      this.toast(
+        newStatus === 'ACTIVE' ? `Campanha "${current.name}" ATIVADA na Meta Ads!` : `Campanha "${current.name}" PAUSADA`
+      );
+    } catch (err) {
+      this.toast(`Não foi possível alterar "${current.name}": ${(err as Error).message}`);
+    }
   }
 
   createLookalikeAudience(
@@ -1058,44 +1065,56 @@ export class AccountStateService {
       .catch(() => {});
   }
 
-  createCampaign(payload: Partial<MetaCampaign>): void {
+  /**
+   * Cria a campanha na Meta sempre como PAUSED. Só entra na lista local após a confirmação do servidor.
+   */
+  async createCampaign(payload: Partial<MetaCampaign>): Promise<void> {
     const accId = this.activeAccount().id;
-    const newCamp: MetaCampaign = {
-      id: `cmp_${Date.now()}`,
-      a: accId,
-      name: payload.name || 'Nova Campanha Lookalike',
-      objective: payload.objective || 'OUTCOME_LEADS',
-      status: 'ACTIVE',
-      audienceId: payload.audienceId || 'aud_1',
-      audienceName: payload.audienceName || 'Lookalike 1% Brasil',
-      isLookalike: payload.isLookalike ?? true,
-      dailyBudget: payload.dailyBudget || 50,
-      spend: 0,
-      impressions: 0,
-      clicks: 0,
-      leads: 0,
-      cpa: 0,
-      roas: 0,
-      startDate: 'hoje',
-      connectedPostId: payload.connectedPostId,
-    };
-
-    this.campaigns.update((prev) => [newCamp, ...prev]);
-    this.toast(`Campanha "${newCamp.name}" criada e veiculando na Meta Ads!`);
-
-    this.supabase
-      .invokeEdgeFunction('meta-marketing-api', {
-        action: 'create_campaign',
-        adAccountId: this.activeAdAccount().id,
+    const adAccountId = this.activeAdAccountId();
+    const name = payload.name || 'Nova Campanha Lookalike';
+    try {
+      const res = await this.supabase.callMetaApi<{ campaignId: string }>('create_campaign', {
+        adAccountId,
         payload: {
-          name: newCamp.name,
-          objective: newCamp.objective,
-          dailyBudget: newCamp.dailyBudget,
-          targetAudienceId: newCamp.audienceId,
+          name,
+          objective: payload.objective || 'OUTCOME_LEADS',
+          dailyBudget: payload.dailyBudget || 50,
         },
-      })
-      .catch(() => {});
+        userToken: this.userToken(),
+      });
+      this.campaigns.update((prev) => [
+        {
+          id: res.campaignId,
+          a: accId,
+          name,
+          objective: payload.objective || 'OUTCOME_LEADS',
+          status: 'PAUSED',
+          audienceId: payload.audienceId || 'aud_1',
+          audienceName: payload.audienceName || 'Lookalike 1% Brasil',
+          isLookalike: payload.isLookalike ?? true,
+          dailyBudget: payload.dailyBudget || 50,
+          spend: 0,
+          impressions: 0,
+          clicks: 0,
+          leads: 0,
+          cpa: 0,
+          roas: 0,
+          startDate: new Date().toISOString().slice(0, 10),
+          connectedPostId: payload.connectedPostId,
+        },
+        ...prev,
+      ]);
+      this.toast(`Campanha "${name}" criada na Meta como PAUSADA. Ative quando estiver pronta.`);
+    } catch (err) {
+      this.toast(`Campanha não criada: ${(err as Error).message}`);
+    }
   }
+
+  /** Token de sessão do usuário logado (login por e-mail). Undefined se não houver sessão válida. */
+  private userToken(): string | undefined {
+    return this.supabase.accessToken();
+  }
+
 
   quickPromoteWithLookalike(title: string, postId?: string): void {
     const aud = this.createLookalikeAudience(title, 1, 'BR');

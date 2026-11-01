@@ -1,5 +1,7 @@
 // Supabase Edge Function: meta-marketing-api
-// Gerenciamento de Campanhas, Lookalike Audiences e Listas de Contato via Meta Marketing API v22.0
+// Proxy seguro para a Meta Graph API. O token do System User fica somente em secrets do Supabase
+// e nunca chega ao navegador. Um System User com acesso a várias Business Portfolios enxerga
+// todas as contas de anúncio delas via /me/businesses.
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.48.1';
 
@@ -9,280 +11,245 @@ const GRAPH_BASE_URL = `https://graph.facebook.com/${GRAPH_VERSION}`;
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': ALLOWED_ORIGIN,
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'X-Content-Type-Options': 'nosniff',
   'X-Frame-Options': 'DENY',
 };
 
-// Utilitário de hash SHA-256 exigido pela Meta para e-mails e telefones
-async function sha256Hex(value: string): Promise<string> {
-  const clean = value.trim().toLowerCase();
-  const msgUint8 = new TextEncoder().encode(clean);
-  const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+const WRITE_ACTIONS = new Set([
+  'create_campaign',
+  'set_campaign_status',
+  'create_custom_audience',
+  'create_lookalike_audience',
+  'sync_contacts_to_audience',
+]);
+
+const CAMPAIGN_OBJECTIVES = new Set([
+  'OUTCOME_LEADS',
+  'OUTCOME_ENGAGEMENT',
+  'OUTCOME_TRAFFIC',
+  'OUTCOME_SALES',
+  'OUTCOME_AWARENESS',
+]);
+
+class HttpError extends Error {
+  constructor(readonly status: number, message: string) {
+    super(message);
+  }
 }
+
+function json(body: unknown, status = 200): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  });
+}
+
+function systemToken(): string {
+  const token = Deno.env.get('META_SYSTEM_USER_TOKEN') || '';
+  if (!token) throw new HttpError(500, 'META_SYSTEM_USER_TOKEN não configurado nos secrets do Supabase');
+  return token;
+}
+
+// Chamada à Graph API. O token vai no header Authorization, nunca na URL.
+async function graph<T = any>(
+  path: string,
+  options: { method?: 'GET' | 'POST'; params?: Record<string, string>; body?: unknown; token?: string } = {}
+): Promise<T> {
+  const url = new URL(`${GRAPH_BASE_URL}/${path.replace(/^\//, '')}`);
+  for (const [k, v] of Object.entries(options.params || {})) url.searchParams.set(k, v);
+
+  const res = await fetch(url.toString(), {
+    method: options.method || 'GET',
+    headers: {
+      Authorization: `Bearer ${options.token || systemToken()}`,
+      ...(options.body ? { 'Content-Type': 'application/json' } : {}),
+    },
+    body: options.body ? JSON.stringify(options.body) : undefined,
+  });
+  const data = await res.json();
+  if (!res.ok || data.error) {
+    const msg = data?.error?.message || `Graph API respondeu ${res.status}`;
+    throw new HttpError(res.status === 400 || res.status === 403 ? 422 : 502, msg);
+  }
+  return data as T;
+}
+
+// Percorre todas as páginas de uma listagem da Graph API (limite de segurança incluído).
+async function graphList<T = any>(path: string, fields: string, maxPages = 10): Promise<T[]> {
+  const out: T[] = [];
+  let page = await graph<{ data: T[]; paging?: { next?: string } }>(path, { params: { fields, limit: '100' } });
+  out.push(...(page.data || []));
+  for (let i = 1; page.paging?.next && i < maxPages; i++) {
+    const res = await fetch(page.paging.next, { headers: { Authorization: `Bearer ${systemToken()}` } });
+    page = await res.json();
+    out.push(...(page.data || []));
+  }
+  return out;
+}
+
+function assertId(value: unknown, kind: 'act' | 'numeric'): string {
+  const str = String(value ?? '').trim();
+  const ok = kind === 'act' ? /^act_\d+$/.test(str) : /^\d+$/.test(str);
+  if (!ok) throw new HttpError(400, `Identificador inválido: ${kind === 'act' ? 'act_<id>' : '<id numérico>'}`);
+  return str;
+}
+
+// Uma conta só é acessível se o System User tiver acesso a ela (via alguma Business Portfolio).
+async function assertAccountAccess(actId: string): Promise<void> {
+  await graph(actId, { params: { fields: 'id' } });
+}
+
+// Ações de escrita exigem usuário autenticado no Supabase e presente na allowlist META_ALLOWED_EMAILS.
+async function assertWriteAllowed(req: Request): Promise<void> {
+  const authHeader = req.headers.get('Authorization') || '';
+  const jwt = authHeader.replace(/^Bearer\s+/i, '');
+  const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
+  const anonKey = Deno.env.get('SUPABASE_ANON_KEY') || '';
+  const allowed = (Deno.env.get('META_ALLOWED_EMAILS') || '')
+    .split(',')
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean);
+
+  if (!jwt || jwt === anonKey || allowed.length === 0) {
+    throw new HttpError(401, 'Ação de escrita exige login de usuário autorizado');
+  }
+  const supabase = createClient(supabaseUrl, anonKey, { global: { headers: { Authorization: `Bearer ${jwt}` } } });
+  const { data, error } = await supabase.auth.getUser(jwt);
+  const email = data?.user?.email?.toLowerCase();
+  if (error || !email || !allowed.includes(email)) {
+    throw new HttpError(403, 'Usuário sem permissão para alterar campanhas');
+  }
+}
+
+// --- Ações de leitura ---------------------------------------------------------
+
+// Lista todas as Business Portfolios acessíveis e as contas de anúncio de cada uma.
+async function listPortfolios() {
+  const businesses = await graphList<{ id: string; name: string }>('me/businesses', 'id,name');
+  const seen = new Set<string>();
+  const result = [];
+
+  for (const biz of businesses) {
+    const [owned, client] = await Promise.all([
+      graphList(`${biz.id}/owned_ad_accounts`, 'id,name,account_status,currency,timezone_name,balance,amount_spent'),
+      graphList(`${biz.id}/client_ad_accounts`, 'id,name,account_status,currency,timezone_name,balance,amount_spent'),
+    ]);
+    const adAccounts = [...owned, ...client]
+      .filter((acc: any) => !seen.has(acc.id) && seen.add(acc.id))
+      .map((acc: any) => ({
+        id: acc.id,
+        name: acc.name,
+        account_status: acc.account_status,
+        currency: acc.currency,
+        timezone_name: acc.timezone_name,
+        balance: acc.balance ? Number(acc.balance) / 100 : 0,
+        amount_spent: acc.amount_spent ? Number(acc.amount_spent) / 100 : 0,
+        portfolioId: biz.id,
+        portfolioName: biz.name,
+      }));
+    result.push({ id: biz.id, name: biz.name, adAccounts });
+  }
+  return result;
+}
+
+async function listCampaigns(actId: string) {
+  await assertAccountAccess(actId);
+  return graphList(
+    `${actId}/campaigns`,
+    'id,name,status,effective_status,objective,daily_budget,lifetime_budget,insights.date_preset(last_30d){spend,impressions,clicks,actions}'
+  );
+}
+
+// Publicações da página. O token da página é obtido no servidor e não é devolvido ao cliente.
+async function listPagePosts(pageId: string) {
+  const pages = await graphList<{ id: string; access_token: string }>('me/accounts', 'id,access_token');
+  const page = pages.find((p) => p.id === pageId);
+  if (!page) throw new HttpError(403, 'Página não acessível pelo System User');
+  return graph(`${pageId}/posts`, {
+    params: { fields: 'id,message,created_time,permalink_url', limit: '10' },
+    token: page.access_token,
+  }).then((r: any) => r.data || []);
+}
+
+// --- Ações de escrita ---------------------------------------------------------
+
+// Campanhas são sempre criadas PAUSED: nada entra no ar sem ação explícita do usuário.
+async function createCampaign(actId: string, payload: any) {
+  await assertAccountAccess(actId);
+  const objective = String(payload?.objective || 'OUTCOME_LEADS');
+  if (!CAMPAIGN_OBJECTIVES.has(objective)) throw new HttpError(400, `Objetivo inválido: ${objective}`);
+  const name = String(payload?.name || '').trim();
+  if (!name) throw new HttpError(400, 'Nome da campanha é obrigatório');
+
+  const body: Record<string, unknown> = {
+    name,
+    objective,
+    status: 'PAUSED',
+    special_ad_categories: [],
+  };
+  if (payload?.dailyBudget) {
+    // dailyBudget chega em reais; a Graph API espera centavos.
+    body.daily_budget = Math.round(Number(payload.dailyBudget) * 100);
+  }
+  return graph(`${actId}/campaigns`, { method: 'POST', body });
+}
+
+async function setCampaignStatus(campaignId: string, status: string) {
+  if (status !== 'ACTIVE' && status !== 'PAUSED') throw new HttpError(400, 'Status inválido');
+  const campaign = await graph(campaignId, { params: { fields: 'account_id' } });
+  await assertAccountAccess(`act_${campaign.account_id}`);
+  return graph(campaignId, { method: 'POST', body: { status } });
+}
+
+// --- Handler ------------------------------------------------------------------
 
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { status: 204, headers: corsHeaders });
   }
-
   if (req.method !== 'POST') {
-    return new Response(JSON.stringify({ error: 'Método não permitido' }), {
-      status: 405,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return json({ error: 'Método não permitido' }, 405);
   }
 
   try {
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
-      return new Response(JSON.stringify({ error: 'Não autorizado' }), {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-
-    const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
-    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY') || '';
-    const metaAccessToken = Deno.env.get('META_SYSTEM_USER_TOKEN') || Deno.env.get('META_APP_SECRET');
-
-    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-      global: { headers: { Authorization: authHeader } },
-    });
-
     const body = await req.json();
-    const { action, adAccountId, payload } = body;
+    const { action, adAccountId, payload } = body ?? {};
 
-    // 1. AÇÃO: Listar Contas de Anúncio (Ad Accounts)
-    if (action === 'list_ad_accounts') {
-      if (metaAccessToken && metaAccessToken.startsWith('EAA')) {
-        try {
-          const res = await fetch(`${GRAPH_BASE_URL}/me/adaccounts?fields=id,name,currency,account_status,balance,timezone_name&access_token=${metaAccessToken}`);
-          if (res.ok) {
-            const data = await res.json();
-            return new Response(JSON.stringify({ success: true, data: data.data || [] }), {
-              status: 200,
-              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-            });
-          }
-        } catch {
-          // Continua para fallback
-        }
-      }
-
-      // Fallback estruturado para demonstração e desenvolvimento
-      return new Response(
-        JSON.stringify({
-          success: true,
-          mode: 'simulation_ready',
-          data: [
-            {
-              id: 'act_1029384756',
-              name: 'Codemix Hub — Principal Ads',
-              currency: 'BRL',
-              account_status: 1,
-              balance: 145000, // R$ 1.450,00
-              timezone_name: 'America/Sao_Paulo',
-            },
-          ],
-        }),
-        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    if (WRITE_ACTIONS.has(action)) {
+      await assertWriteAllowed(req);
     }
 
-    // 2. AÇÃO: Criar Custom Audience a partir de Lista de Contatos
-    if (action === 'create_custom_audience') {
-      const { name, description } = payload;
-      const formattedAdAccountId = adAccountId?.startsWith('act_') ? adAccountId : `act_${adAccountId || '1029384756'}`;
+    switch (action) {
+      case 'list_portfolios':
+        return json({ success: true, portfolios: await listPortfolios() });
 
-      if (metaAccessToken && metaAccessToken.startsWith('EAA')) {
-        try {
-          const metaRes = await fetch(`${GRAPH_BASE_URL}/${formattedAdAccountId}/customaudiences`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              name,
-              description: description || 'Lista de contatos capturados pelo InstaAI',
-              subtype: 'CUSTOM',
-              customer_file_source: 'USER_PROVIDED_ONLY',
-              access_token: metaAccessToken,
-            }),
-          });
-          const metaData = await metaRes.json();
-          if (metaRes.ok && metaData.id) {
-            return new Response(
-              JSON.stringify({
-                success: true,
-                audienceId: metaData.id,
-                name,
-                type: 'CUSTOM_LIST',
-              }),
-              { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-            );
-          }
-        } catch {
-          // Fallback
-        }
+      case 'list_campaigns':
+        return json({ success: true, data: await listCampaigns(assertId(adAccountId, 'act')) });
+
+      case 'list_page_posts':
+        return json({ success: true, data: await listPagePosts(assertId(payload?.pageId, 'numeric')) });
+
+      case 'create_campaign': {
+        const data = await createCampaign(assertId(adAccountId, 'act'), payload);
+        return json({ success: true, campaignId: data.id, status: 'PAUSED' });
       }
 
-      const generatedId = `ca_${Date.now()}`;
-      return new Response(
-        JSON.stringify({
-          success: true,
-          mode: 'simulation_ready',
-          audienceId: generatedId,
-          name,
-          type: 'CUSTOM_LIST',
-          message: 'Público personalizado registrado na Meta Marketing API',
-        }),
-        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    // 3. AÇÃO: Sincronizar Contatos com Hashing SHA-256
-    if (action === 'sync_contacts_to_audience') {
-      const { audienceId, contacts } = payload;
-      // contacts: Array<{ email?: string; phone?: string; username: string }>
-
-      const hashedRows: string[][] = [];
-      for (const c of contacts || []) {
-        const hashedEmail = c.email ? await sha256Hex(c.email) : (c.username ? await sha256Hex(`${c.username}@instagram.lead`) : '');
-        const hashedPhone = c.phone ? await sha256Hex(c.phone.replace(/\D/g, '')) : '';
-        if (hashedEmail || hashedPhone) {
-          hashedRows.push([hashedEmail, hashedPhone]);
-        }
+      case 'set_campaign_status': {
+        const campaignId = assertId(payload?.campaignId, 'numeric');
+        await setCampaignStatus(campaignId, String(payload?.status));
+        return json({ success: true, campaignId, status: payload.status });
       }
 
-      if (metaAccessToken && metaAccessToken.startsWith('EAA') && audienceId && !audienceId.startsWith('ca_')) {
-        try {
-          const syncRes = await fetch(`${GRAPH_BASE_URL}/${audienceId}/users`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              payload: {
-                schema: ['EMAIL_SHA256', 'PHONE_SHA256'],
-                data: hashedRows,
-              },
-              access_token: metaAccessToken,
-            }),
-          });
-          const syncData = await syncRes.json();
-          return new Response(
-            JSON.stringify({
-              success: true,
-              received: hashedRows.length,
-              metaResponse: syncData,
-            }),
-            { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-          );
-        } catch {
-          // Fallback
-        }
-      }
-
-      return new Response(
-        JSON.stringify({
-          success: true,
-          mode: 'simulation_ready',
-          syncedCount: hashedRows.length,
-          schema: ['EMAIL_SHA256', 'PHONE_SHA256'],
-          message: `${hashedRows.length} contatos criptografados em SHA-256 e sincronizados na Meta`,
-        }),
-        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      default:
+        // Audiências (custom/lookalike/sync) continuam fora desta revisão e serão tratadas
+        // na etapa de públicos: não respondem mais com sucesso simulado.
+        return json({ error: `Ação inválida ou ainda não disponível: ${action}` }, 400);
     }
-
-    // 4. AÇÃO: Criar Lookalike Audience (Público Semelhante)
-    if (action === 'create_lookalike_audience') {
-      const { name, originAudienceId, ratio = 0.01, country = 'BR' } = payload;
-      const formattedAdAccountId = adAccountId?.startsWith('act_') ? adAccountId : `act_${adAccountId || '1029384756'}`;
-
-      if (metaAccessToken && metaAccessToken.startsWith('EAA')) {
-        try {
-          const lookalikeRes = await fetch(`${GRAPH_BASE_URL}/${formattedAdAccountId}/customaudiences`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              name,
-              subtype: 'LOOKALIKE',
-              origin_audience_id: originAudienceId,
-              lookalike_spec: {
-                type: 'similarity',
-                ratio: Number(ratio),
-                country: country.toUpperCase(),
-              },
-              access_token: metaAccessToken,
-            }),
-          });
-          const lookalikeData = await lookalikeRes.json();
-          if (lookalikeRes.ok && lookalikeData.id) {
-            return new Response(
-              JSON.stringify({
-                success: true,
-                lookalikeId: lookalikeData.id,
-                ratio,
-                country,
-                estimatedReach: Math.round(Number(ratio) * 160000000), // ~1.6M para 1% BR
-              }),
-              { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-            );
-          }
-        } catch {
-          // Fallback
-        }
-      }
-
-      const generatedId = `la_${Date.now()}`;
-      const estimatedReach = Math.round(Number(ratio) * 160000000);
-      return new Response(
-        JSON.stringify({
-          success: true,
-          mode: 'simulation_ready',
-          lookalikeId: generatedId,
-          name,
-          ratio,
-          country,
-          estimatedReach,
-          message: `Lookalike ${Math.round(Number(ratio) * 100)}% (${country}) gerado na Meta com alcance estimado de ~${(estimatedReach / 1000000).toFixed(1)}M pessoas`,
-        }),
-        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    // 5. AÇÃO: Criar Campanha Completa com Lookalike & AdSet
-    if (action === 'create_campaign') {
-      const { name, objective, dailyBudget, targetAudienceId, creativeHeadline, creativePostId } = payload;
-      const formattedAdAccountId = adAccountId?.startsWith('act_') ? adAccountId : `act_${adAccountId || '1029384756'}`;
-
-      const generatedCampId = `cmp_${Date.now()}`;
-      return new Response(
-        JSON.stringify({
-          success: true,
-          campaignId: generatedCampId,
-          name,
-          objective: objective || 'OUTCOME_LEADS',
-          dailyBudget: dailyBudget || 50,
-          targetAudienceId,
-          status: 'ACTIVE',
-          message: 'Campanha de Lookalike e Anúncios ativada com sucesso na Meta Marketing API!',
-        }),
-        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    return new Response(JSON.stringify({ error: `Ação inválida: ${action}` }), {
-      status: 400,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
   } catch (err: unknown) {
-    const errorMsg = err instanceof Error ? err.message : 'Erro interno';
-    return new Response(JSON.stringify({ error: errorMsg }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    if (err instanceof HttpError) return json({ success: false, error: err.message }, err.status);
+    const msg = err instanceof Error ? err.message : 'Erro interno';
+    return json({ success: false, error: msg }, 500);
   }
 });
-

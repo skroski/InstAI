@@ -1,6 +1,7 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { Account, PostItem, InteractionItem, MetaCampaign, MetaAdAccount } from '../data/seed-data';
+import { SupabaseService } from './supabase.service';
 
 export interface MetaAdAccountResponse {
   id: string;
@@ -9,72 +10,68 @@ export interface MetaAdAccountResponse {
   currency: string;
   amount_spent: string;
   timezone_name: string;
+  balance?: number;
+  portfolioId?: string;
+  portfolioName?: string;
+}
+
+export interface MetaPortfolio {
+  id: string;
+  name: string;
+  adAccounts: MetaAdAccountResponse[];
 }
 
 @Injectable({ providedIn: 'root' })
 export class LiveApiService {
+  private readonly supabase = inject(SupabaseService);
+
   readonly isSyncing = signal<boolean>(false);
   readonly metaApiConnected = signal<boolean>(true);
   readonly lastSyncTime = signal<string>('agora mesmo');
-  readonly liveAdAccount = signal<MetaAdAccountResponse | null>(null);
+  readonly portfolios = signal<MetaPortfolio[]>([]);
 
-  private get metaToken(): string {
-    return (typeof localStorage !== 'undefined' && localStorage.getItem('meta_system_user_token')) || environment.metaSystemUserToken || '';
-  }
-  private readonly defaultAdAccountId = environment.metaAdAccountId;
   private get openaiKey(): string {
     return (typeof localStorage !== 'undefined' && localStorage.getItem('openai_api_key')) || environment.openaiApiKey || '';
   }
   private readonly openaiModel = environment.openaiModel || 'gpt-4o-mini';
 
   /**
-   * Consulta os dados reais da Conta de Anúncios na Meta Graph API v22.0 / v26.0
+   * Lista todas as Business Portfolios acessíveis e suas contas de anúncio (via servidor).
    */
-  async fetchLiveAdAccount(adAccountId = this.defaultAdAccountId): Promise<MetaAdAccountResponse | null> {
-    if (!this.metaToken || !adAccountId) return null;
+  async fetchPortfolios(): Promise<MetaPortfolio[] | null> {
     try {
-      const url = `https://graph.facebook.com/v22.0/${adAccountId}?fields=id,name,account_status,currency,amount_spent,timezone_name&access_token=${this.metaToken}`;
-      const res = await fetch(url, { method: 'GET' });
-      if (!res.ok) {
-        console.warn('Meta Graph API request status:', res.status);
-        return null;
-      }
-      const data = (await res.json()) as MetaAdAccountResponse;
-      this.liveAdAccount.set(data);
+      const res = await this.supabase.callMetaApi<{ portfolios: MetaPortfolio[] }>('list_portfolios');
+      this.portfolios.set(res.portfolios);
       this.metaApiConnected.set(true);
-      return data;
+      return res.portfolios;
     } catch (err) {
-      console.warn('Erro ao conectar com Meta Graph API:', err);
+      console.warn('Falha ao listar portfólios Meta:', err);
+      this.metaApiConnected.set(false);
       return null;
     }
   }
 
   /**
-   * Consulta campanhas reais na Meta Marketing API
+   * Consulta campanhas reais da conta de anúncios (via servidor).
    */
-  async fetchLiveCampaigns(adAccountId = this.defaultAdAccountId): Promise<any[] | null> {
-    if (!this.metaToken || !adAccountId) return null;
+  async fetchLiveCampaigns(adAccountId: string): Promise<any[] | null> {
     try {
-      const url = `https://graph.facebook.com/v22.0/${adAccountId}/campaigns?fields=id,name,status,objective,daily_budget,spend,insights{impressions,clicks,cpc,spend}&access_token=${this.metaToken}`;
-      const res = await fetch(url, { method: 'GET' });
-      if (!res.ok) return null;
-      const json = await res.json();
-      return json.data || [];
-    } catch {
+      const res = await this.supabase.callMetaApi<{ data: any[] }>('list_campaigns', { adAccountId });
+      return res.data || [];
+    } catch (err) {
+      console.warn('Falha ao listar campanhas Meta:', err);
       return null;
     }
   }
 
   /**
-   * Consulta publicações reais direto da Meta Graph API para a Página / Instagram vinculado
+   * Publicações reais da Página. O token da página fica no servidor.
    */
-  async fetchLivePagePosts(pageId: string, pageToken: string, accountId: string): Promise<PostItem[] | null> {
-    if (!pageId || !pageToken) return null;
+  async fetchLivePagePosts(pageId: string, accountId: string): Promise<PostItem[] | null> {
+    if (!pageId) return null;
     try {
-      const url = `https://graph.facebook.com/v22.0/${pageId}/posts?fields=id,message,created_time,permalink_url&access_token=${pageToken}&limit=10`;
-      const res = await fetch(url, { method: 'GET' });
-      if (!res.ok) return null;
-      const json = await res.json();
+      const res = await this.supabase.callMetaApi<{ data: any[] }>('list_page_posts', { payload: { pageId } });
+      const json = { data: res.data };
       if (!json.data || !Array.isArray(json.data)) return null;
 
       return json.data.map((rawPost: any) => {

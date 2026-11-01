@@ -150,6 +150,8 @@ export interface MetaAdAccount {
   balance: number; // R$
   timezone: string;
   pixelId: string;
+  portfolioId?: string; // Business Portfolio (Meta) à qual a conta pertence
+  portfolioName?: string;
 }
 
 export type MetaAudienceType = 'CUSTOM_LIST' | 'LOOKALIKE' | 'IG_ENGAGEMENT';
