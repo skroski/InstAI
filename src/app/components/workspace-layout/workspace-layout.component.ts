@@ -10,6 +10,7 @@ import { UnifiedInboxComponent } from '../unified-inbox/unified-inbox.component'
 import { AccountsManagerComponent } from '../accounts-manager/accounts-manager.component';
 import { AiCopilotChatComponent } from '../ai-copilot-chat/ai-copilot-chat.component';
 import { MetaCampaignsComponent } from '../meta-campaigns/meta-campaigns.component';
+import { IcpStudioComponent } from '../icp-studio/icp-studio.component';
 import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
 
 @Component({
@@ -24,6 +25,7 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
     AccountsManagerComponent,
     AiCopilotChatComponent,
     MetaCampaignsComponent,
+    IcpStudioComponent,
   ],
   template: `
     <div
@@ -135,6 +137,16 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
             <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
             <span class="nav-txt">campanhas & meta ads</span>
             <span class="nav-badge" [class.ai]="state.campaignMetrics().activeCount > 0">{{ state.campaignMetrics().activeCount }} ativas</span>
+          </button>
+
+          <button type="button" class="nav-item" [class.active]="state.view() === 'icp'" (click)="state.setView('icp')">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/>
+              <path d="M2 12h20"/>
+            </svg>
+            <span class="nav-txt">icp studio</span>
+            <span class="nav-badge ai">{{ state.icpStats().tier1Count }} ouro</span>
           </button>
 
           <button type="button" class="nav-item" [class.active]="state.view() === 'prompts'" (click)="state.setView('prompts')">
@@ -709,6 +721,11 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
             <app-meta-campaigns />
           }
 
+          <!-- 9. ICP STUDIO (MATRIZ 360° & QUALIFICAÇÃO) -->
+          @if (state.view() === 'icp') {
+            <app-icp-studio />
+          }
+
           <!-- 8. PROMPT STUDIO (ENGENHARIA DE PROMPTS VISUAIS) -->
           @if (state.view() === 'prompts') {
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -1073,6 +1090,7 @@ export class WorkspaceLayoutComponent {
     automations: { l: 'automações ', b: 'de direct' },
     audience: { l: 'audiência ', b: '& crm social' },
     campaigns: { l: 'campanhas ', b: '& meta ads' },
+    icp: { l: 'perfil de cliente ', b: 'ideal (icp)' },
     prompts: { l: 'prompt ', b: 'studio' },
     analytics: { l: 'analytics ', b: '& insights' },
     skills: { l: 'skills ', b: '& comandos /' },

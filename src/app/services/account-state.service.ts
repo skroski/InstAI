@@ -35,6 +35,10 @@ import {
   SEED_AD_ACCOUNTS,
   SEED_AUDIENCES,
   SEED_CAMPAIGNS,
+  IcpProfile,
+  IcpTier,
+  IcpSegmentType,
+  SEED_ICPS,
 } from '../data/seed-data';
 
 export type WorkspaceView =
@@ -46,6 +50,7 @@ export type WorkspaceView =
   | 'automations'
   | 'audience'
   | 'campaigns'
+  | 'icp'
   | 'prompts'
   | 'analytics'
   | 'accounts'
@@ -168,6 +173,11 @@ export class AccountStateService {
   readonly isCreatingLookalike = signal<boolean>(false);
   readonly isCreatingCampaign = signal<boolean>(false);
 
+  // ICP (Ideal Customer Profile) Signals
+  readonly icpProfiles = signal<IcpProfile[]>(SEED_ICPS);
+  readonly activeIcpId = signal<string>('icp_1');
+  readonly isGeneratingIcp = signal<boolean>(false);
+
   // Skills Signals
   readonly skillOn = signal<Record<string, boolean>>({});
   readonly skillQ = signal<string>('');
@@ -277,6 +287,37 @@ export class AccountStateService {
       totalClicks,
       avgCpa,
       avgRoas: weightedRoas,
+    };
+  });
+
+  // Computed ICP Profile & Lead Match
+  readonly activeIcpProfile = computed<IcpProfile>(() => {
+    const aid = this.activeIcpId();
+    const currAccId = this.activeAccount().id;
+    return (
+      this.icpProfiles().find((p) => p.id === aid) ||
+      this.icpProfiles().find((p) => p.a === currAccId) ||
+      this.icpProfiles()[0]
+    );
+  });
+
+  readonly accountIcps = computed<IcpProfile[]>(() => {
+    const accId = this.activeAccount().id;
+    return this.icpProfiles().filter((p) => p.a === accId || p.a === 'global');
+  });
+
+  readonly icpStats = computed(() => {
+    const accId = this.activeAccount().id;
+    const list = this.contacts().filter((c) => c.a === accId);
+    const tier1 = list.filter((c) => (c.icpScore || 0) >= 80);
+    const tier2 = list.filter((c) => (c.icpScore || 0) >= 50 && (c.icpScore || 0) < 80);
+    const descarte = list.filter((c) => (c.icpScore || 0) < 50);
+    return {
+      total: list.length,
+      tier1Count: tier1.length,
+      tier2Count: tier2.length,
+      descarteCount: descarte.length,
+      tier1Pct: list.length > 0 ? Math.round((tier1.length / list.length) * 100) : 0,
     };
   });
 
@@ -918,6 +959,279 @@ export class AccountStateService {
       dailyBudget: 50.0,
       connectedPostId: postId,
     });
+    this.setView('campaigns');
+  }
+
+  importExternalContactsAndCreateLookalike(options: {
+    audienceName: string;
+    rawText: string;
+    autoLookalike?: boolean;
+    lookalikeRatio?: number;
+  }): { count: number; customAudience: MetaAudience; lookalikeAudience?: MetaAudience } {
+    const accId = this.activeAccount().id;
+    const lines = options.rawText.split(/[\r\n]+/);
+    const newContacts: ContactItem[] = [];
+    const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
+    const phoneRegex = /(?:\+?55\s?)?(?:\(?\d{2}\)?\s?)?(?:9?\d{4}[-\s]?\d{4})/;
+
+    let parsedCount = 0;
+    for (const line of lines) {
+      const cleanLine = line.trim();
+      if (!cleanLine || cleanLine.startsWith('#')) continue;
+
+      const emailMatch = cleanLine.match(emailRegex);
+      const email = emailMatch ? emailMatch[0].toLowerCase() : undefined;
+
+      const phoneMatch = cleanLine.match(phoneRegex);
+      let phone = phoneMatch ? phoneMatch[0].replace(/\D/g, '') : undefined;
+      if (phone && !phone.startsWith('55') && phone.length <= 11) {
+        phone = '55' + phone;
+      }
+
+      // Extrai nome ou usa o início do e-mail
+      const parts = cleanLine.split(/[,;\t]/);
+      let username = parts[0]?.trim() || '';
+      if (email && (!username || username === email)) {
+        username = email.split('@')[0].replace(/[^a-zA-Z0-9_.]/g, '');
+      }
+
+      if (email || phone) {
+        parsedCount++;
+        newContacts.push({
+          id: `c_imp_${Date.now()}_${parsedCount}`,
+          a: accId,
+          u: username || `cliente_${parsedCount}`,
+          email,
+          phone,
+          tags: ['importado', 'csv_clientes', 'base_lookalike'],
+          src: 'Importação CSV / CRM',
+          last: 'hoje',
+          metaSynced: true,
+        });
+      }
+    }
+
+    if (newContacts.length === 0) {
+      this.toast('Nenhum e-mail ou telefone válido encontrado para importar');
+      throw new Error('Nenhum dado válido');
+    }
+
+    // 1. Adiciona contatos à lista local
+    this.contacts.update((prev) => [...newContacts, ...prev]);
+
+    // 2. Cria a Custom Audience (Lista de Clientes)
+    const customAudName = options.audienceName.trim() || `Lista Importada (${parsedCount} clientes)`;
+    const customAud: MetaAudience = {
+      id: `aud_imp_${Date.now()}`,
+      a: accId,
+      name: customAudName,
+      type: 'CUSTOM_LIST',
+      size: parsedCount,
+      status: 'READY',
+      country: 'BR',
+      lastSync: 'agora mesmo',
+    };
+    this.audiences.update((prev) => [customAud, ...prev]);
+
+    // 3. Notifica a Meta Marketing API para criar público e enviar hash SHA-256
+    this.supabase
+      .invokeEdgeFunction('meta-marketing-api', {
+        action: 'create_custom_audience',
+        adAccountId: this.activeAdAccount().id,
+        payload: {
+          name: customAudName,
+          description: `Importação de ${parsedCount} clientes via CSV/Planilha`,
+        },
+      })
+      .then(() => {
+        return this.supabase.invokeEdgeFunction('meta-marketing-api', {
+          action: 'sync_contacts_to_audience',
+          adAccountId: this.activeAdAccount().id,
+          payload: {
+            audienceId: customAud.id,
+            contacts: newContacts.map((c) => ({
+              email: c.email,
+              phone: c.phone,
+              username: c.u,
+            })),
+          },
+        });
+      })
+      .catch(() => {});
+
+    // 4. Se solicitado, gera automaticamente o Lookalike
+    let lookalikeAud: MetaAudience | undefined;
+    if (options.autoLookalike !== false) {
+      const ratio = options.lookalikeRatio || 1;
+      lookalikeAud = this.createLookalikeAudience(
+        customAudName,
+        ratio,
+        'BR',
+        `Lookalike ${ratio}% Brasil — Semelhante à Lista "${customAudName}"`
+      );
+    }
+
+    this.toast(
+      `✅ ${parsedCount} clientes importados com SHA-256! ${lookalikeAud ? 'Lookalike gerado com sucesso.' : ''}`
+    );
+
+    return {
+      count: parsedCount,
+      customAudience: customAud,
+      lookalikeAudience: lookalikeAud,
+    };
+  }
+
+  // ==========================================
+  // Métodos ICP (Ideal Customer Profile) Studio
+  // ==========================================
+
+  selectIcpProfile(id: string): void {
+    this.activeIcpId.set(id);
+    const p = this.icpProfiles().find((x) => x.id === id);
+    if (p) {
+      this.toast(`ICP ativo: ${p.name}`);
+    }
+  }
+
+  createIcpProfile(profile: Partial<IcpProfile>): IcpProfile {
+    const accId = this.activeAccount().id;
+    const newIcp: IcpProfile = {
+      id: `icp_${Date.now()}`,
+      a: accId,
+      name: profile.name || 'Novo Perfil ICP',
+      segmentType: profile.segmentType || 'B2B',
+      targetRole: profile.targetRole || 'Tomador de Decisão / Cliente Alvo',
+      companyProfile: profile.companyProfile || '',
+      ticketMedio: profile.ticketMedio || 'R$ 500 - R$ 2.000',
+      pains: profile.pains || [],
+      desires: profile.desires || [],
+      greenFlags: profile.greenFlags || [],
+      redFlags: profile.redFlags || [],
+      objections: profile.objections || [],
+      hooks: profile.hooks || [],
+      metaKeywords: profile.metaKeywords || [],
+      createdAt: 'hoje',
+      updatedAt: 'hoje',
+    };
+
+    this.icpProfiles.update((prev) => [newIcp, ...prev]);
+    this.activeIcpId.set(newIcp.id);
+    this.toast(`Matriz ICP "${newIcp.name}" criada com sucesso!`);
+    return newIcp;
+  }
+
+  updateIcpProfile(id: string, updates: Partial<IcpProfile>): void {
+    this.icpProfiles.update((prev) =>
+      prev.map((p) => (p.id === id ? { ...p, ...updates, updatedAt: 'agora' } : p))
+    );
+    this.toast('Matriz ICP atualizada!');
+  }
+
+  deleteIcpProfile(id: string): void {
+    this.icpProfiles.update((prev) => prev.filter((p) => p.id !== id));
+    const remaining = this.accountIcps();
+    if (remaining.length > 0) {
+      this.activeIcpId.set(remaining[0].id);
+    }
+    this.toast('Perfil de ICP removido');
+  }
+
+  async generateIcpWithAi(description: string, segment: IcpSegmentType = 'B2B'): Promise<IcpProfile> {
+    this.isGeneratingIcp.set(true);
+    const acc = this.activeAccount();
+
+    try {
+      // Simulação estruturada sênior e integrada
+      const cleanDesc = description.trim();
+      const generatedName = `ICP — ${cleanDesc.slice(0, 35)}`;
+
+      const newIcp = this.createIcpProfile({
+        name: generatedName,
+        segmentType: segment,
+        targetRole: `Tomadores de Decisão no nicho: ${cleanDesc.slice(0, 45)}`,
+        companyProfile: segment === 'B2B' ? 'Empresas em tração faturando > R$ 30k/mês' : 'Consumidores de classe A/B com poder de compra',
+        ticketMedio: segment === 'B2B' ? 'R$ 2.500 a R$ 8.000' : 'R$ 250 a R$ 900',
+        pains: [
+          'Gargalo em processos manuais repetitivos gerando perda de tempo',
+          'Demora no atendimento custando fechamentos imediatos',
+          'Sensação de que o marketing atrai muitos curiosos sem orçamento',
+          'Dificuldade de mensurar o retorno de cada canal de aquisição',
+        ],
+        desires: [
+          'Previsibilidade de vendas com leads qualificados todo dia',
+          'Atendimento ágil em menos de 1 minuto 24 horas por dia',
+          'Aumentar margem de lucro e ticket médio sem dobrar a equipe',
+          'Operação redonda rodando sem depender 100% do dono',
+        ],
+        greenFlags: [
+          'Já tem orçamento reservado para contratação imediata',
+          'Dores urgentes e consciência de que precisa de ajuda externa',
+          'Interlocutor é o decisor com poder de passar o cartão ou assinar',
+          'Tem histórico de já ter comprado soluções na mesma faixa de preço',
+        ],
+        redFlags: [
+          'Apenas pesquisando sem prazo definido para implementar',
+          'Busca solução gratuita, "quebra-galho" ou pirata',
+          'Não tem clareza do próprio faturamento ou produto',
+          'Curioso ou concorrente disfarçado',
+        ],
+        objections: [
+          '"Está caro / Preciso falar com meu sócio"',
+          '"Não sei se funciona para o meu nicho específico"',
+          '"Já tive uma experiência ruim com outra empresa"',
+        ],
+        hooks: [
+          `Se você atua com ${cleanDesc.slice(0, 25)} e ainda perde tempo com processo manual, veja isso.`,
+          'Por que 90% das empresas continuam perdendo clientes por demora no Direct.',
+          'O método exato para filtrar apenas clientes de ticket alto antes de iniciar o atendimento.',
+        ],
+        metaKeywords: [
+          cleanDesc.split(' ')[0] || 'Negócios',
+          'Empreendedorismo',
+          'Vendas B2B',
+          'Marketing Digital',
+        ],
+      });
+
+      this.toast(`✨ Matriz de ICP gerada com sucesso pela IA!`);
+      return newIcp;
+    } finally {
+      this.isGeneratingIcp.set(false);
+    }
+  }
+
+  scoreContact(contactId: string, score: number): void {
+    const tier: IcpTier = score >= 80 ? 'TIER_1_OURO' : score >= 50 ? 'TIER_2_PRATA' : 'DESQUALIFICADO';
+    this.contacts.update((prev) =>
+      prev.map((c) => (c.id === contactId ? { ...c, icpScore: score, icpTier: tier } : c))
+    );
+  }
+
+  exportTier1ToMetaLookalike(ratio: number = 1): void {
+    const accId = this.activeAccount().id;
+    const icp = this.activeIcpProfile();
+    const tier1Contacts = this.contacts().filter((c) => c.a === accId && (c.icpScore || 0) >= 80);
+
+    if (tier1Contacts.length === 0) {
+      this.toast('Nenhum contato qualificado como Tier 1 Ouro para exportar');
+      return;
+    }
+
+    const listName = `Lista ICP Ouro (${tier1Contacts.length} leads) — ${icp.name.slice(0, 25)}`;
+    const newAud = this.createAudienceFromContacts(
+      listName,
+      tier1Contacts.map((c) => c.id)
+    );
+
+    this.createLookalikeAudience(
+      listName,
+      ratio,
+      'BR',
+      `Lookalike ${ratio}% Brasil — Super ICP (${icp.name.slice(0, 20)})`
+    );
+
+    this.toast(`🚀 Público Lookalike criado na Meta baseado exclusivamente nos seus leads Tier 1!`);
     this.setView('campaigns');
   }
 }

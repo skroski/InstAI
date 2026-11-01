@@ -103,6 +103,8 @@ export interface FlowItem {
   nodes: FlowNode[];
 }
 
+export type IcpTier = 'TIER_1_OURO' | 'TIER_2_PRATA' | 'DESQUALIFICADO';
+
 export interface ContactItem {
   id: string;
   a: string;
@@ -113,6 +115,29 @@ export interface ContactItem {
   email?: string;
   phone?: string;
   metaSynced?: boolean;
+  icpScore?: number; // 0 - 100
+  icpTier?: IcpTier;
+}
+
+export type IcpSegmentType = 'B2B' | 'B2C' | 'D2C' | 'SERVICOS';
+
+export interface IcpProfile {
+  id: string;
+  a: string; // id da conta ig ou 'global'
+  name: string;
+  segmentType: IcpSegmentType;
+  targetRole: string; // Perfil / Cargo / Persona
+  companyProfile: string; // Porte / Faturamento / Cenário
+  ticketMedio: string; // Faixa de preço / LTV
+  pains: string[]; // Dores crônicas
+  desires: string[]; // Desejos & Transformação
+  greenFlags: string[]; // Sinais de alta qualificação (Tier 1)
+  redFlags: string[]; // Sinais eliminatórios (Curiosos)
+  objections: string[]; // Principais barreiras de compra
+  hooks: string[]; // Ganchos recomendados para anúncios Meta
+  metaKeywords: string[]; // Interesses para refinamento na Meta
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface MetaAdAccount {
@@ -765,15 +790,15 @@ export const SEED_FLOWS: FlowItem[] = [
 ];
 
 export const SEED_CONTACTS: ContactItem[] = [
-  { id: 'c1', a: 'a1', u: 'marina.lopes.dev', email: 'marina.dev@gmail.com', phone: '+5511987654321', tags: ['lead quente'], src: 'AGENTE . Reels', last: 'hoje 09:12', metaSynced: true },
-  { id: 'c2', a: 'a1', u: 'lucas.prod', email: 'lucas.product@techsaas.com', phone: '+5511976543210', tags: ['lead quente', 'novo'], src: 'AGENTE . Reels', last: 'hoje 05:55', metaSynced: true },
-  { id: 'c3', a: 'a1', u: 'clinica.horizonte', email: 'contato@clinicahorizonte.med.br', phone: '+5521998877665', tags: ['cliente'], src: 'menção de story', last: 'ontem', metaSynced: true },
-  { id: 'c4', a: 'a1', u: 'rafa.tech', email: 'rafael.tecnologia@outlook.com', phone: '+5531988776655', tags: ['novo'], src: 'comentário', last: 'hoje 08:40', metaSynced: false },
-  { id: 'c5', a: 'a1', u: 'dev.carla', email: 'carla.costa.eng@gmail.com', phone: '+5541999881122', tags: ['novo'], src: 'comentário', last: 'hoje 07:30', metaSynced: false },
-  { id: 'c6', a: 'a3', u: 'tutor.bia', email: 'beatriz.vet@hotmail.com', phone: '+5519987651234', tags: ['cliente'], src: 'dm', last: 'hoje 10:03', metaSynced: true },
-  { id: 'c7', a: 'a3', u: 'petshop.sol', email: 'financeiro@petshopsol.com.br', phone: '+5511991234567', tags: ['lead quente'], src: 'AGENDA . Reels', last: 'hoje 09:30', metaSynced: true },
-  { id: 'c8', a: 'a3', u: 'clinica.pet.sul', email: 'adm@petsul.com.br', phone: '+5551981223344', tags: ['lead quente', 'novo'], src: 'comentário', last: 'hoje 08:05', metaSynced: false },
-  { id: 'c9', a: 'a2', u: 'loja.centro', email: 'comercial@lojacentrosp.com.br', phone: '+5511971112233', tags: ['lead quente'], src: 'dm', last: 'hoje 11:20', metaSynced: true },
+  { id: 'c1', a: 'a1', u: 'marina.lopes.dev', email: 'marina.dev@gmail.com', phone: '+5511987654321', tags: ['lead quente', 'tier_1'], src: 'AGENTE . Reels', last: 'hoje 09:12', metaSynced: true, icpScore: 94, icpTier: 'TIER_1_OURO' },
+  { id: 'c2', a: 'a1', u: 'lucas.prod', email: 'lucas.product@techsaas.com', phone: '+5511976543210', tags: ['lead quente', 'tier_1'], src: 'AGENTE . Reels', last: 'hoje 05:55', metaSynced: true, icpScore: 91, icpTier: 'TIER_1_OURO' },
+  { id: 'c3', a: 'a1', u: 'clinica.horizonte', email: 'contato@clinicahorizonte.med.br', phone: '+5521998877665', tags: ['cliente', 'tier_1'], src: 'menção de story', last: 'ontem', metaSynced: true, icpScore: 88, icpTier: 'TIER_1_OURO' },
+  { id: 'c4', a: 'a1', u: 'rafa.tech', email: 'rafael.tecnologia@outlook.com', phone: '+5531988776655', tags: ['novo', 'tier_2'], src: 'comentário', last: 'hoje 08:40', metaSynced: false, icpScore: 68, icpTier: 'TIER_2_PRATA' },
+  { id: 'c5', a: 'a1', u: 'dev.carla', email: 'carla.costa.eng@gmail.com', phone: '+5541999881122', tags: ['novo', 'descarte'], src: 'comentário', last: 'hoje 07:30', metaSynced: false, icpScore: 35, icpTier: 'DESQUALIFICADO' },
+  { id: 'c6', a: 'a3', u: 'tutor.bia', email: 'beatriz.vet@hotmail.com', phone: '+5519987651234', tags: ['cliente', 'tier_1'], src: 'dm', last: 'hoje 10:03', metaSynced: true, icpScore: 92, icpTier: 'TIER_1_OURO' },
+  { id: 'c7', a: 'a3', u: 'petshop.sol', email: 'financeiro@petshopsol.com.br', phone: '+5511991234567', tags: ['lead quente', 'tier_1'], src: 'AGENDA . Reels', last: 'hoje 09:30', metaSynced: true, icpScore: 90, icpTier: 'TIER_1_OURO' },
+  { id: 'c8', a: 'a3', u: 'clinica.pet.sul', email: 'adm@petsul.com.br', phone: '+5551981223344', tags: ['lead quente', 'tier_2'], src: 'comentário', last: 'hoje 08:05', metaSynced: false, icpScore: 72, icpTier: 'TIER_2_PRATA' },
+  { id: 'c9', a: 'a2', u: 'loja.centro', email: 'comercial@lojacentrosp.com.br', phone: '+5511971112233', tags: ['lead quente', 'tier_1'], src: 'dm', last: 'hoje 11:20', metaSynced: true, icpScore: 89, icpTier: 'TIER_1_OURO' },
 ];
 
 export const SEED_INTS: InteractionItem[] = [
@@ -954,24 +979,24 @@ export const SEED_RULES: KeywordRule[] = [
 
 export const SEED_AD_ACCOUNTS: MetaAdAccount[] = [
   {
-    id: 'act_1029384756',
+    id: 'act_1124982890873935',
     a: 'a1',
-    name: 'Codemix Hub — Principal Ads',
+    name: 'Anuncios Codemix',
     currency: 'BRL',
     status: 'ACTIVE',
     balance: 1450.0,
     timezone: 'America/Sao_Paulo',
-    pixelId: 'px_8372910482910',
+    pixelId: 'px_codemix_meta_2026',
   },
   {
-    id: 'act_2938471029',
+    id: 'act_891826527522907',
     a: 'a2',
-    name: 'Duplo D Moda & Estilo Ads',
+    name: 'Anúncios Duplo D',
     currency: 'BRL',
     status: 'ACTIVE',
     balance: 890.0,
     timezone: 'America/Sao_Paulo',
-    pixelId: 'px_9482019482012',
+    pixelId: 'px_duplod_meta_2026',
   },
   {
     id: 'act_8392019481',
@@ -1122,5 +1147,149 @@ export const SEED_CAMPAIGNS: MetaCampaign[] = [
     connectedPostId: 'p4',
   },
 ];
+
+export const SEED_ICPS: IcpProfile[] = [
+  {
+    id: 'icp_1',
+    a: 'a1',
+    name: 'Tech Founders & Gestores de Produto (SaaS/Web)',
+    segmentType: 'B2B',
+    targetRole: 'Founders, CTOs, Tech Leads e Diretores de Operação',
+    companyProfile: 'SaaS ou negócios digitais com faturamento > R$ 30k/mês e gargalo em suporte/DM',
+    ticketMedio: 'R$ 3.500 a R$ 12.000 / projeto',
+    pains: [
+      'Equipe sobrecarregada respondendo dúvidas repetitivas no WhatsApp e Direct',
+      'Perda de vendas por demora no atendimento de leads quentes',
+      'Custo alto com atendentes humanos em tarefas que poderiam ser automatizadas',
+      'Chatbots tradicionais engessados que irritam os clientes',
+    ],
+    desires: [
+      'Operação de atendimento e qualificação 24/7 com inteligência artificial',
+      'Leads qualificados e passados para o WhatsApp em menos de 1 minuto',
+      'Redução de até 70% no custo operacional de suporte',
+      'Escalar o faturamento sem precisar dobrar a equipe',
+    ],
+    greenFlags: [
+      'Já possui faturamento e tração de clientes ativa',
+      'Tem urgência e orçamento aprovado para implementação',
+      'Usa stack moderna (Supabase, PostgreSQL, n8n, WhatsApp API)',
+      'O interlocutor é o tomador de decisão final (Founder/Diretor)',
+    ],
+    redFlags: [
+      'Ainda está na fase da ideia, sem produto ou clientes',
+      'Busca soluções gratuitas ou "milagrosas"',
+      'Não tem tempo nem interesse em alinhar os fluxos da empresa',
+      'Curioso ou estudante sem intenção comercial',
+    ],
+    objections: [
+      '"Já contratei bot antes e foi uma experiência horrível"',
+      '"Tenho receio de a IA passar informações erradas de preço ou produto"',
+      '"Quanto tempo leva para ficar pronto e funcionando?"',
+    ],
+    hooks: [
+      'Se seu time gasta mais de 2 horas por dia respondendo o mesmo direct, você está queimando caixa.',
+      'Como qualificamos leads no Instagram e passamos pro WhatsApp em 40 segundos.',
+      'A diferença entre um chatbot burro de árvore de botões e um agente de IA conectado ao seu banco.',
+    ],
+    metaKeywords: [
+      'Software as a service',
+      'Automação de processos',
+      'Inteligência Artificial',
+      'Startups',
+      'Empreendedorismo',
+    ],
+    createdAt: '24/10/2026',
+    updatedAt: '31/10/2026',
+  },
+  {
+    id: 'icp_2',
+    a: 'a2',
+    name: 'Mulheres Contemporâneas — Moda Atemporal',
+    segmentType: 'D2C',
+    targetRole: 'Mulheres de 28 a 48 anos, profissionais independentes, classe A/B',
+    companyProfile: 'Consumidoras finais com alto padrão estético e busca por sofisticação',
+    ticketMedio: 'R$ 380 a R$ 1.200 / pedido',
+    pains: [
+      'Roupas de fast-fashion que estragam na primeira lavagem',
+      'Falta de tempo para pesquisar looks e ir a shoppings',
+      'Dificuldade de encontrar roupas elegantes que sirvam para trabalho e eventos',
+    ],
+    desires: [
+      'Guarda-roupa cápsula inteligente com peças que combinam entre si',
+      'Elegância sem esforço no dia a dia',
+      'Tecidos nobres de alta durabilidade e caimento impecável',
+    ],
+    greenFlags: [
+      'Compra online com frequência e valoriza acabamento',
+      'Já consome marcas de alfaiataria premium',
+      'Prioriza qualidade e durabilidade sobre preço baixo',
+    ],
+    redFlags: [
+      'Busca apenas descontos agressivos ou liquidação',
+      'Prefere sintéticos de baixo custo descartáveis',
+    ],
+    objections: [
+      '"E se o tamanho não der certo?"',
+      '"O tecido é realmente tão bom quanto nas fotos?"',
+    ],
+    hooks: [
+      '3 peças essenciais de alfaiataria que substituem 10 roupas de fast-fashion.',
+      'Como montar um guarda-roupa sofisticado sem perder tempo toda manhã.',
+    ],
+    metaKeywords: [
+      'Moda sustentável',
+      'Alfaiataria feminina',
+      'Estilo clássico',
+      'Lojas de moda premium',
+    ],
+    createdAt: '20/10/2026',
+    updatedAt: '31/10/2026',
+  },
+  {
+    id: 'icp_3',
+    a: 'a3',
+    name: 'Veterinários e Gestores de Clínicas Pet',
+    segmentType: 'B2B',
+    targetRole: 'Médicos Veterinários Proprietários e Administradores de Clínicas',
+    companyProfile: 'Clínicas veterinárias e pet shops com consultório faturando > R$ 40k/mês',
+    ticketMedio: 'R$ 1.800 a R$ 4.500 / mês',
+    pains: [
+      'No-show (tutores que faltam consultas e exames sem avisar)',
+      'Recepção sobrecarregada e atendimento desorganizado no WhatsApp',
+      'Vacinas e vermífugos atrasados sem retorno automático dos tutores',
+    ],
+    desires: [
+      'Agenda cheia com confirmação automática de consultas 24h antes',
+      'Disparo automático de lembretes de vacina no WhatsApp dos tutores',
+      'Recepção livre para acolher os pacientes presenciais',
+    ],
+    greenFlags: [
+      'Clínica em funcionamento com mais de 1 veterinário',
+      'Mais de 100 atendimentos por mês',
+      'Desejo imediato de reduzir faltas e perdas de faturamento',
+    ],
+    redFlags: [
+      'Veterinário autônomo sem consultório físico nem agenda fixa',
+      'Sem nenhum volume de clientes atual',
+    ],
+    objections: [
+      '"Os tutores mais velhos vão conseguir usar o WhatsApp?"',
+      '"Integra com meu sistema veterinário atual?"',
+    ],
+    hooks: [
+      'Quantas consultas sua clínica perdeu este mês porque o tutor simplesmente esqueceu?',
+      'Como automatizar a confirmação de consultas da sua clínica e zerar o no-show.',
+    ],
+    metaKeywords: [
+      'Medicina veterinária',
+      'Clínica veterinária',
+      'Pet shop',
+      'Gestão de clínicas',
+    ],
+    createdAt: '18/10/2026',
+    updatedAt: '31/10/2026',
+  },
+];
+
 
 
