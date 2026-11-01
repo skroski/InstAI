@@ -1,9 +1,11 @@
 import { Component, inject, computed } from '@angular/core';
 import { AccountStateService } from '../../services/account-state.service';
 import { PostFormat, PostItem, PostStatus } from '../../data/seed-data';
+import { MediaUploaderComponent } from '../media-uploader/media-uploader.component';
 
 @Component({
   selector: 'app-content-studio',
+  imports: [MediaUploaderComponent],
   template: `
     @if (state.contentMode() === 'kanban') {
       <div
@@ -58,6 +60,39 @@ import { PostFormat, PostItem, PostStatus } from '../../data/seed-data';
                   </span>
                 </span>
                 <span class="font-medium text-[14px] leading-[1.3]">{{ p.topic }}</span>
+
+                @if (p.media && p.media.length > 0) {
+                  <div
+                    class="relative w-full h-24 rounded-[4px] overflow-hidden bg-black/40 border border-[rgba(var(--ov),.1)]"
+                  >
+                    @if (p.media[0].type === 'video') {
+                      <img
+                        [src]="p.media[0].thumbnailUrl || p.media[0].url"
+                        alt="Vídeo"
+                        class="w-full h-full object-cover"
+                      />
+                      <span
+                        class="absolute bottom-1 right-1 px-1.5 py-0.5 rounded bg-black/80 text-[10px] text-white font-mono flex items-center gap-1"
+                      >
+                        ▶ Vídeo
+                      </span>
+                    } @else {
+                      <img
+                        [src]="p.media[0].url"
+                        [alt]="p.media[0].name"
+                        class="w-full h-full object-cover"
+                      />
+                      @if (p.media.length > 1) {
+                        <span
+                          class="absolute bottom-1 right-1 px-1.5 py-0.5 rounded bg-black/80 text-[10px] text-white font-mono"
+                        >
+                          1/{{ p.media.length }}
+                        </span>
+                      }
+                    }
+                  </div>
+                }
+
                 <span class="text-[12px]" style="color: var(--c-dim);">{{ postMeta(p) }}</span>
               </button>
             }
@@ -208,6 +243,28 @@ import { PostFormat, PostItem, PostStatus } from '../../data/seed-data';
             </button>
             <button
               type="button"
+              class="bg-transparent border-0 py-2 px-0 cursor-pointer text-[14px] flex items-center gap-1.5"
+              [style.border-bottom]="
+                '2px solid ' +
+                (state.drawerTab() === 'media' ? '#f6bc03' : 'transparent')
+              "
+              [style.color]="
+                state.drawerTab() === 'media' ? 'var(--c-text)' : 'var(--c-muted)'
+              "
+              [style.font-weight]="state.drawerTab() === 'media' ? '500' : '400'"
+              (click)="state.drawerTab.set('media')"
+            >
+              <span>mídias</span>
+              @if ((sel.media?.length || 0) > 0) {
+                <span
+                  class="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-[#f6bc03]/20 text-[var(--c-acc)] font-bold"
+                >
+                  {{ sel.media?.length }}
+                </span>
+              }
+            </button>
+            <button
+              type="button"
               class="bg-transparent border-0 py-2 px-0 cursor-pointer text-[14px]"
               [style.border-bottom]="
                 '2px solid ' +
@@ -252,6 +309,13 @@ import { PostFormat, PostItem, PostStatus } from '../../data/seed-data';
             <div class="text-[12.5px]" style="color: var(--c-dim);">
               gerado por {{ sel.ai }} . brand voice de @{{ state.activeAccount().user }} aplicado
             </div>
+          } @else if (state.drawerTab() === 'media') {
+            <app-media-uploader
+              [mediaList]="sel.media || []"
+              [format]="sel.t"
+              (mediaAdded)="state.addMediaToSelectedPost($event)"
+              (mediaRemoved)="state.removeMediaFromSelectedPost($event)"
+            />
           } @else {
             @for (pr of sel.pr; track $index) {
               <div
@@ -312,17 +376,22 @@ import { PostFormat, PostItem, PostStatus } from '../../data/seed-data';
           <div class="flex gap-2">
             <button
               type="button"
-              class="h-8 px-[14px] rounded-[4px] cursor-pointer cm-hover-ov12"
+              class="h-8 px-[14px] rounded-[4px] cursor-pointer cm-hover-ov12 flex items-center gap-1.5"
               style="background: rgba(var(--ov), .06); border: 1px solid rgba(var(--ov), .18); color: var(--c-text);"
-              (click)="state.toast('Upload simples: arte final vinculada em media_urls')"
+              (click)="state.drawerTab.set('media')"
             >
-              anexar mídia
+              <span>📁</span>
+              <span>{{ (sel.media?.length || 0) > 0 ? 'gerenciar mídias (' + sel.media?.length + ')' : 'anexar mídia' }}</span>
             </button>
             <button
               type="button"
-              disabled
-              class="h-8 px-[14px] rounded-[4px] cursor-not-allowed"
-              style="background: var(--c-card); border: 1px solid rgba(var(--ov), .1); color: var(--c-dim);"
+              class="h-8 px-[14px] rounded-[4px] transition-all flex items-center gap-1.5"
+              [disabled]="(sel.media?.length || 0) === 0"
+              [style.background]="(sel.media?.length || 0) > 0 ? 'var(--c-acc)' : 'var(--c-card)'"
+              [style.color]="(sel.media?.length || 0) > 0 ? '#111' : 'var(--c-dim)'"
+              [style.border]="(sel.media?.length || 0) > 0 ? '1px solid #f1a10b' : '1px solid rgba(var(--ov), .1)'"
+              [style.cursor]="(sel.media?.length || 0) > 0 ? 'pointer' : 'not-allowed'"
+              (click)="state.toast('Post com ' + (sel.media?.length || 0) + ' mídia(s) pronto para envio ao Instagram!')"
             >
               publicar agora
             </button>

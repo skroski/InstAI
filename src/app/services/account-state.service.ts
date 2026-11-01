@@ -23,8 +23,10 @@ import {
   InteractionItem,
   InteractionStatus,
   KeywordRule,
+  MediaType,
   PostFormat,
   PostItem,
+  PostMedia,
   PostStatus,
   SkillCommand,
   TwinField,
@@ -71,6 +73,7 @@ export interface ComposerState {
   pr: string;
   day: number;
   time: string;
+  media: PostMedia[];
 }
 
 export interface TwinRuntimeSettings {
@@ -140,7 +143,7 @@ export class AccountStateService {
   // Content & Posts Signals
   readonly posts = signal<PostItem[]>(SEED_POSTS);
   readonly selId = signal<string | null>(null);
-  readonly drawerTab = signal<'cap' | 'pr'>('cap');
+  readonly drawerTab = signal<'cap' | 'media' | 'pr'>('cap');
   readonly captionDrafts = signal<Record<string, string>>({});
   readonly comp = signal<ComposerState | null>(null);
 
@@ -597,6 +600,7 @@ export class AccountStateService {
       pr: '',
       day: 5,
       time: '18:00',
+      media: [],
     });
   }
 
@@ -608,6 +612,79 @@ export class AccountStateService {
     const current = this.comp();
     if (!current) return;
     this.comp.set({ ...current, ...patch });
+  }
+
+  addMediaToComposer(newMedia: PostMedia[]): void {
+    const current = this.comp();
+    if (!current) return;
+    const existing = current.media || [];
+    // Se o usuário adicionou mais de 1 mídia e o formato era IMAGE, sugere/converte para CAROUSEL automaticamente
+    let nextFormat = current.t;
+    if (existing.length + newMedia.length > 1 && current.t === 'IMAGE') {
+      nextFormat = 'CAROUSEL';
+    }
+    this.comp.set({
+      ...current,
+      t: nextFormat,
+      media: [...existing, ...newMedia],
+    });
+    this.toast(`${newMedia.length} mídia(s) adicionada(s) ao rascunho`);
+  }
+
+  removeMediaFromComposer(mediaId: string): void {
+    const current = this.comp();
+    if (!current) return;
+    this.comp.set({
+      ...current,
+      media: (current.media || []).filter((m) => m.id !== mediaId),
+    });
+  }
+
+  reorderMediaInComposer(fromIdx: number, toIdx: number): void {
+    const current = this.comp();
+    if (!current || !current.media) return;
+    const list = [...current.media];
+    const [moved] = list.splice(fromIdx, 1);
+    list.splice(toIdx, 0, moved);
+    this.comp.set({ ...current, media: list });
+  }
+
+  addMediaToSelectedPost(newMedia: PostMedia[]): void {
+    const sel = this.selectedPost();
+    if (!sel) return;
+    this.posts.update((list) =>
+      list.map((p) => {
+        if (p.id !== sel.id) return p;
+        const currentMedia = p.media || [];
+        let format = p.t;
+        if (currentMedia.length + newMedia.length > 1 && p.t === 'IMAGE') {
+          format = 'CAROUSEL';
+        }
+        return {
+          ...p,
+          t: format,
+          media: [...currentMedia, ...newMedia],
+        };
+      })
+    );
+    this.drawerTab.set('media');
+    this.toast(`${newMedia.length} mídia(s) vinculada(s) ao post`);
+  }
+
+  removeMediaFromSelectedPost(mediaId: string): void {
+    const sel = this.selectedPost();
+    if (!sel) return;
+    this.posts.update((list) =>
+      list.map((p) =>
+        p.id === sel.id
+          ? {
+              ...p,
+              media: (p.media || []).filter((m) => m.id !== mediaId),
+            }
+          : p
+      )
+    );
+    this.toast('Mídia removida');
   }
 
   generateComposerCaptionWithAi(): void {
@@ -660,6 +737,7 @@ export class AccountStateService {
       day: status === 'SCHEDULED' ? current.day : null,
       time: status === 'SCHEDULED' ? current.time : '',
       ai: 'Manual',
+      media: current.media && current.media.length > 0 ? [...current.media] : [],
     }));
 
     this.posts.update((prev) => [...newPosts, ...prev]);

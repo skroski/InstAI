@@ -11,6 +11,7 @@ import { AccountsManagerComponent } from '../accounts-manager/accounts-manager.c
 import { AiCopilotChatComponent } from '../ai-copilot-chat/ai-copilot-chat.component';
 import { MetaCampaignsComponent } from '../meta-campaigns/meta-campaigns.component';
 import { IcpStudioComponent } from '../icp-studio/icp-studio.component';
+import { MediaUploaderComponent } from '../media-uploader/media-uploader.component';
 import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
 
 @Component({
@@ -26,6 +27,7 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
     AiCopilotChatComponent,
     MetaCampaignsComponent,
     IcpStudioComponent,
+    MediaUploaderComponent,
   ],
   template: `
     <div
@@ -960,8 +962,8 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
 
     <!-- ==================== MODAL: COMPOSER ==================== -->
     @if (state.comp(); as comp) {
-      <div class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="w-full max-w-3xl rounded-[10px] bg-[var(--c-panel)] border border-[var(--c-border-strong)] shadow-2xl overflow-hidden grid grid-cols-1 md:grid-cols-5">
+      <div class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-3 md:p-6 overflow-y-auto">
+        <div class="w-full max-w-4xl max-h-[92vh] rounded-[10px] bg-[var(--c-panel)] border border-[var(--c-border-strong)] shadow-2xl overflow-y-auto grid grid-cols-1 md:grid-cols-5 my-auto">
           <div class="p-5 md:col-span-3 flex flex-col gap-3">
             <div class="flex items-center justify-between">
               <h3 class="text-sm font-bold text-[var(--c-text)]">Novo Post Multi-Conta</h3>
@@ -975,10 +977,10 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
                   class="w-full px-2.5 py-1.5 rounded-[6px] bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs text-[var(--c-text)] cm-input-focus"
                   [ngModel]="comp.t"
                   (ngModelChange)="setComposerFormat($event)">
-                  <option value="CAROUSEL">CARROSSEL</option>
-                  <option value="REELS">REELS</option>
-                  <option value="IMAGE">IMAGEM 4:5</option>
-                  <option value="STORIES">STORIES</option>
+                  <option value="CAROUSEL">CARROSSEL (Fotos e Vídeos)</option>
+                  <option value="REELS">REELS (Vídeo 9:16)</option>
+                  <option value="IMAGE">IMAGEM FEED 4:5</option>
+                  <option value="STORIES">STORIES (9:16)</option>
                 </select>
               </div>
               <div>
@@ -1001,6 +1003,21 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
                 (ngModelChange)="state.patchComposer({ topic: $event })" />
             </div>
 
+            <!-- Módulo de Upload de Mídias (Imagens e Vídeos) -->
+            <div>
+              <label class="text-[11px] font-mono text-[var(--c-text-muted)] block mb-1">
+                Mídias (Fotos ou Vídeos)
+              </label>
+              <app-media-uploader
+                [mediaList]="comp.media || []"
+                [format]="comp.t"
+                [compact]="true"
+                (mediaAdded)="state.addMediaToComposer($event)"
+                (mediaRemoved)="state.removeMediaFromComposer($event)"
+                (mediaChange)="state.patchComposer({ media: $event })"
+              />
+            </div>
+
             <div>
               <div class="flex items-center justify-between mb-1">
                 <label class="text-[11px] font-mono text-[var(--c-text-muted)]">Legenda</label>
@@ -1012,32 +1029,98 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
                 </button>
               </div>
               <textarea
-                rows="4"
+                rows="3"
                 class="w-full px-3 py-2 rounded-[10px] bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs text-[var(--c-text)] cm-input-focus"
                 placeholder="Digite a legenda..."
                 [ngModel]="comp.cap"
                 (ngModelChange)="state.patchComposer({ cap: $event })"></textarea>
             </div>
 
-            <div class="flex items-center justify-end gap-2 pt-2">
+            <div class="flex items-center justify-end gap-2 pt-1 border-t border-[rgba(var(--ov),.1)]">
               <cm-button variant="ghost" size="sm" (clicked)="state.saveComposerPosts('DRAFT')">salvar rascunho</cm-button>
               <cm-button variant="primary" size="sm" [arrow]="true" (clicked)="state.saveComposerPosts('SCHEDULED')">agendar publicação</cm-button>
             </div>
           </div>
 
-          <div class="p-5 bg-[var(--c-bg-elev)] border-l border-[var(--c-border)] md:col-span-2 flex flex-col justify-between">
+          <!-- Preview Realista da Mídia e Post -->
+          <div class="p-5 bg-[var(--c-bg-elev)] border-l border-[var(--c-border)] md:col-span-2 flex flex-col justify-between gap-3">
             <div>
-              <div class="text-[10px] font-mono uppercase text-[var(--c-text-muted)] mb-2">Preview · &#64;{{ state.activeAccount().user }}</div>
-              <div class="aspect-[4/5] rounded-[6px] bg-gradient-to-br from-[#2b2b2b] via-[#1f1f1f] to-[#f1a10b]/25 border border-[var(--c-border)] p-4 flex flex-col justify-between">
-                <div class="text-[10px] font-mono text-[#fbd23a]">
-                  {{ comp.t }}
+              <div class="flex items-center justify-between text-[10px] font-mono uppercase text-[var(--c-text-muted)] mb-2">
+                <span>Preview · &#64;{{ state.activeAccount().user }}</span>
+                <span class="text-[#fbd23a] font-bold">{{ comp.t }}</span>
+              </div>
+
+              @if ((comp.media.length || 0) > 0) {
+                <div class="relative rounded-[6px] overflow-hidden border border-[var(--c-border)] bg-black/60 flex items-center justify-center"
+                     [ngClass]="comp.t === 'REELS' || comp.t === 'STORIES' ? 'aspect-[9/16] max-h-[380px] mx-auto' : 'aspect-[4/5] max-h-[320px] mx-auto'">
+                  @let currentMedia = comp.media![composerActiveSlide() % comp.media!.length];
+                  @if (currentMedia.type === 'video') {
+                    <video
+                      [src]="currentMedia.url"
+                      controls
+                      playsinline
+                      autoplay
+                      muted
+                      loop
+                      class="w-full h-full object-contain"
+                    ></video>
+                    <span class="absolute top-2 left-2 px-1.5 py-0.5 rounded bg-black/80 text-[10px] text-white font-mono">
+                      ▶ Vídeo
+                    </span>
+                  } @else {
+                    <img
+                      [src]="currentMedia.url"
+                      [alt]="currentMedia.name"
+                      class="w-full h-full object-cover"
+                    />
+                  }
+
+                  <!-- Controles de Slide do Carrossel no Preview -->
+                  @if (comp.media!.length > 1) {
+                    <button
+                      type="button"
+                      class="absolute left-1.5 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-black/70 hover:bg-black/90 text-white flex items-center justify-center text-xs cursor-pointer border border-white/20"
+                      (click)="prevComposerSlide(comp.media!.length)"
+                    >
+                      ‹
+                    </button>
+                    <button
+                      type="button"
+                      class="absolute right-1.5 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-black/70 hover:bg-black/90 text-white flex items-center justify-center text-xs cursor-pointer border border-white/20"
+                      (click)="nextComposerSlide(comp.media!.length)"
+                    >
+                      ›
+                    </button>
+                    <span class="absolute bottom-2 right-2 px-2 py-0.5 rounded-full bg-black/80 text-[10px] font-mono text-white">
+                      {{ (composerActiveSlide() % comp.media!.length) + 1 }} / {{ comp.media!.length }}
+                    </span>
+                  }
                 </div>
-                <div class="text-sm font-bold text-white leading-snug">
-                  {{ comp.topic || 'Seu título aparecerá em destaque aqui' }}
+              } @else {
+                <div class="aspect-[4/5] rounded-[6px] bg-gradient-to-br from-[#2b2b2b] via-[#1f1f1f] to-[#f1a10b]/25 border border-[var(--c-border)] p-4 flex flex-col justify-between">
+                  <div class="text-[10px] font-mono text-[#fbd23a]">
+                    {{ comp.t }} · Sem mídia anexada
+                  </div>
+                  <div class="text-sm font-bold text-white leading-snug">
+                    {{ comp.topic || 'Seu título aparecerá em destaque aqui' }}
+                  </div>
+                  <div class="text-[10.5px] text-white/70 italic">
+                    Arraste imagens ou vídeos ao lado para ver o preview real
+                  </div>
+                  <div class="text-[10px] font-mono text-white/60">
+                    &#64;{{ state.activeAccount().user }}
+                  </div>
                 </div>
-                <div class="text-[10px] font-mono text-white/60">
-                  &#64;{{ state.activeAccount().user }}
-                </div>
+              }
+            </div>
+
+            <!-- Mini legenda simulando a visualização no Instagram -->
+            <div class="p-2.5 rounded-[6px] bg-[rgba(var(--ov),.04)] border border-[rgba(var(--ov),.08)] flex flex-col gap-1 text-[11.5px]">
+              <div class="font-bold text-[var(--c-text)]">
+                &#64;{{ state.activeAccount().user }}
+              </div>
+              <div class="text-[var(--c-text-muted)] line-clamp-2 leading-relaxed">
+                {{ comp.cap || comp.topic || 'A legenda da publicação aparecerá aqui...' }}
               </div>
             </div>
           </div>
@@ -1201,6 +1284,19 @@ export class WorkspaceLayoutComponent {
 
   setComposerFormat(fmt: PostFormat): void {
     this.state.patchComposer({ t: fmt });
+    this.composerActiveSlide.set(0);
+  }
+
+  readonly composerActiveSlide = signal<number>(0);
+
+  nextComposerSlide(total: number): void {
+    if (total <= 1) return;
+    this.composerActiveSlide.update((i) => (i + 1) % total);
+  }
+
+  prevComposerSlide(total: number): void {
+    if (total <= 1) return;
+    this.composerActiveSlide.update((i) => (i - 1 + total) % total);
   }
 
   startResizeLeft(event: MouseEvent): void {

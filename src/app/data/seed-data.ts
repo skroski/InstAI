@@ -23,6 +23,18 @@ export interface Account {
 export type PostFormat = 'IMAGE' | 'CAROUSEL' | 'REELS' | 'STORIES';
 export type PostStatus = 'DRAFT' | 'PROMPT_READY' | 'SCHEDULED' | 'PUBLISHED' | 'FAILED';
 
+export type MediaType = 'image' | 'video';
+
+export interface PostMedia {
+  id: string;
+  url: string; // Data URL (base64) ou Object URL ou HTTP URL
+  type: MediaType;
+  name: string;
+  size?: number; // em bytes
+  aspectRatio?: '1:1' | '4:5' | '9:16' | '16:9';
+  thumbnailUrl?: string; // Capa/frame gerado para vídeos
+}
+
 export interface ImagePrompt {
   t: string;
   ar: string;
@@ -41,6 +53,7 @@ export interface PostItem {
   day: number | null;
   time: string;
   ai: string;
+  media?: PostMedia[];
 }
 
 export interface TwinField {
@@ -450,6 +463,16 @@ export const SEED_POSTS: PostItem[] = [
     day: 1,
     time: '12:30',
     ai: 'Claude 3.7',
+    media: [
+      {
+        id: 'med_p1_1',
+        type: 'video',
+        url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+        name: 'reels_agente_ia.mp4',
+        aspectRatio: '9:16',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=720&q=80',
+      },
+    ],
   },
   {
     id: 'p2',
@@ -479,6 +502,29 @@ export const SEED_POSTS: PostItem[] = [
     day: 4,
     time: '18:00',
     ai: 'Gemini 2.5',
+    media: [
+      {
+        id: 'med_p2_1',
+        type: 'image',
+        url: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80',
+        name: 'slide1_briefing.jpg',
+        aspectRatio: '4:5',
+      },
+      {
+        id: 'med_p2_2',
+        type: 'image',
+        url: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=800&q=80',
+        name: 'slide2_arquitetura.jpg',
+        aspectRatio: '4:5',
+      },
+      {
+        id: 'med_p2_3',
+        type: 'image',
+        url: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80',
+        name: 'slide3_deploy.jpg',
+        aspectRatio: '4:5',
+      },
+    ],
   },
   {
     id: 'p3',
@@ -498,6 +544,15 @@ export const SEED_POSTS: PostItem[] = [
     day: null,
     time: '',
     ai: 'Claude',
+    media: [
+      {
+        id: 'med_p3_1',
+        type: 'image',
+        url: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=800&q=80',
+        name: 'supabase_rls.jpg',
+        aspectRatio: '4:5',
+      },
+    ],
   },
   {
     id: 'p4',
@@ -511,6 +566,15 @@ export const SEED_POSTS: PostItem[] = [
     day: 0,
     time: '09:00',
     ai: 'Claude',
+    media: [
+      {
+        id: 'med_p4_1',
+        type: 'image',
+        url: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=720&q=80',
+        name: 'stories_bastidores.jpg',
+        aspectRatio: '9:16',
+      },
+    ],
   },
   {
     id: 'p5',
