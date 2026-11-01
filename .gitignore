@@ -1,8 +1,14 @@
 node_modules/
 dist/
 .angular/
-.env
-.env.local
 .DS_Store
 *.log
 
+# Environment variables & secrets
+.env
+.env.*
+!.env.example
+
+# Angular environments
+src/environments/*
+!src/environments/environment.example.ts

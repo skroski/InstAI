@@ -66,6 +66,51 @@ export class LiveApiService {
   }
 
   /**
+   * Consulta publicações reais direto da Meta Graph API para a Página / Instagram vinculado
+   */
+  async fetchLivePagePosts(pageId: string, pageToken: string, accountId: string): Promise<PostItem[] | null> {
+    if (!pageId || !pageToken) return null;
+    try {
+      const url = `https://graph.facebook.com/v22.0/${pageId}/posts?fields=id,message,created_time,permalink_url&access_token=${pageToken}&limit=10`;
+      const res = await fetch(url, { method: 'GET' });
+      if (!res.ok) return null;
+      const json = await res.json();
+      if (!json.data || !Array.isArray(json.data)) return null;
+
+      return json.data.map((rawPost: any) => {
+        const msg = rawPost.message || '';
+        const lines = msg.split('\n').filter((l: string) => l.trim().length > 0);
+        const topic = lines[0]?.slice(0, 70) || `Publicação Meta #${rawPost.id.slice(-6)}`;
+        const hashtags = msg.match(/#[a-zA-Z0-9_À-ÿ]+/g) || ['#meta', '#feed'];
+        const dateObj = rawPost.created_time ? new Date(rawPost.created_time) : new Date();
+        const dayIdx = dateObj.getDay();
+
+        return {
+          id: `live_${rawPost.id}`,
+          a: accountId,
+          t: msg.includes('Arrasta pro lado') || msg.includes('Slide') ? 'CAROUSEL' : 'IMAGE',
+          s: 'PUBLISHED' as const,
+          topic,
+          cap: msg,
+          tags: hashtags,
+          pr: [
+            {
+              t: 'Mídia Meta Oficial',
+              ar: '4:5',
+              x: `Publicação real sincronizada via Meta Graph API em ${rawPost.created_time}. Link: ${rawPost.permalink_url || ''}`,
+            },
+          ],
+          day: dayIdx,
+          time: dateObj.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+          ai: 'Meta Graph API v22.0',
+        };
+      });
+    } catch {
+      return null;
+    }
+  }
+
+  /**
    * Geração direta com OpenAI GPT-4o-mini para textos variados e ricos
    */
   async generateWithOpenAi(prompt: string, systemPrompt = 'Você é um estrategista de conteúdo para Instagram.'): Promise<string | null> {

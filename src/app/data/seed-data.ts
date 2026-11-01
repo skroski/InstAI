@@ -17,6 +17,7 @@ export interface Account {
   wh: boolean;
   voice: BrandVoice;
   style: string;
+  pageId?: string;
 }
 
 export type PostFormat = 'IMAGE' | 'CAROUSEL' | 'REELS' | 'STORIES';
@@ -239,12 +240,48 @@ export interface AccountMetrics {
 
 export const ACCS: Account[] = [
   {
+    id: 'a_amaral',
+    pageId: '185387824832414',
+    user: 'amaralnatacao',
+    name: 'Amaral Natação',
+    ini: 'AN',
+    st: 'ativo',
+    days: 60,
+    perms: 4,
+    wh: true,
+    voice: {
+      tom: 'Acolhedor, motivador e familiar. Enfatiza constância, bem-estar, segurança aquática e respeito ao ritmo de cada aluno.',
+      pub: 'Pais, mães, famílias, adultos e idosos que buscam natação infantil, hidroginástica ou prática esportiva em Curitiba.',
+      regras: 'Sempre convidar para a aula experimental gratuita pelo WhatsApp (41) 98516-9970. Lembrar os 47 anos de tradição e as 7 piscinas.',
+    },
+    style:
+      'crystal clear swimming pool water caustics, soft turquoise and royal blue highlights (#0077b6, #00b4d8), natural sun rays piercing water, warm family smiles, premium swim academy editorial --style raw',
+  },
+  {
+    id: 'a2',
+    pageId: '184846338220933',
+    user: 'duplod.oficial',
+    name: 'Duplo D Design & Dev',
+    ini: 'DD',
+    st: 'ativo',
+    days: 60,
+    perms: 4,
+    wh: true,
+    voice: {
+      tom: 'Estratégico, moderno, autoritativo e inspirador sobre design visual, grids e engenharia de software.',
+      pub: 'Empreendedores, designers, desenvolvedores e marcas que buscam interfaces de alto impacto, automações e produtos digitais.',
+      regras: 'Sempre conectar design visual com usabilidade e resultados de negócios. Valorizar técnica e clareza.',
+    },
+    style:
+      'sleek dark UI design canvas, subtle geometric grid overlay, neon coral and deep violet gradients (#ff477e, #7928ca), clean typography, modern tech aesthetic --style raw',
+  },
+  {
     id: 'a1',
     user: 'codemix.web',
     name: 'Codemix — Soluções Web',
     ini: 'CW',
     st: 'ativo',
-    days: 41,
+    days: 60,
     perms: 4,
     wh: true,
     voice: {
@@ -254,23 +291,6 @@ export const ACCS: Account[] = [
     },
     style:
       'flat charcoal #2b2b2b background, amber-to-orange splash symbol (#FFCB05 → #F58220) at 6% opacity bleeding off one edge, generous negative space for headline type, matte editorial finish, no people --style raw',
-  },
-  {
-    id: 'a2',
-    user: 'duplod.oficial',
-    name: 'Duplo D',
-    ini: 'DD',
-    st: 'expirando',
-    days: 6,
-    perms: 4,
-    wh: true,
-    voice: {
-      tom: 'Acolhedor e elegante, frases curtas.',
-      pub: 'Mulheres de 25 a 45 anos que buscam moda atemporal.',
-      regras: 'Sempre mencionar o catálogo no CTA. Sem gírias.',
-    },
-    style:
-      'soft natural window light, burgundy #ab2930 and plum #441556 accents on slate #647883 neutrals, film grain, 85mm lens, shallow depth of field --style raw',
   },
   {
     id: 'a3',

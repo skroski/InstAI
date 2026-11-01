@@ -515,6 +515,40 @@ export class AccountStateService {
         this.campaigns.set(mappedCamps);
       }
 
+      // 1.2 Busca publicações reais para as páginas Meta conectadas (Amaral Natação e Duplo D)
+      const metaPages = (environment as any).metaPages;
+      if (metaPages) {
+        if (metaPages.amaral?.id && metaPages.amaral?.token) {
+          const amaralPosts = await this.liveApi.fetchLivePagePosts(
+            metaPages.amaral.id,
+            metaPages.amaral.token,
+            'a_amaral'
+          );
+          if (amaralPosts && amaralPosts.length > 0) {
+            this.posts.update((prev) => {
+              const existingIds = new Set(prev.map((p) => p.id));
+              const fresh = amaralPosts.filter((p) => !existingIds.has(p.id));
+              return [...fresh, ...prev];
+            });
+          }
+        }
+
+        if (metaPages.duplod?.id && metaPages.duplod?.token) {
+          const duploPosts = await this.liveApi.fetchLivePagePosts(
+            metaPages.duplod.id,
+            metaPages.duplod.token,
+            'a2'
+          );
+          if (duploPosts && duploPosts.length > 0) {
+            this.posts.update((prev) => {
+              const existingIds = new Set(prev.map((p) => p.id));
+              const fresh = duploPosts.filter((p) => !existingIds.has(p.id));
+              return [...fresh, ...prev];
+            });
+          }
+        }
+      }
+
       // 2. Varia dados ricos para a conta ativa
       const activeAcc = this.activeAccount();
       const varied = this.liveApi.generateVariedDataForAccount(activeAcc, this.seq);
