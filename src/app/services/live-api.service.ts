@@ -2,6 +2,7 @@ import { Injectable, inject, signal } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { Account, PostItem, InteractionItem, MetaCampaign, MetaAdAccount } from '../data/seed-data';
 import { SupabaseService } from './supabase.service';
+import { brtParts, todayIso, weekdayIndex } from '../shared/dates';
 
 export interface MetaAdAccountResponse {
   id: string;
@@ -71,7 +72,7 @@ export class LiveApiService {
     if (!pageId) return null;
     try {
       // 1. Tenta buscar direto via Graph API com attachments ricos caso haja token de página
-      const pageKey = pageId === '185387824832414' ? 'amaral' : pageId === '184846338220933' ? 'duplod' : null;
+      const pageKey = pageId === '185387824832414' ? 'amaral' : pageId === '184846338220933' ? 'duplod' : pageId === '134910416362221' ? 'vetbots' : null;
       const pageToken = pageKey ? (environment.metaPages as any)?.[pageKey]?.token : null;
 
       let rawPosts: any[] = [];
@@ -105,8 +106,9 @@ export class LiveApiService {
         const lines = msg.split('\n').filter((l: string) => l.trim().length > 0);
         const topic = lines[0]?.slice(0, 70) || `Publicação Meta #${rawPost.id.slice(-6)}`;
         const hashtags = msg.match(/#[a-zA-Z0-9_À-ÿ]+/g) || ['#meta', '#feed'];
-        const dateObj = rawPost.created_time ? new Date(rawPost.created_time) : new Date();
-        const dayIdx = dateObj.getDay();
+        // Data/hora reais de Brasília; `day` segue a semana começando na segunda (0 = seg).
+        const when = brtParts(rawPost.created_time || new Date().toISOString()) ?? { date: todayIso(), time: '00:00' };
+        const dayIdx = weekdayIndex(when.date);
 
         const media: any[] = [];
         const att = rawPost.attachments?.data?.[0];
@@ -145,6 +147,7 @@ export class LiveApiService {
           s: 'PUBLISHED' as const,
           topic,
           cap: msg,
+          permalink: rawPost.permalink_url || undefined,
           tags: hashtags,
           pr: [
             {
@@ -153,8 +156,9 @@ export class LiveApiService {
               x: `Publicação real sincronizada via Meta Graph API em ${rawPost.created_time}. Link: ${rawPost.permalink_url || ''}`,
             },
           ],
+          date: when.date,
           day: dayIdx,
-          time: dateObj.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+          time: when.time,
           ai: 'Meta Graph API v22.0',
           media,
         };
@@ -317,7 +321,7 @@ export class LiveApiService {
           },
         ],
       };
-    } else {
+    } else if (acc.id === 'a2') {
       // Duplo D (Design Visual, UI/UX, Engenharia de Software e Grids)
       return {
         posts: [
@@ -424,6 +428,65 @@ export class LiveApiService {
             cpa: 9.72,
             roas: 5.8,
             startDate: '24/10/2026',
+          },
+        ],
+      };
+    } else {
+      // VetBots (IA para Clínicas Veterinárias & Pet Shops)
+      return {
+        posts: [
+          {
+            id: `p_dyn_${++nextSeq}`,
+            a: 'a_vetbots',
+            t: 'REELS',
+            s: 'PUBLISHED',
+            topic: 'Como a IA confirma consultas e reduz no-show em 73%',
+            cap: 'Tutor esquece consulta, recepcionista passa a tarde ligando e a clínica perde faturamento.\n\nVeja como a VetBots envia lembrete interativo no WhatsApp 24h antes e já reocupa a vaga se o tutor desmarcar.\n\nComente AGENDA para ver uma demonstração na prática.',
+            tags: ['#veterinaria', '#gestaovet', '#clinicaveterinaria', '#ia'],
+            pr: [
+              {
+                t: 'Capa 9:16',
+                ar: '9:16',
+                x: 'Modern veterinary clinic front desk, cheerful veterinarian with digital tablet, golden retriever sitting obediently, warm bright medical lighting --ar 9:16',
+              },
+            ],
+            day: 0,
+            time: '12:00',
+            ai: 'Claude',
+          },
+        ],
+        ints: [
+          {
+            id: `i_dyn_${++nextSeq}`,
+            a: 'a_vetbots',
+            u: 'dr_marcelo_vetcampinas',
+            t: 'DM',
+            s: 'UNREAD',
+            sent: 'positivo',
+            time: '08:35',
+            c: 'Bom dia! Temos 4 veterinários e 2 recepcionistas. Nosso no-show nas consultas é de 22%. A ferramenta de vocês integra com o WhatsApp e sistema da clínica?',
+            media: '',
+            ai: 'Bom dia, Dr. Marcelo! Integra perfeitamente com o WhatsApp da clínica. A taxa de no-show costuma cair drasticamente nas primeiras semanas com confirmação em 1 clique. Quer agendar 15 minutos para ver funcionando?',
+          },
+        ],
+        campaigns: [
+          {
+            id: `cmp_dyn_${++nextSeq}`,
+            a: 'a_vetbots',
+            name: 'LAL 1% Donos de Clínicas Veterinárias & Hospitais Pet',
+            objective: 'OUTCOME_LEADS',
+            status: 'ACTIVE',
+            audienceId: 'aud_vet_1',
+            audienceName: 'Lookalike 1% Brasil — Donos de Clínicas e Pet Shops',
+            isLookalike: true,
+            dailyBudget: 60.0,
+            spend: 420.0,
+            impressions: 18400,
+            clicks: 590,
+            leads: 42,
+            cpa: 10.0,
+            roas: 5.2,
+            startDate: '25/10/2026',
           },
         ],
       };

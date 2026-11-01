@@ -151,6 +151,7 @@ import { InteractionItem, InteractionStatus, InteractionType, Sentiment } from '
 
             <textarea
               rows="4"
+              aria-label="Texto da resposta"
               placeholder="Escreva ou use a sugestão da IA…"
               class="w-full resize-y rounded-[10px] p-3 text-[14px] leading-[1.55] cm-input-focus"
               style="background: var(--c-sunk); border: 1px solid rgba(var(--ov), .09); color: var(--c-text);"
@@ -236,6 +237,18 @@ export class UnifiedInboxComponent {
   }
 
   sendReply(cur: InteractionItem): void {
+    // Ocultar spam não precisa de texto; qualquer outra resposta precisa e respeita o limite da Meta (1000).
+    if (!cur.spam) {
+      const text = this.replyValue(cur.id).trim();
+      if (!text) {
+        this.state.toast('Escreva uma resposta ou use a sugestão da IA');
+        return;
+      }
+      if (text.length > 1000) {
+        this.state.toast(`A resposta passa ${text.length - 1000} caracteres do limite de 1000`);
+        return;
+      }
+    }
     this.state.updateInteractionStatus(
       [cur.id],
       { s: 'AI_REPLIED' },

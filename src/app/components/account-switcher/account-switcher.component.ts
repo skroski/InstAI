@@ -84,9 +84,9 @@ import { AccountStatus } from '../../data/seed-data';
             type="button"
             class="mt-1 py-2 px-[10px] bg-transparent rounded-[4px] cursor-pointer text-[13px] text-left cm-hover-ov8"
             style="border: 1px dashed rgba(var(--ov), .28); color: var(--c-acc);"
-            (click)="connectMetaOAuth()"
+            (click)="openAccounts()"
           >
-            + conectar conta via oauth da meta
+            + nova conta de cliente
           </button>
         </div>
       }
@@ -100,7 +100,13 @@ export class AccountSwitcherComponent {
   readonly active = computed(() => this.state.activeAccount());
 
   toneLabel(st: AccountStatus): string {
-    return st === 'ativo' ? 'Ativo' : st === 'expirando' ? 'Expirando' : 'Erro';
+    return st === 'ativo'
+      ? 'Ativo'
+      : st === 'expirando'
+        ? 'Expirando'
+        : st === 'pendente'
+          ? 'Pendente'
+          : 'Erro';
   }
 
   toneColor(st: AccountStatus): string {
@@ -108,7 +114,9 @@ export class AccountSwitcherComponent {
       ? 'var(--c-ok)'
       : st === 'expirando'
         ? '#f1a10b'
-        : 'var(--c-err)';
+        : st === 'pendente'
+          ? 'var(--c-muted)'
+          : 'var(--c-err)';
   }
 
   onPickAccount(accountId: string): void {
@@ -118,9 +126,8 @@ export class AccountSwitcherComponent {
     }
   }
 
-  connectMetaOAuth(): void {
-    this.state.switcherOpen.set(false);
-    this.state.toast('Redirecionando para o OAuth da Meta…');
+  openAccounts(): void {
+    this.state.setView('accounts');
   }
 }
 

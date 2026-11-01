@@ -1,7 +1,9 @@
 import { Injectable, inject, signal, computed, resource } from '@angular/core';
 import { environment } from '../../environments/environment';
-import { SupabaseService } from './supabase.service';
+import { META_OAUTH_KEY, SupabaseService } from './supabase.service';
 import { LiveApiService } from './live-api.service';
+import { isHttpUrl } from '../shared/validators';
+import { addDays, isValidIsoDate, isValidTime, todayIso, weekdayIndex, withDate } from '../shared/dates';
 import {
   ACCS,
   CMDS,
@@ -15,6 +17,7 @@ import {
   SEED_POSTS,
   SEED_RULES,
   TWINS,
+  EMPTY_TWIN,
   Account,
   BrandVoice,
   ContactItem,
@@ -60,7 +63,7 @@ export type WorkspaceView =
   | 'accounts'
   | 'skills';
 
-export type ContentMode = 'kanban' | 'grid' | 'feed' | 'calendar';
+export type ContentMode = 'kanban' | 'grid' | 'list' | 'feed' | 'calendar';
 export type ThemeMode = 'dark' | 'light';
 export type RightTabMode = 'copilot' | 'activity';
 
@@ -71,9 +74,25 @@ export interface ComposerState {
   cap: string;
   tags: string;
   pr: string;
-  day: number;
-  time: string;
+  date: string; // YYYY-MM-DD
+  time: string; // HH:MM
   media: PostMedia[];
+  /** true depois da primeira tentativa de salvar: a partir daí os erros aparecem nos campos. */
+  tried?: boolean;
+}
+
+/** Limites do Instagram usados na validação do compositor. */
+export const CAPTION_MAX = 2200;
+export const TOPIC_MAX = 70;
+export const HASHTAGS_MAX = 30;
+
+export interface ComposerIssues {
+  accs?: string;
+  topic?: string;
+  cap?: string;
+  tags?: string;
+  date?: string;
+  time?: string;
 }
 
 export interface TwinRuntimeSettings {
@@ -82,6 +101,26 @@ export interface TwinRuntimeSettings {
   ch: { dm: boolean; com: boolean; bio: boolean };
   fields: TwinField[];
 }
+
+/** Dados digitados no formulário de cliente. */
+export interface AccountDraft {
+  name: string;
+  user: string;
+  pageId: string;
+  adAccountId: string; // '' = cliente sem conta de anúncios
+  voice: BrandVoice;
+  style: string;
+}
+
+interface StoredWorkspace {
+  accounts: Account[];
+  adAccounts: MetaAdAccount[];
+  removedIds: string[];
+}
+
+const WORKSPACE_KEY = 'codemix_workspace_accounts';
+
+const normalizeAdId = (raw: string): string => (raw.startsWith('act_') ? raw : `act_${raw}`);
 
 @Injectable({ providedIn: 'root' })
 export class AccountStateService {
@@ -116,13 +155,14 @@ export class AccountStateService {
 
   constructor() {
     this.syncWithLiveApiAndVaryData().catch(() => {});
+    void this.handleAuthRedirects();
   }
 
   // Layout & Theme Signals
   readonly theme = signal<ThemeMode>('dark');
   readonly view = signal<WorkspaceView>('overview');
   readonly contentMode = signal<ContentMode>('kanban');
-  readonly contentSubTab = signal<'kanban' | 'grid' | 'feed' | 'calendar' | 'prompts'>('kanban');
+  readonly contentSubTab = signal<'kanban' | 'grid' | 'list' | 'feed' | 'calendar' | 'prompts'>('kanban');
   readonly inboxSubTab = signal<'dms' | 'comments' | 'triggers' | 'audience'>('dms');
   readonly campaignSubTab = signal<'campaigns' | 'audiences' | 'icp' | 'sync'>('campaigns');
   readonly automationSubTab = signal<'twin' | 'flows' | 'skills' | 'analytics'>('twin');
@@ -134,8 +174,10 @@ export class AccountStateService {
   readonly viewportWidth = signal<number>(typeof window !== 'undefined' ? window.innerWidth : 1440);
 
   // Multi-Tenant Accounts Signals
-  readonly accounts = signal<Account[]>(ACCS);
-  readonly activeId = signal<string>('a_amaral');
+  private readonly stored = this.loadStored();
+  private removedIds: string[] = this.stored?.removedIds ?? [];
+  readonly accounts = signal<Account[]>(this.restoreAccounts(this.stored));
+  readonly activeId = signal<string>(this.accounts()[0]?.id ?? 'a_amaral');
   readonly switcherOpen = signal<boolean>(false);
   readonly voiceOverrides = signal<Record<string, BrandVoice>>({});
   readonly styleOverrides = signal<Record<string, string>>({});
@@ -156,6 +198,22 @@ export class AccountStateService {
   readonly rules = signal<KeywordRule[]>(SEED_RULES);
   readonly newKw = signal<string>('');
   readonly newLink = signal<string>('');
+  readonly ruleTried = signal<boolean>(false);
+
+  /** Problemas do formulário de gatilho; vazio = válido. */
+  readonly ruleIssues = computed<{ kw?: string; link?: string }>(() => {
+    const kw = this.newKw().trim();
+    const link = this.newLink().trim();
+    const issues: { kw?: string; link?: string } = {};
+    if (!kw) issues.kw = 'Informe a palavra-chave';
+    else if (kw.length < 2 || kw.length > 30 || /\s/.test(kw)) issues.kw = 'Use de 2 a 30 caracteres, sem espaços';
+    else if (this.rules().some((r) => r.a === this.activeAccount().id && r.kw === kw.toUpperCase())) {
+      issues.kw = 'Já existe um gatilho com essa palavra';
+    }
+    if (!link) issues.link = 'Informe o link de destino';
+    else if (!isHttpUrl(link)) issues.link = 'Use um link completo, começando com https://';
+    return issues;
+  });
 
   // Digital Twin Signals
   readonly twins = signal<Record<string, Partial<TwinRuntimeSettings>>>({});
@@ -178,8 +236,8 @@ export class AccountStateService {
   readonly bcast = signal<string>('');
 
   // Meta Marketing API & Lookalike Signals
-  readonly adAccounts = signal<MetaAdAccount[]>(SEED_AD_ACCOUNTS);
-  readonly activeAdAccountId = signal<string>(environment.metaAdAccountId || 'act_1124982890873935');
+  readonly adAccounts = signal<MetaAdAccount[]>(this.stored?.adAccounts ?? SEED_AD_ACCOUNTS);
+  readonly activeAdAccountId = signal<string>(this.accounts()[0]?.adAccountId ?? '');
   readonly audiences = signal<MetaAudience[]>(SEED_AUDIENCES);
   readonly campaigns = signal<MetaCampaign[]>(SEED_CAMPAIGNS);
   readonly campaignFilter = signal<'all' | 'active' | 'paused' | 'lookalike'>('all');
@@ -222,7 +280,9 @@ export class AccountStateService {
 
   readonly accountPosts = computed<PostItem[]>(() => {
     const id = this.activeAccount().id;
-    return this.posts().filter((p) => p.a === id);
+    return this.posts()
+      .filter((p) => p.a === id)
+      .map(withDate);
   });
 
   readonly accountInts = computed<InteractionItem[]>(() => {
@@ -251,14 +311,11 @@ export class AccountStateService {
   );
 
   // Computed Meta Ads & Lookalike
-  readonly activeAdAccount = computed<MetaAdAccount>(() => {
-    const aid = this.activeAdAccountId();
+  // Só devolve a conta de anúncios se ela pertencer ao cliente ativo. Nunca cai para outra conta.
+  readonly activeAdAccount = computed<MetaAdAccount | null>(() => {
     const currAccId = this.activeAccount().id;
-    return (
-      this.adAccounts().find((a) => a.id === aid) ||
-      this.adAccounts().find((a) => a.a === currAccId) ||
-      this.adAccounts()[0]
-    );
+    const ad = this.adAccounts().find((a) => a.id === this.activeAdAccountId());
+    return ad && ad.a === currAccId ? ad : null;
   });
 
   readonly accountAudiences = computed<MetaAudience[]>(() => {
@@ -401,6 +458,74 @@ export class AccountStateService {
     return includeInactive ? list : list.filter((c) => on[c.c] !== false);
   }
 
+  // ----- Retorno de OAuth (Supabase e Meta) -----
+
+  /** Inicia a conexão de uma conta do Instagram pela Meta. Exige sessão: a função confere o usuário. */
+  async connectMetaAccount(): Promise<void> {
+    try {
+      const { url } = await this.supabase.callMetaOAuth<{ url: string }>('authorize_url');
+      sessionStorage.setItem(META_OAUTH_KEY, '1');
+      location.assign(url);
+    } catch (err) {
+      this.toast((err as Error).message);
+    }
+  }
+
+  private async handleAuthRedirects(): Promise<void> {
+    try {
+      const supa = await this.supabase.completeOAuthRedirect();
+      if (supa) this.toast(supa);
+      await this.completeMetaRedirect();
+    } catch (err) {
+      this.toast((err as Error).message || 'Não foi possível concluir o login');
+    }
+  }
+
+  private async completeMetaRedirect(): Promise<void> {
+    let started = false;
+    try {
+      started = sessionStorage.getItem(META_OAUTH_KEY) === '1';
+    } catch {
+      /* sem storage */
+    }
+    const params = new URLSearchParams(location.search);
+    // Só trata o retorno se fomos nós que iniciamos o fluxo (protege contra ?code= forjado).
+    if (!started || !(params.has('code') || params.has('error'))) return;
+    try {
+      sessionStorage.removeItem(META_OAUTH_KEY);
+    } catch {
+      /* sem storage */
+    }
+    const code = params.get('code');
+    const state = params.get('state');
+    const denied = params.get('error_description') || params.get('error');
+    history.replaceState(null, '', location.pathname);
+
+    if (denied) {
+      this.toast(`Conexão com a Meta cancelada: ${denied}`);
+      return;
+    }
+    if (!code || !state) {
+      this.toast('Retorno da Meta incompleto. Tente conectar de novo.');
+      return;
+    }
+    try {
+      const res = await this.supabase.callMetaOAuth<{ accounts: { username: string }[]; skipped?: { reason: string }[] }>(
+        'exchange_code',
+        { code, state }
+      );
+      this.setView('accounts');
+      const names = res.accounts.map((a) => `@${a.username}`).join(', ');
+      this.toast(
+        res.accounts.length
+          ? `Conectada(s) pela Meta: ${names}`
+          : 'Login na Meta concluído, mas nenhuma conta do Instagram Business foi encontrada nas suas páginas'
+      );
+    } catch (err) {
+      this.toast((err as Error).message);
+    }
+  }
+
   toast(msg: string): void {
     this.toastMsg.set(msg);
     if (this.toastTimer) clearTimeout(this.toastTimer);
@@ -436,10 +561,196 @@ export class AccountStateService {
     const found = this.accounts().find((a) => a.id === accountId);
     if (!found) return undefined;
     this.activeId.set(found.id);
+    this.activeAdAccountId.set(found.adAccountId ?? '');
     this.switcherOpen.set(false);
     this.selId.set(null);
     this.intId.set(null);
     return found;
+  }
+
+  /** Cadastra um cliente novo. Ele nasce pendente (sem token da Meta) e vira o cliente ativo. */
+  addAccount(draft: AccountDraft): Account {
+    const clean = this.checkDraft(draft);
+    const account: Account = {
+      id: `a_${Date.now().toString(36)}`,
+      user: clean.user,
+      name: clean.name,
+      ini: this.initialsOf(clean.name),
+      st: 'pendente',
+      days: 0,
+      perms: 0,
+      wh: false,
+      voice: clean.voice,
+      style: clean.style,
+      pageId: clean.pageId || undefined,
+      adAccountId: clean.adAccountId || undefined,
+    };
+    if (clean.adAccountId) this.linkAdAccount(clean.adAccountId, account.id);
+    this.accounts.update((list) => [...list, account]);
+    this.selectAccount(account.id);
+    this.persistWorkspace();
+    this.toast(`Cliente "${account.name}" cadastrado`);
+    return account;
+  }
+
+  /** Edita o cadastro de um cliente, inclusive a conta de anúncios principal. */
+  updateAccount(accountId: string, draft: AccountDraft): Account {
+    const current = this.accounts().find((a) => a.id === accountId);
+    if (!current) throw new Error('Cliente não encontrado.');
+    const clean = this.checkDraft(draft, accountId);
+    const updated: Account = {
+      ...current,
+      user: clean.user,
+      name: clean.name,
+      ini: this.initialsOf(clean.name),
+      pageId: clean.pageId || undefined,
+      adAccountId: clean.adAccountId || undefined,
+      voice: clean.voice,
+      style: clean.style,
+    };
+    if (clean.adAccountId) this.linkAdAccount(clean.adAccountId, accountId);
+    this.accounts.update((list) => list.map((a) => (a.id === accountId ? updated : a)));
+    if (this.activeId() === accountId) this.activeAdAccountId.set(clean.adAccountId);
+    this.persistWorkspace();
+    return updated;
+  }
+
+  /** Troca só o tom e o estilo. Não passa pela validação do cadastro. */
+  patchAccount(accountId: string, patch: Partial<Pick<Account, 'voice' | 'style'>>): void {
+    this.accounts.update((list) =>
+      list.map((a) => (a.id === accountId ? { ...a, ...patch } : a))
+    );
+    this.persistWorkspace();
+  }
+
+  /** Tira o cliente do painel e libera as contas de anúncios dele. Não mexe na conta da Meta. */
+  removeAccount(accountId: string): void {
+    const list = this.accounts();
+    const target = list.find((a) => a.id === accountId);
+    if (!target) return;
+    if (list.length <= 1) throw new Error('Mantenha pelo menos um cliente cadastrado.');
+
+    this.accounts.set(list.filter((a) => a.id !== accountId));
+    this.adAccounts.update((ads) => ads.map((ad) => (ad.a === accountId ? { ...ad, a: '' } : ad)));
+    const withoutKey = <T>(rec: Record<string, T>): Record<string, T> =>
+      Object.fromEntries(Object.entries(rec).filter(([key]) => key !== accountId));
+    this.voiceOverrides.update(withoutKey);
+    this.styleOverrides.update(withoutKey);
+    this.twins.update(withoutKey);
+    this.twSrc.update(withoutKey);
+    this.removedIds = [...this.removedIds, accountId];
+
+    if (this.activeId() === accountId) this.selectAccount(this.accounts()[0].id);
+    this.persistWorkspace();
+    this.toast(`Cliente "${target.name}" removido do painel`);
+  }
+
+  /** Conta de anúncios do cliente ativo. Sem uma vinculada, avisa em vez de usar outra. */
+  private requireAdAccount(): MetaAdAccount {
+    const ad = this.activeAdAccount();
+    if (!ad) {
+      const msg = 'Vincule uma conta de anúncios a este cliente antes de continuar.';
+      this.toast(msg);
+      throw new Error(msg);
+    }
+    return ad;
+  }
+
+  private checkDraft(draft: AccountDraft, selfId?: string): AccountDraft {
+    const name = draft.name.trim();
+    if (!name) throw new Error('Informe o nome do cliente.');
+    if (name.length > 60) throw new Error('O nome deve ter no máximo 60 caracteres.');
+
+    const user = draft.user.trim().replace(/^@/, '').toLowerCase();
+    if (!/^[a-z0-9._]{1,30}$/.test(user)) {
+      throw new Error('Usuário do Instagram inválido: use letras, números, ponto ou underline.');
+    }
+    const taken = this.accounts().find((a) => a.user === user && a.id !== selfId);
+    if (taken) throw new Error(`@${user} já está cadastrado como "${taken.name}".`);
+
+    const pageId = draft.pageId.trim();
+    if (pageId && !/^\d+$/.test(pageId)) {
+      throw new Error('O ID da página deve conter apenas números.');
+    }
+
+    if (draft.adAccountId) {
+      const ad = this.adAccounts().find((a) => a.id === draft.adAccountId);
+      if (!ad) throw new Error('Conta de anúncios não encontrada.');
+      const owner = this.accounts().find((a) => a.id === ad.a && a.id !== selfId);
+      if (owner) throw new Error(`Essa conta de anúncios já está vinculada a "${owner.name}".`);
+    }
+
+    return { ...draft, name, user, pageId };
+  }
+
+  private initialsOf(name: string): string {
+    const words = name.split(/\s+/).filter(Boolean);
+    const ini = words.length >= 2 ? `${words[0][0]}${words[1][0]}` : name.slice(0, 2);
+    return ini.toUpperCase();
+  }
+
+  private linkAdAccount(adAccountId: string, accountId: string): void {
+    this.adAccounts.update((list) =>
+      list.map((ad) => (ad.id === adAccountId ? { ...ad, a: accountId } : ad))
+    );
+  }
+
+  /**
+   * Junta o que foi salvo no navegador com o seed. O seed manda no status e nos dados da Meta
+   * (assim uma mudança em seed-data.ts não fica escondida); o salvo manda nos campos editáveis.
+   */
+  private restoreAccounts(stored: StoredWorkspace | null): Account[] {
+    if (!stored) return ACCS;
+    const seeds = new Map(ACCS.map((seed) => [seed.id, seed] as const));
+    const removed = new Set(stored.removedIds);
+    const saved = stored.accounts.map((a) => {
+      const seed = seeds.get(a.id);
+      if (!seed) return a;
+      return {
+        ...seed,
+        name: a.name,
+        user: a.user,
+        pageId: a.pageId,
+        adAccountId: a.adAccountId,
+        voice: a.voice,
+        style: a.style,
+      };
+    });
+    const fresh = ACCS.filter(
+      (seed) => !removed.has(seed.id) && !stored.accounts.some((a) => a.id === seed.id)
+    );
+    return [...saved, ...fresh];
+  }
+
+  private loadStored(): StoredWorkspace | null {
+    try {
+      const raw = localStorage.getItem(WORKSPACE_KEY);
+      if (!raw) return null;
+      const data = JSON.parse(raw) as Partial<StoredWorkspace>;
+      if (!Array.isArray(data.accounts) || data.accounts.length === 0 || !Array.isArray(data.adAccounts)) {
+        return null;
+      }
+      return {
+        accounts: data.accounts,
+        adAccounts: data.adAccounts,
+        removedIds: Array.isArray(data.removedIds) ? data.removedIds : [],
+      };
+    } catch {
+      return null;
+    }
+  }
+
+  private persistWorkspace(): void {
+    const data: StoredWorkspace = {
+      accounts: this.accounts(),
+      adAccounts: this.adAccounts(),
+      removedIds: this.removedIds,
+    };
+    try {
+      localStorage.setItem(WORKSPACE_KEY, JSON.stringify(data));
+    } catch {
+      // Sem storage disponível: as contas valem só enquanto a página estiver aberta.
+    }
   }
 
   setView(v: WorkspaceView): void {
@@ -480,11 +791,12 @@ export class AccountStateService {
       // 1. Lista as contas de anúncio de todas as Business Portfolios acessíveis
       const portfolios = await this.liveApi.fetchPortfolios();
       if (portfolios) {
-        const accId = this.activeAccount().id;
+        // A Meta não diz de que cliente é cada conta: mantém o dono já cadastrado
+        const owners = new Map(this.adAccounts().map((ad): [string, string] => [ad.id, ad.a]));
         const liveAccounts: MetaAdAccount[] = portfolios.flatMap((p) =>
           p.adAccounts.map((acc) => ({
-            id: acc.id.startsWith('act_') ? acc.id : `act_${acc.id}`,
-            a: accId,
+            id: normalizeAdId(acc.id),
+            a: owners.get(normalizeAdId(acc.id)) ?? '',
             name: acc.name,
             currency: acc.currency,
             status: acc.account_status === 1 ? 'ACTIVE' : 'DISABLED',
@@ -497,14 +809,13 @@ export class AccountStateService {
         );
         if (liveAccounts.length > 0) {
           this.adAccounts.set(liveAccounts);
-          if (!liveAccounts.some((a) => a.id === this.activeAdAccountId())) {
-            this.activeAdAccountId.set(liveAccounts[0].id);
-          }
+          this.persistWorkspace();
         }
       }
 
       // 1.1 Consulta campanhas reais da conta de anúncio ativa
-      const liveCamps = await this.liveApi.fetchLiveCampaigns(this.activeAdAccountId());
+      const activeAd = this.activeAdAccount();
+      const liveCamps = activeAd ? await this.liveApi.fetchLiveCampaigns(activeAd.id) : null;
       if (liveCamps && liveCamps.length > 0) {
         const mappedCamps: MetaCampaign[] = liveCamps.map((lc) => ({
           id: lc.id,
@@ -551,6 +862,17 @@ export class AccountStateService {
             });
           }
         }
+
+        if (metaPages.vetbots?.id) {
+          const vetbotsPosts = await this.liveApi.fetchLivePagePosts(metaPages.vetbots.id, 'a_vetbots');
+          if (vetbotsPosts && vetbotsPosts.length > 0) {
+            this.posts.update((prev) => {
+              const existingIds = new Set(prev.map((p) => p.id));
+              const fresh = vetbotsPosts.filter((p) => !existingIds.has(p.id));
+              return [...fresh, ...prev];
+            });
+          }
+        }
       }
 
       // 2. Varia dados ricos para a conta ativa
@@ -589,7 +911,7 @@ export class AccountStateService {
     }
   }
 
-  openComposer(initialFormat: PostFormat = 'IMAGE', initialTopic = ''): void {
+  openComposer(initialFormat: PostFormat = 'IMAGE', initialTopic = '', initialDate?: string): void {
     const acc = this.activeAccount();
     this.comp.set({
       accs: [acc.id],
@@ -598,10 +920,47 @@ export class AccountStateService {
       cap: '',
       tags: '',
       pr: '',
-      day: 5,
+      date: initialDate && isValidIsoDate(initialDate) ? initialDate : addDays(todayIso(), 1),
       time: '18:00',
       media: [],
     });
+  }
+
+  /** Problemas do formulário do compositor, por campo; vazio = válido. `schedule` inclui data/hora. */
+  composerIssues(schedule: boolean): ComposerIssues {
+    const c = this.comp();
+    const issues: ComposerIssues = {};
+    if (!c) return issues;
+    if (!c.accs.length) issues.accs = 'Escolha ao menos uma conta de destino';
+    if (c.topic.length > TOPIC_MAX) issues.topic = `Máximo de ${TOPIC_MAX} caracteres`;
+    if (!c.cap.trim()) issues.cap = 'Escreva a legenda';
+    else if (c.cap.length > CAPTION_MAX) {
+      issues.cap = `A legenda passa ${c.cap.length - CAPTION_MAX} caracteres do limite de ${CAPTION_MAX}`;
+    }
+
+    const tags = c.tags.split(/[\s,]+/).filter(Boolean);
+    if (tags.some((t) => !/^#[\p{L}\p{N}_]+$/u.test(t))) {
+      issues.tags = 'Cada hashtag começa com # e usa só letras, números e _';
+    } else if (tags.length > HASHTAGS_MAX) {
+      issues.tags = `O Instagram aceita até ${HASHTAGS_MAX} hashtags`;
+    }
+
+    if (schedule) {
+      if (!isValidIsoDate(c.date)) issues.date = 'Informe uma data válida';
+      if (!isValidTime(c.time)) issues.time = 'Use o formato HH:MM (ex.: 18:30)';
+      if (!issues.date && !issues.time && `${c.date} ${c.time}` <= this.nowKey()) {
+        issues.date = 'Escolha um horário no futuro';
+      }
+    }
+    return issues;
+  }
+
+  /** "YYYY-MM-DD HH:MM" do momento atual, para comparar com data/hora de agendamento. */
+  private nowKey(): string {
+    const n = new Date();
+    const hh = String(n.getHours()).padStart(2, '0');
+    const mm = String(n.getMinutes()).padStart(2, '0');
+    return `${todayIso()} ${hh}:${mm}`;
   }
 
   closeComposer(): void {
@@ -708,8 +1067,11 @@ export class AccountStateService {
   saveComposerPosts(status: 'DRAFT' | 'SCHEDULED'): void {
     const current = this.comp();
     if (!current) return;
-    if (!current.accs.length || !current.cap.trim()) {
-      this.toast('Escolha uma conta e escreva a legenda');
+    const issues = this.composerIssues(status === 'SCHEDULED');
+    const firstIssue = Object.values(issues)[0];
+    if (firstIssue) {
+      this.patchComposer({ tried: true });
+      this.toast(firstIssue);
       return;
     }
     const newPosts: PostItem[] = current.accs.map((id) => ({
@@ -724,7 +1086,7 @@ export class AccountStateService {
             : 'DRAFT',
       topic: (current.topic.trim() || current.cap.trim().split('\n')[0]).slice(0, 70),
       cap: current.cap,
-      tags: current.tags.split(/\s+/).filter(Boolean),
+      tags: current.tags.split(/[\s,]+/).filter(Boolean),
       pr: current.pr.trim()
         ? [
             {
@@ -734,7 +1096,8 @@ export class AccountStateService {
             },
           ]
         : [],
-      day: status === 'SCHEDULED' ? current.day : null,
+      day: status === 'SCHEDULED' ? weekdayIndex(current.date) : null,
+      date: status === 'SCHEDULED' ? current.date : undefined,
       time: status === 'SCHEDULED' ? current.time : '',
       ai: 'Manual',
       media: current.media && current.media.length > 0 ? [...current.media] : [],
@@ -754,15 +1117,7 @@ export class AccountStateService {
     if (!sel) return;
     this.posts.update((list) =>
       list.map((p) =>
-        p.id === sel.id
-          ? {
-              ...p,
-              s: newStatus,
-              ...(newStatus === 'SCHEDULED' && p.day === null
-                ? { day: 5, time: '18:00' }
-                : {}),
-            }
-          : p
+        p.id === sel.id ? this.withStatus(p, newStatus) : p
       )
     );
   }
@@ -770,15 +1125,7 @@ export class AccountStateService {
   movePostStatus(postId: string, newStatus: PostStatus): void {
     this.posts.update((list) =>
       list.map((p) =>
-        p.id === postId
-          ? {
-              ...p,
-              s: newStatus,
-              ...(newStatus === 'SCHEDULED' && p.day === null
-                ? { day: 5, time: '18:00' }
-                : {}),
-            }
-          : p
+        p.id === postId ? this.withStatus(p, newStatus) : p
       )
     );
     const map: Record<PostStatus, string> = {
@@ -789,6 +1136,47 @@ export class AccountStateService {
       FAILED: 'Falha',
     };
     this.toast(`Post movido para ${map[newStatus] || newStatus}`);
+  }
+
+  /** Agendar um post sem data o coloca amanhã às 18:00 (o usuário ajusta depois no painel do post). */
+  private withStatus(p: PostItem, newStatus: PostStatus): PostItem {
+    if (newStatus === 'SCHEDULED' && !p.date && p.day === null) {
+      const date = addDays(todayIso(), 1);
+      return { ...p, s: newStatus, date, day: weekdayIndex(date), time: '18:00' };
+    }
+    return { ...p, s: newStatus };
+  }
+
+  /** Define (ou troca) a data/hora de um post. Rejeita valores inválidos e devolve o motivo. */
+  schedulePost(postId: string, date: string, time: string): string | null {
+    if (!isValidIsoDate(date)) return 'Informe uma data válida';
+    if (!isValidTime(time)) return 'Use o formato HH:MM (ex.: 18:30)';
+    this.posts.update((list) =>
+      list.map((p) =>
+        p.id === postId
+          ? {
+              ...p,
+              date,
+              day: weekdayIndex(date),
+              time,
+              s: p.s === 'DRAFT' || p.s === 'PROMPT_READY' || p.s === 'FAILED' ? 'SCHEDULED' : p.s,
+            }
+          : p
+      )
+    );
+    this.toast('Agendamento atualizado');
+    return null;
+  }
+
+  /** Move o post para outro dia mantendo o horário (arrastar no calendário). */
+  reschedulePostToDate(postId: string, date: string): void {
+    const post = this.posts().find((p) => p.id === postId);
+    if (!post || post.s === 'PUBLISHED') return;
+    if (date < todayIso()) {
+      this.toast('Não é possível agendar um post no passado');
+      return;
+    }
+    this.schedulePost(postId, date, post.time && isValidTime(post.time) ? post.time : '18:00');
   }
 
   deletePost(postId: string): void {
@@ -848,8 +1236,10 @@ export class AccountStateService {
   addKeywordRule(scopeLabel: string): void {
     const kw = this.newKw().trim();
     const link = this.newLink().trim();
-    if (!kw || !link) {
-      this.toast('Informe palavra-chave e link de destino');
+    const issues = this.ruleIssues();
+    if (issues.kw || issues.link) {
+      this.ruleTried.set(true);
+      this.toast((issues.kw ?? issues.link)!);
       return;
     }
     const acc = this.activeAccount();
@@ -866,6 +1256,7 @@ export class AccountStateService {
     ]);
     this.newKw.set('');
     this.newLink.set('');
+    this.ruleTried.set(false);
     this.toast('Regra criada: webhook de comentários ativo');
   }
 
@@ -877,7 +1268,7 @@ export class AccountStateService {
 
   // Digital Twin helpers
   getTwinSettings(accountId = this.activeAccount().id): TwinRuntimeSettings {
-    const base = TWINS[accountId];
+    const base = TWINS[accountId] ?? EMPTY_TWIN;
     const ov = this.twins()[accountId] || {};
     return {
       mode: ov.mode || 'aprovacao',
@@ -899,7 +1290,7 @@ export class AccountStateService {
     const id = this.activeAccount().id;
     this.twSrc.update((prev) => ({
       ...prev,
-      [id]: [...(prev[id] || TWINS[id].sources), [type, name, 'processando']],
+      [id]: [...(prev[id] || (TWINS[id] ?? EMPTY_TWIN).sources), [type, name, 'processando']],
     }));
     this.toast('Fonte adicionada · indexando');
     setTimeout(() => {
@@ -925,7 +1316,7 @@ export class AccountStateService {
   }
 
   getTwinAnswer(acc: Account, q: string) {
-    const T = TWINS[acc.id];
+    const T = TWINS[acc.id] ?? EMPTY_TWIN;
     if (T.qa[q]) return T.qa[q];
     const f = this.getTwinSettings(acc.id)
       .fields.filter((x) => x.on)
@@ -1047,11 +1438,18 @@ export class AccountStateService {
   // ==========================================
 
   selectAdAccount(adAccountId: string): void {
-    this.activeAdAccountId.set(adAccountId);
-    const acc = this.adAccounts().find((a) => a.id === adAccountId);
-    if (acc) {
-      this.toast(`Conta de anúncios alterada: ${acc.name}`);
+    const ad = this.adAccounts().find((a) => a.id === adAccountId);
+    const current = this.activeAccount();
+    if (!ad || ad.a !== current.id) {
+      this.toast('Essa conta de anúncios não pertence ao cliente ativo');
+      return;
     }
+    this.activeAdAccountId.set(ad.id);
+    this.accounts.update((list) =>
+      list.map((a) => (a.id === current.id ? { ...a, adAccountId: ad.id } : a))
+    );
+    this.persistWorkspace();
+    this.toast(`Conta de anúncios alterada: ${ad.name}`);
   }
 
   /**
@@ -1084,6 +1482,7 @@ export class AccountStateService {
     customName?: string
   ): MetaAudience {
     const accId = this.activeAccount().id;
+    const adAccountId = this.requireAdAccount().id;
     const estReach = Math.round((ratio / 100) * 160000000); // 1.6M para cada 1% no BR
     const name =
       customName ||
@@ -1109,7 +1508,7 @@ export class AccountStateService {
     this.supabase
       .invokeEdgeFunction('meta-marketing-api', {
         action: 'create_lookalike_audience',
-        adAccountId: this.activeAdAccount().id,
+        adAccountId,
         payload: {
           name,
           ratio: ratio / 100,
@@ -1124,6 +1523,7 @@ export class AccountStateService {
 
   createAudienceFromContacts(name: string, contactIds: string[]): MetaAudience {
     const accId = this.activeAccount().id;
+    const adAccountId = this.requireAdAccount().id;
     const targetContacts = this.contacts().filter((c) => contactIds.includes(c.id));
     const size = targetContacts.length > 0 ? targetContacts.length : 1;
 
@@ -1149,7 +1549,7 @@ export class AccountStateService {
     this.supabase
       .invokeEdgeFunction('meta-marketing-api', {
         action: 'create_custom_audience',
-        adAccountId: this.activeAdAccount().id,
+        adAccountId,
         payload: {
           name,
           description: `Importação de ${size} contatos via InstaAI Hub`,
@@ -1162,6 +1562,7 @@ export class AccountStateService {
 
   syncContactsToMeta(audienceId: string): void {
     const accId = this.activeAccount().id;
+    const adAccountId = this.requireAdAccount().id;
     const accContacts = this.contacts().filter((c) => c.a === accId);
     
     this.contacts.update((prev) =>
@@ -1177,7 +1578,7 @@ export class AccountStateService {
     this.supabase
       .invokeEdgeFunction('meta-marketing-api', {
         action: 'sync_contacts_to_audience',
-        adAccountId: this.activeAdAccount().id,
+        adAccountId,
         payload: {
           audienceId,
           contacts: accContacts.map((c) => ({
@@ -1195,9 +1596,9 @@ export class AccountStateService {
    */
   async createCampaign(payload: Partial<MetaCampaign>): Promise<void> {
     const accId = this.activeAccount().id;
-    const adAccountId = this.activeAdAccountId();
     const name = payload.name || 'Nova Campanha Lookalike';
     try {
+      const adAccountId = this.requireAdAccount().id;
       const res = await this.supabase.callMetaApi<{ campaignId: string }>('create_campaign', {
         adAccountId,
         payload: {
@@ -1262,6 +1663,7 @@ export class AccountStateService {
     lookalikeRatio?: number;
   }): { count: number; customAudience: MetaAudience; lookalikeAudience?: MetaAudience } {
     const accId = this.activeAccount().id;
+    const adAccountId = this.requireAdAccount().id;
     const lines = options.rawText.split(/[\r\n]+/);
     const newContacts: ContactItem[] = [];
     const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
@@ -1330,7 +1732,7 @@ export class AccountStateService {
     this.supabase
       .invokeEdgeFunction('meta-marketing-api', {
         action: 'create_custom_audience',
-        adAccountId: this.activeAdAccount().id,
+        adAccountId,
         payload: {
           name: customAudName,
           description: `Importação de ${parsedCount} clientes via CSV/Planilha`,
@@ -1339,7 +1741,7 @@ export class AccountStateService {
       .then(() => {
         return this.supabase.invokeEdgeFunction('meta-marketing-api', {
           action: 'sync_contacts_to_audience',
-          adAccountId: this.activeAdAccount().id,
+          adAccountId,
           payload: {
             audienceId: customAud.id,
             contacts: newContacts.map((c) => ({

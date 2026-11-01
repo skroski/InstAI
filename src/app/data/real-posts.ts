@@ -7,6 +7,7 @@ import { PostItem } from "./seed-data";
 export const REAL_META_POSTS: PostItem[] = [
   {
     "id": "live_185387824832414_1544580937713912",
+    "permalink": "https://www.facebook.com/1547166704122002/posts/1544580937713912",
     "a": "a_amaral",
     "t": "CAROUSEL",
     "s": "PUBLISHED",
@@ -27,7 +28,8 @@ export const REAL_META_POSTS: PostItem[] = [
         "x": "Publicação real sincronizada via Meta Graph API em 2026-10-29T23:24:00+0000. Link: https://www.facebook.com/1547166704122002/posts/1544580937713912"
       }
     ],
-    "day": 4,
+    "date": "2026-10-29",
+    "day": 3,
     "time": "20:24",
     "ai": "Meta Graph API v22.0",
     "media": [
@@ -77,6 +79,7 @@ export const REAL_META_POSTS: PostItem[] = [
   },
   {
     "id": "live_185387824832414_1536187241886615",
+    "permalink": "https://www.facebook.com/1547166704122002/posts/1536187241886615",
     "a": "a_amaral",
     "t": "CAROUSEL",
     "s": "PUBLISHED",
@@ -97,7 +100,8 @@ export const REAL_META_POSTS: PostItem[] = [
         "x": "Publicação real sincronizada via Meta Graph API em 2026-10-21T18:38:25+0000. Link: https://www.facebook.com/1547166704122002/posts/1536187241886615"
       }
     ],
-    "day": 3,
+    "date": "2026-10-21",
+    "day": 2,
     "time": "15:38",
     "ai": "Meta Graph API v22.0",
     "media": [
@@ -140,6 +144,7 @@ export const REAL_META_POSTS: PostItem[] = [
   },
   {
     "id": "live_185387824832414_1530456235793049",
+    "permalink": "https://www.facebook.com/1547166704122002/posts/1530456235793049",
     "a": "a_amaral",
     "t": "IMAGE",
     "s": "PUBLISHED",
@@ -164,7 +169,8 @@ export const REAL_META_POSTS: PostItem[] = [
         "x": "Publicação real sincronizada via Meta Graph API em 2026-10-15T22:21:57+0000. Link: https://www.facebook.com/1547166704122002/posts/1530456235793049"
       }
     ],
-    "day": 4,
+    "date": "2026-10-15",
+    "day": 3,
     "time": "19:21",
     "ai": "Meta Graph API v22.0",
     "media": [
@@ -179,6 +185,7 @@ export const REAL_META_POSTS: PostItem[] = [
   },
   {
     "id": "live_185387824832414_1523450623160277",
+    "permalink": "https://www.facebook.com/1547166704122002/posts/1523450623160277",
     "a": "a_amaral",
     "t": "CAROUSEL",
     "s": "PUBLISHED",
@@ -201,7 +208,8 @@ export const REAL_META_POSTS: PostItem[] = [
         "x": "Publicação real sincronizada via Meta Graph API em 2026-10-08T18:45:11+0000. Link: https://www.facebook.com/1547166704122002/posts/1523450623160277"
       }
     ],
-    "day": 4,
+    "date": "2026-10-08",
+    "day": 3,
     "time": "15:45",
     "ai": "Meta Graph API v22.0",
     "media": [
@@ -251,6 +259,7 @@ export const REAL_META_POSTS: PostItem[] = [
   },
   {
     "id": "live_185387824832414_1516510073854332",
+    "permalink": "https://www.facebook.com/1547166704122002/posts/1516510073854332",
     "a": "a_amaral",
     "t": "CAROUSEL",
     "s": "PUBLISHED",
@@ -272,7 +281,8 @@ export const REAL_META_POSTS: PostItem[] = [
         "x": "Publicação real sincronizada via Meta Graph API em 2026-10-01T13:27:51+0000. Link: https://www.facebook.com/1547166704122002/posts/1516510073854332"
       }
     ],
-    "day": 4,
+    "date": "2026-10-01",
+    "day": 3,
     "time": "10:27",
     "ai": "Meta Graph API v22.0",
     "media": [
@@ -322,6 +332,7 @@ export const REAL_META_POSTS: PostItem[] = [
   },
   {
     "id": "live_185387824832414_1510306677808005",
+    "permalink": "https://www.facebook.com/1547166704122002/posts/1510306677808005",
     "a": "a_amaral",
     "t": "CAROUSEL",
     "s": "PUBLISHED",
@@ -341,7 +352,8 @@ export const REAL_META_POSTS: PostItem[] = [
         "x": "Publicação real sincronizada via Meta Graph API em 2026-09-25T10:01:01+0000. Link: https://www.facebook.com/1547166704122002/posts/1510306677808005"
       }
     ],
-    "day": 5,
+    "date": "2026-09-25",
+    "day": 4,
     "time": "07:01",
     "ai": "Meta Graph API v22.0",
     "media": [
@@ -398,6 +410,7 @@ export const REAL_META_POSTS: PostItem[] = [
   },
   {
     "id": "live_185387824832414_1502140571957949",
+    "permalink": "https://www.facebook.com/reel/38430698076577270/",
     "a": "a_amaral",
     "t": "REELS",
     "s": "PUBLISHED",
@@ -417,7 +430,8 @@ export const REAL_META_POSTS: PostItem[] = [
         "x": "Publicação real sincronizada via Meta Graph API em 2026-09-16T08:41:35+0000. Link: https://www.facebook.com/reel/38430698076577270/"
       }
     ],
-    "day": 3,
+    "date": "2026-09-16",
+    "day": 2,
     "time": "05:41",
     "ai": "Meta Graph API v22.0",
     "media": [
@@ -432,6 +446,7 @@ export const REAL_META_POSTS: PostItem[] = [
   },
   {
     "id": "live_185387824832414_1502135521958454",
+    "permalink": "https://www.facebook.com/1547166704122002/posts/1502135521958454",
     "a": "a_amaral",
     "t": "CAROUSEL",
     "s": "PUBLISHED",
@@ -451,7 +466,8 @@ export const REAL_META_POSTS: PostItem[] = [
         "x": "Publicação real sincronizada via Meta Graph API em 2026-09-16T08:31:48+0000. Link: https://www.facebook.com/1547166704122002/posts/1502135521958454"
       }
     ],
-    "day": 3,
+    "date": "2026-09-16",
+    "day": 2,
     "time": "05:31",
     "ai": "Meta Graph API v22.0",
     "media": [
@@ -522,6 +538,7 @@ export const REAL_META_POSTS: PostItem[] = [
   },
   {
     "id": "live_185387824832414_1493924909446182",
+    "permalink": "https://www.facebook.com/1547166704122002/posts/1493924909446182",
     "a": "a_amaral",
     "t": "IMAGE",
     "s": "PUBLISHED",
@@ -543,7 +560,8 @@ export const REAL_META_POSTS: PostItem[] = [
         "x": "Publicação real sincronizada via Meta Graph API em 2026-09-06T22:38:44+0000. Link: https://www.facebook.com/1547166704122002/posts/1493924909446182"
       }
     ],
-    "day": 0,
+    "date": "2026-09-06",
+    "day": 6,
     "time": "19:38",
     "ai": "Meta Graph API v22.0",
     "media": [
@@ -558,6 +576,7 @@ export const REAL_META_POSTS: PostItem[] = [
   },
   {
     "id": "live_185387824832414_1489474206557919",
+    "permalink": "https://www.facebook.com/1547166704122002/posts/1489474206557919",
     "a": "a_amaral",
     "t": "IMAGE",
     "s": "PUBLISHED",
@@ -582,7 +601,8 @@ export const REAL_META_POSTS: PostItem[] = [
         "x": "Publicação real sincronizada via Meta Graph API em 2026-09-01T21:49:48+0000. Link: https://www.facebook.com/1547166704122002/posts/1489474206557919"
       }
     ],
-    "day": 2,
+    "date": "2026-09-01",
+    "day": 1,
     "time": "18:49",
     "ai": "Meta Graph API v22.0",
     "media": [
@@ -597,6 +617,7 @@ export const REAL_META_POSTS: PostItem[] = [
   },
   {
     "id": "live_184846338220933_1088367546782510",
+    "permalink": "https://www.facebook.com/1437305638555364/posts/1088367546782510",
     "a": "a2",
     "t": "IMAGE",
     "s": "PUBLISHED",
@@ -613,13 +634,15 @@ export const REAL_META_POSTS: PostItem[] = [
         "x": "Publicação real sincronizada via Meta Graph API em 2025-09-08T21:23:36+0000. Link: https://www.facebook.com/1437305638555364/posts/1088367546782510"
       }
     ],
-    "day": 1,
+    "date": "2025-09-08",
+    "day": 0,
     "time": "18:23",
     "ai": "Meta Graph API v22.0",
     "media": []
   },
   {
     "id": "live_184846338220933_925522019733731",
+    "permalink": "https://www.facebook.com/1437305638555364/posts/925522019733731",
     "a": "a2",
     "t": "CAROUSEL",
     "s": "PUBLISHED",
@@ -636,7 +659,8 @@ export const REAL_META_POSTS: PostItem[] = [
         "x": "Publicação real sincronizada via Meta Graph API em 2025-01-31T22:00:02+0000. Link: https://www.facebook.com/1437305638555364/posts/925522019733731"
       }
     ],
-    "day": 5,
+    "date": "2025-01-31",
+    "day": 4,
     "time": "19:00",
     "ai": "Meta Graph API v22.0",
     "media": [
@@ -693,6 +717,7 @@ export const REAL_META_POSTS: PostItem[] = [
   },
   {
     "id": "live_184846338220933_923962869889646",
+    "permalink": "https://www.facebook.com/1437305638555364/posts/923962869889646",
     "a": "a2",
     "t": "CAROUSEL",
     "s": "PUBLISHED",
@@ -709,7 +734,8 @@ export const REAL_META_POSTS: PostItem[] = [
         "x": "Publicação real sincronizada via Meta Graph API em 2025-01-29T15:00:08+0000. Link: https://www.facebook.com/1437305638555364/posts/923962869889646"
       }
     ],
-    "day": 3,
+    "date": "2025-01-29",
+    "day": 2,
     "time": "12:00",
     "ai": "Meta Graph API v22.0",
     "media": [
@@ -766,6 +792,7 @@ export const REAL_META_POSTS: PostItem[] = [
   },
   {
     "id": "live_184846338220933_922622686690331",
+    "permalink": "https://www.facebook.com/1437305638555364/posts/922622686690331",
     "a": "a2",
     "t": "CAROUSEL",
     "s": "PUBLISHED",
@@ -786,7 +813,8 @@ export const REAL_META_POSTS: PostItem[] = [
         "x": "Publicação real sincronizada via Meta Graph API em 2025-01-27T16:00:24+0000. Link: https://www.facebook.com/1437305638555364/posts/922622686690331"
       }
     ],
-    "day": 1,
+    "date": "2025-01-27",
+    "day": 0,
     "time": "13:00",
     "ai": "Meta Graph API v22.0",
     "media": [
@@ -829,6 +857,7 @@ export const REAL_META_POSTS: PostItem[] = [
   },
   {
     "id": "live_184846338220933_456701769949094",
+    "permalink": "https://www.facebook.com/1437305638555364/posts/456701769949094",
     "a": "a2",
     "t": "CAROUSEL",
     "s": "PUBLISHED",
@@ -845,7 +874,8 @@ export const REAL_META_POSTS: PostItem[] = [
         "x": "Publicação real sincronizada via Meta Graph API em 2022-11-26T21:03:59+0000. Link: https://www.facebook.com/1437305638555364/posts/456701769949094"
       }
     ],
-    "day": 6,
+    "date": "2022-11-26",
+    "day": 5,
     "time": "18:03",
     "ai": "Meta Graph API v22.0",
     "media": [
@@ -881,6 +911,7 @@ export const REAL_META_POSTS: PostItem[] = [
   },
   {
     "id": "live_184846338220933_455798136706124",
+    "permalink": "https://www.facebook.com/1437305638555364/posts/455798136706124",
     "a": "a2",
     "t": "IMAGE",
     "s": "PUBLISHED",
@@ -901,7 +932,8 @@ export const REAL_META_POSTS: PostItem[] = [
         "x": "Publicação real sincronizada via Meta Graph API em 2022-11-25T12:56:20+0000. Link: https://www.facebook.com/1437305638555364/posts/455798136706124"
       }
     ],
-    "day": 5,
+    "date": "2022-11-25",
+    "day": 4,
     "time": "09:56",
     "ai": "Meta Graph API v22.0",
     "media": [
@@ -916,6 +948,7 @@ export const REAL_META_POSTS: PostItem[] = [
   },
   {
     "id": "live_184846338220933_453294860289785",
+    "permalink": "https://www.facebook.com/1437305638555364/posts/453294860289785",
     "a": "a2",
     "t": "CAROUSEL",
     "s": "PUBLISHED",
@@ -932,7 +965,8 @@ export const REAL_META_POSTS: PostItem[] = [
         "x": "Publicação real sincronizada via Meta Graph API em 2022-11-21T18:01:49+0000. Link: https://www.facebook.com/1437305638555364/posts/453294860289785"
       }
     ],
-    "day": 1,
+    "date": "2022-11-21",
+    "day": 0,
     "time": "15:01",
     "ai": "Meta Graph API v22.0",
     "media": [
@@ -996,6 +1030,7 @@ export const REAL_META_POSTS: PostItem[] = [
   },
   {
     "id": "live_184846338220933_2415437848495093",
+    "permalink": "https://www.facebook.com/1437305638555364/posts/2415437848495093",
     "a": "a2",
     "t": "CAROUSEL",
     "s": "PUBLISHED",
@@ -1012,7 +1047,8 @@ export const REAL_META_POSTS: PostItem[] = [
         "x": "Publicação real sincronizada via Meta Graph API em 2019-08-04T13:19:06+0000. Link: https://www.facebook.com/1437305638555364/posts/2415437848495093"
       }
     ],
-    "day": 0,
+    "date": "2019-08-04",
+    "day": 6,
     "time": "10:19",
     "ai": "Meta Graph API v22.0",
     "media": [
@@ -1090,6 +1126,7 @@ export const REAL_META_POSTS: PostItem[] = [
   },
   {
     "id": "live_184846338220933_1222428605201759",
+    "permalink": "https://www.facebook.com/184846338220933/posts/1460154680690086/",
     "a": "a2",
     "t": "IMAGE",
     "s": "PUBLISHED",
@@ -1106,7 +1143,8 @@ export const REAL_META_POSTS: PostItem[] = [
         "x": "Publicação real sincronizada via Meta Graph API em 2017-07-05T22:57:24+0000. Link: https://www.facebook.com/184846338220933/posts/1460154680690086/"
       }
     ],
-    "day": 3,
+    "date": "2017-07-05",
+    "day": 2,
     "time": "19:57",
     "ai": "Meta Graph API v22.0",
     "media": [
@@ -1121,6 +1159,7 @@ export const REAL_META_POSTS: PostItem[] = [
   },
   {
     "id": "live_184846338220933_489157263055311",
+    "permalink": "https://www.facebook.com/184846338220933/posts/1460150560690498/",
     "a": "a2",
     "t": "IMAGE",
     "s": "PUBLISHED",
@@ -1137,7 +1176,8 @@ export const REAL_META_POSTS: PostItem[] = [
         "x": "Publicação real sincronizada via Meta Graph API em 2017-07-05T22:49:50+0000. Link: https://www.facebook.com/184846338220933/posts/1460150560690498/"
       }
     ],
-    "day": 3,
+    "date": "2017-07-05",
+    "day": 2,
     "time": "19:49",
     "ai": "Meta Graph API v22.0",
     "media": [
@@ -1147,6 +1187,571 @@ export const REAL_META_POSTS: PostItem[] = [
         "url": "https://scontent.xx.fbcdn.net/fb.png",
         "name": "foto_principal.jpg",
         "aspectRatio": "1:1"
+      }
+    ]
+  },
+  // --- VETBOTS (@vetbots - Assistente Virtual Veterinário) ---
+{
+    "id": "live_vb_18094779455174496",
+    "permalink": "https://www.instagram.com/p/DfBMKLoDNrf/",
+    "a": "a_vetbots",
+    "t": "CAROUSEL",
+    "s": "PUBLISHED",
+    "topic": "🚨 *BLACK NOVEMBER VETBOTS: FILA INTELIGENTE GRÁTIS + 50% OF",
+    "cap": "🚨 *BLACK NOVEMBER VETBOTS: FILA INTELIGENTE GRÁTIS + 50% OFF!*\n\nRecepção lotada, tutores esperando e sua equipe sobrecarregada? A VetBots tem uma oportunidade para mudar essa realidade! 🐾\n\n🔥 *FILA PRESENCIAL INTELIGENTE GRÁTIS!*\n\n📺 Organize a fila de atendimento e exiba as chamadas dos pacientes na TV da sala de espera. Com download imediato e sem custo de licença!\n\n💥 *E TEM MAIS: 50% DE DESCONTO NA IMPLANTAÇÃO DA VETBOTS I.A.!*\n\nAutomatize sua rotina com:\n✅ Agendamentos inteligentes\n✅ Dashboard para gerenciar conversas\n✅ Triagem de plantão\n✅ Fluxos de atendimento automatizados\n✅ Lembretes de consultas\n\n🚀 *Mais organização, menos trabalho manual e mais tempo para cuidar dos pacientes!*\n\n⚠️ Aproveite a Black November VetBots e transforme o atend#inteligenciaartificial \n\nComente *EU QUERO* aqui embaixo.\n\n#VetBots #BlackNovember #GestãoVeterinária #ClínicaVeterinária #HospitalVeterinário #AutomaçãoVeterinária #InteligênciaArtificial",
+    "tags": [
+      "#inteligenciaartificial",
+      "#VetBots",
+      "#BlackNovember",
+      "#GestãoVeterinária",
+      "#ClínicaVeterinária",
+      "#HospitalVeterinário",
+      "#AutomaçãoVeterinária",
+      "#InteligênciaArtificial"
+    ],
+    "pr": [
+      {
+        "t": "Mídia Meta Oficial",
+        "ar": "4:5",
+        "x": "Publicação real sincronizada via Meta Graph API em 2026-10-28T00:53:24+0000. Link: https://www.instagram.com/p/DfBMKLoDNrf/"
+      }
+    ],
+    "date": "2026-10-28",
+    "day": 2,
+    "time": "21:53",
+    "ai": "Meta Graph API v22.0",
+    "media": [
+      {
+        "id": "med_vb_18094779455174496_0",
+        "type": "image",
+        "url": "https://scontent.cdninstagram.com/v/t39.30808-6/873505086_122286624236035012_6832151390301872297_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=108&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_eui2=AeEPG5WS_zWMvjf1Oiq7GDVm6L34rZm7kvjovfitmbuS-I4pCcstK5ErBBO47n7J0nc&_nc_ohc=Eim2GM_XwsYQ7kNvwFstQca&_nc_oc=Ados9QKorLYESm6dOOS_jkucWnlkJu1W7nU3SfeLAqF84YtmffUVG54o3uwMJROKlRY&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&edm=AFF3FJ0EAAAA&_nc_gid=XIlMMh4V9_z65tQvhBekIw&oh=00_AQSATmPvxWw2bofCdPxlrPZGD3EiHYuGu8PnzTFp9ygMJA&oe=6AED7C54",
+        "name": "slide_1.jpg",
+        "aspectRatio": "4:5"
+      },
+      {
+        "id": "med_vb_18094779455174496_1",
+        "type": "image",
+        "url": "https://scontent.cdninstagram.com/v/t39.30808-6/861746025_122286624248035012_1799595453513753814_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=111&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_eui2=AeGGtz-V9qu4l5mO_lSYqMLdgQP3Urym6NiBA_dSvKbo2K83cFc13_hgtjm7eYdLQAs&_nc_ohc=IL299WKdAUgQ7kNvwFwOjpv&_nc_oc=AdrV_ns8y0b_kHRIZstNo4f32bPZTZzg0DTj1bLghXO3qMVyittX4JYtDnDnFgZ0khM&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&edm=AFF3FJ0EAAAA&_nc_gid=XIlMMh4V9_z65tQvhBekIw&oh=00_AQTPG6k2qNjxNWCkq-xw_zrebcQybXyGOT3RICYnyWTQgw&oe=6AED7D15",
+        "name": "slide_2.jpg",
+        "aspectRatio": "4:5"
+      },
+      {
+        "id": "med_vb_18094779455174496_2",
+        "type": "image",
+        "url": "https://scontent.cdninstagram.com/v/t39.30808-6/862764613_122286624206035012_6935041153511328274_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=109&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_eui2=AeG31cmfdIXs49k_j9x8wKz4Zlg7rpVI-eRmWDuulUj55AhbD3lddoKSeir6ilPsvU8&_nc_ohc=FunZIAJlKuMQ7kNvwHTbeNk&_nc_oc=AdrZc6aSFLgQuJGM3c4mHtWtbNgmfIDHpPMxKlEvv3VTDZFJJxeIvYKxPfTsdTbqeLI&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&edm=AFF3FJ0EAAAA&_nc_gid=XIlMMh4V9_z65tQvhBekIw&oh=00_AQTMI08M5TD3vB8AbF9ySPUcaeoJDZ8lKSs8Iz7NsB34rg&oe=6AED92BE",
+        "name": "slide_3.jpg",
+        "aspectRatio": "4:5"
+      },
+      {
+        "id": "med_vb_18094779455174496_3",
+        "type": "image",
+        "url": "https://scontent.cdninstagram.com/v/t39.30808-6/866285292_122286624254035012_3014991671586542684_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=104&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_eui2=AeGiP4Ku6AVwX1TjVt4bnbFMV6JYo3xOsixXolijfE6yLHFL5wfDvWhJMbbgYdvuhPE&_nc_ohc=IgbTFYsEbIcQ7kNvwHT3U13&_nc_oc=AdrEFOS5SwuIFtCkaVAPCC3uaYtc2Cmep5tynWkSHKvAw3C1twyKIbwqHz5gsM3B5DM&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&edm=AFF3FJ0EAAAA&_nc_gid=XIlMMh4V9_z65tQvhBekIw&oh=00_AQQi1uPtHgQsawkiOyHelB35npwhn7bb7vR9ech8eBZZvg&oe=6AEDA040",
+        "name": "slide_4.jpg",
+        "aspectRatio": "4:5"
+      }
+    ]
+  },
+  {
+    "id": "live_vb_18139639960727817",
+    "permalink": "https://www.instagram.com/reel/DfBJeopvkIl/",
+    "a": "a_vetbots",
+    "t": "REELS",
+    "s": "PUBLISHED",
+    "topic": "🚨 **BLACK NOVEMBER VETBOTS: FILA INTELIGENTE GRÁTIS + 50% O",
+    "cap": "🚨 **BLACK NOVEMBER VETBOTS: FILA INTELIGENTE GRÁTIS + 50% OFF!**\n\nRecepção lotada, tutores esperando e sua equipe sobrecarregada? A VetBots tem uma oportunidade para mudar essa realidade! 🐾\n\n🔥 **FILA PRESENCIAL INTELIGENTE GRÁTIS!**\n\n📺 Organize a fila de atendimento e exiba as chamadas dos pacientes na TV da sala de espera. Com download imediato e sem custo de licença!\n\n💥 **E TEM MAIS: 50% DE DESCONTO NA IMPLANTAÇÃO DA VETBOTS I.A.!**\n\nAutomatize sua rotina com:\n✅ Agendamentos inteligentes\n✅ Dashboard para gerenciar conversas\n✅ Triagem de plantão\n✅ Fluxos de atendimento automatizados\n✅ Lembretes de consultas\n\n🚀 **Mais organização, menos trabalho manual e mais tempo para cuidar dos pacientes!**\n\n🎯 **QUER APROVEITAR A BLACK NOVEMBER VETBOTS?**\n\n1️⃣ Conheça e acompanhe **@vetbots** para ficar por dentro das novidades.\n\n2️⃣ Comente **EU QUERO** aqui embaixo.\n\n3️⃣ Receba no direct o link para baixar a Fila Presencial Inteligente e os detalhes da condição especial!\n\n⚠️ Aproveite a Black November VetBots e transforme o atendimento da sua clínica!\n\n#VetBots #BlackNovember #GestãoVeterinária #ClínicaVeterinária #HospitalVeterinário AutomaçãoVeterinária InteligênciaArtificial",
+    "tags": [
+      "#VetBots",
+      "#BlackNovember",
+      "#GestãoVeterinária",
+      "#ClínicaVeterinária",
+      "#HospitalVeterinário"
+    ],
+    "pr": [
+      {
+        "t": "Mídia Meta Oficial",
+        "ar": "9:16",
+        "x": "Publicação real sincronizada via Meta Graph API em 2026-10-28T00:33:36+0000. Link: https://www.instagram.com/reel/DfBJeopvkIl/"
+      }
+    ],
+    "date": "2026-10-28",
+    "day": 2,
+    "time": "21:33",
+    "ai": "Meta Graph API v22.0",
+    "media": [
+      {
+        "id": "med_vb_18139639960727817_0",
+        "type": "video",
+        "url": "https://instagram.fbfh3-2.fna.fbcdn.net/o1/v/t2/f2/m86/AQPxLjBZJF9xUc-biv9dKmUDSmzvMl5W0XeszYSvqBGAYP79DBl2MD5zZO7reiNvHmXJ-CtQy1tYJDkwQ4ueR8XYS1priVDYnfgdzY8.mp4?_nc_cat=105&_nc_oc=AdrfKsBJ09i_kZBXmX4VW3f3zVPOtFixG6r-tZnTO1oioLHG__GfoE5kFpWnnjQYiok&_nc_sid=5e9851&_nc_ht=instagram.fbfh3-2.fna.fbcdn.net&_nc_ohc=V73v64p8JDkQ7kNvwGoO504&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uQ0xJUFMuQzMuNDgwLmRhc2hfYmFzZWxpbmVfMV92MSIsInhwdl9hc3NldF9pZCI6MjM3ODA3MDk3MjczMTI3MywiYXNzZXRfYWdlX2RheXMiOjQsInZpX3VzZWNhc2VfaWQiOjEyMzc0LCJkdXJhdGlvbl9zIjoyOCwidXJsZ2VuX3NvdXJjZSI6Ind3dyJ9&ccb=17-1&vs=b1c56e918ec94211&_nc_vs=HBksFQIYUmlnX3hwdl9yZWVsc19wZXJtYW5lbnRfc3JfcHJvZC9DOURBMEU4QjdFQjE0MTc3QjlEQUI2NzNENjc5ODgxNF92aWRlb19kYXNoaW5pdC5tcDQVAALIARIAFQIYUWlnX3hwdl9wbGFjZW1lbnRfcGVybWFuZW50X3YyLzFFOEU5OTJCQUY1NTQ4NkI4NDA0ODZERjM0NkVBQzU0X2F1ZGlvX2Rhc2hpbml0Lm1wNBUCAsgBEgAoABgAGwKIB3VzZV9vaWwBMRJwcm9ncmVzc2l2ZV9yZWNpcGUBMRUAACaSvqS5-bW5CBUCKAJDMywXQDyzMzMzMzMYEmRhc2hfYmFzZWxpbmVfMV92MREAdf4HZazBAQA&_nc_gid=XIlMMh4V9_z65tQvhBekIw&edm=AFF3FJ0EAAAA&_nc_map=urlgen_bucketless&_nc_zt=28&_nc_eui2=AeGPiewkzpPfPU7GutHnKbr-hBcB_5KTkQKEFwH_kpORAk60x3o9tRrzfgBh9O-S9Ws&oh=00_AQTLSGXtTwQ348TYQGy_0fz3TPC93hDre04jKECvuzJopg&oe=6AE98556",
+        "thumbnailUrl": "https://scontent.cdninstagram.com/v/t51.71878-15/868258470_1745604416510530_8291536557123403606_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=105&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&_nc_eui2=AeERp9kz2BugW1YnlJkg7gjrXjnjVn29XvReOeNWfb1e9LbrdmVRdjabfXzuCCcEoHo&_nc_ohc=0VYlmK8ksJYQ7kNvwGyIOL5&_nc_oc=AdrFxVlx0SEAqSnvVA4MnlQKDpWB39XE3rL9ovMChL1wumOiyRfKm--x9wuTWx_QV8E&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&edm=AFF3FJ0EAAAA&_nc_gid=XIlMMh4V9_z65tQvhBekIw&_nc_tpa=Q5bMBQLAdtoKth6Gi2lK_n_EKoggSw4bEfoMQCtGvdNdqr3YG19DQECGTOVTnFjNs6noM3xGJZF86wpbzA&oh=00_AQR92Drh7O8_odtai52sPc-ZeF3Z7j4ggVwDYMti4E0fsQ&oe=6AED6CAA",
+        "name": "reels.mp4",
+        "aspectRatio": "9:16"
+      }
+    ]
+  },
+  {
+    "id": "live_vb_18112666163334599",
+    "permalink": "https://www.instagram.com/reel/DekyKTjCp_f/",
+    "a": "a_vetbots",
+    "t": "REELS",
+    "s": "PUBLISHED",
+    "topic": "📱 *O WhatsApp pode ser o vilão silencioso da sua clínica ve",
+    "cap": "📱 *O WhatsApp pode ser o vilão silencioso da sua clínica veterinária.*\n\nSão mensagens que se acumulam, tutores esperando respostas, agendamentos que passam despercebidos e uma equipe sobrecarregada tentando dar conta de tudo. E, enquanto a recepção tenta acompanhar o ritmo, oportunidades podem estar sendo perdidas. \n\n🐾 *A VetBots chegou para mudar esse cenário!*\n\nNossos robôs de atendimento com inteligência artificial ajudam sua clínica a responder com agilidade, organizar agendamentos e manter o atendimento ativo 24 horas por dia, inclusive quando sua equipe não está disponível.\n\n💙 Mais organização, menos sobrecarga e uma recepção que trabalha em parceria com a tecnologia, sem substituir o cuidado humano.\n\n*Não deixe o WhatsApp controlar a rotina da sua clínica. Deixe a VetBots ajudar!*\n\n#VetBots #ClínicaVeterinária #GestãoVeterinária #InteligênciaArtificial #AtendimentoVeterinário #MarketingVeterinário #AutomaçãoDeAtendimento #MedicinaVeterinária",
+    "tags": [
+      "#VetBots",
+      "#ClínicaVeterinária",
+      "#GestãoVeterinária",
+      "#InteligênciaArtificial",
+      "#AtendimentoVeterinário",
+      "#MarketingVeterinário",
+      "#AutomaçãoDeAtendimento",
+      "#MedicinaVeterinária"
+    ],
+    "pr": [
+      {
+        "t": "Mídia Meta Oficial",
+        "ar": "9:16",
+        "x": "Publicação real sincronizada via Meta Graph API em 2026-10-17T00:07:58+0000. Link: https://www.instagram.com/reel/DekyKTjCp_f/"
+      }
+    ],
+    "date": "2026-10-17",
+    "day": 5,
+    "time": "21:07",
+    "ai": "Meta Graph API v22.0",
+    "media": [
+      {
+        "id": "med_vb_18112666163334599_0",
+        "type": "video",
+        "url": "https://instagram.fbfh3-2.fna.fbcdn.net/o1/v/t2/f2/m86/AQNds3Z_-jDnxyMtr4sRiNGscP9d6DlSlXT3qAEOGppU1pKWG80x3tRr7emwow4saLKWxL0S77BGVxflAk6bcyBfRA-pyiPWVLLVzsM.mp4?_nc_cat=109&_nc_oc=AdodyJB9eG2R8iPAv7fxrDgx6Rvhtg130rzF6kTRTBNGXFktb1sAB00in0Qvp8nSYpw&_nc_sid=5e9851&_nc_ht=instagram.fbfh3-2.fna.fbcdn.net&_nc_ohc=wbGe3cQSZTIQ7kNvwErWI6X&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uQ0xJUFMuQzMuNzIwLmRhc2hfYmFzZWxpbmVfMV92MSIsInhwdl9hc3NldF9pZCI6MTc5OTYwODA5MDUwNDQyMDUsImFzc2V0X2FnZV9kYXlzIjoxNSwidmlfdXNlY2FzZV9pZCI6MTAwOTksImR1cmF0aW9uX3MiOjIwLCJ1cmxnZW5fc291cmNlIjoid3d3In0%3D&ccb=17-1&vs=62a6c00da824f76&_nc_vs=HBksFQIYUmlnX3hwdl9yZWVsc19wZXJtYW5lbnRfc3JfcHJvZC8wQjFFRUZCRDI3QTQ0NjUzOTMyNjBEOEYyMjhFMzI0QV92aWRlb19kYXNoaW5pdC5tcDQVAALIARIAFQIYUWlnX3hwdl9wbGFjZW1lbnRfcGVybWFuZW50X3YyL0EwNkMyMDY1MTUwQTRFNDg5QkY5MEY5MEZEQUJDNzM5X2F1ZGlvX2Rhc2hpbml0Lm1wNBUCAsgBEgAoABgAGwKIB3VzZV9vaWwBMRJwcm9ncmVzc2l2ZV9yZWNpcGUBMRUAACbag46b49X3PxUCKAJDMywXQDQAAAAAAAAYEmRhc2hfYmFzZWxpbmVfMV92MREAdf4HZeadAQA&_nc_gid=XIlMMh4V9_z65tQvhBekIw&edm=AFF3FJ0EAAAA&_nc_map=urlgen_bucketless&_nc_zt=28&_nc_eui2=AeEPCjmG7lT87hz_xQwh8i6f23mF1b9obUnbeYXVv2htSX_u7gYNbZy05M_DOYrlQNA&oh=00_AQQEBVKcCvhQlDkVtoxRknqx9N8sSlZWO8oUpREZUyZOsg&oe=6AE9A68E",
+        "thumbnailUrl": "https://scontent.cdninstagram.com/v/t51.82787-15/851059248_17996081043044205_2738791060068636878_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=109&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&_nc_eui2=AeGlXIqS2sv8L75SGhkEDeDBezPhSezFCBZ7M-FJ7MUIFncgjcCzI_mLtUqZ8ps0Jrc&_nc_ohc=017T008TiJ4Q7kNvwGh-00H&_nc_oc=AdoD3YqJdggMQS3LafJ2KroLmaBb69iz87pj0ohp0JpsTUlo3qSqwvyqmWeyaeIp75g&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&edm=AFF3FJ0EAAAA&_nc_gid=XIlMMh4V9_z65tQvhBekIw&_nc_tpa=Q5bMBQJEp__T257EuExdfXI1q0bKvYAOr-H8-zgYAqHiz6UcvYuZftmDRYjmdhujbx4_Voa-9U5_crPCqA&oh=00_AQS0irmK-M6gV2a2cl0dwIJeJDP_kRUKH-tBBjBQLzobyw&oe=6AED81CD",
+        "name": "reels.mp4",
+        "aspectRatio": "9:16"
+      }
+    ]
+  },
+  {
+    "id": "live_vb_18394068235161426",
+    "permalink": "https://www.instagram.com/reel/DeWnA-LlfHc/",
+    "a": "a_vetbots",
+    "t": "REELS",
+    "s": "PUBLISHED",
+    "topic": "🐾 IA OU HUMANO? QUANDO PASSAR A CONVERSA PARA A EQUIPE",
+    "cap": "🐾 IA OU HUMANO? QUANDO PASSAR A CONVERSA PARA A EQUIPE\nAutomatizar o atendimento não significa deixar o robô responder tudo. \n\nTem conversa que precisa de gente, e saber quando passar a vez é o que separa uma automação que ajuda de uma que atrapalha.\n\n✅ Quando chamar uma pessoa:\n🚨 Urgência ou suspeita de emergência: pet em risco pede gente na conversa\n🙋 O tutor pediu para falar com alguém: respeite o pedido\n📋 O pedido foge das regras da clínica: na exceção, quem decide é a equipe\n🩺 A dúvida é clínica: sintoma, diagnóstico ou medicação não são papel da IA\n🔁 A conversa travou e não avança\n\nO segredo é combinar essas regras antes, com a equipe, e passar o contexto junto. Assim ninguém precisa perguntar tudo de novo.\n\nA IA cuida do repetitivo. \nSua equipe cuida do que importa. 💚\n\n🐾 Quer ver na prática? Fala com a gente!\n\n📲 (41) 9 9823-4643\n🌐 vetbots.com.br\n#VetBots #AtendimentoVeterinário #IAparaVeterinários #ClínicaVeterinária #HospitalVeterinário #AgendamentoAutomático #VetTech #Automação #NegócioPet",
+    "tags": [
+      "#VetBots",
+      "#AtendimentoVeterinário",
+      "#IAparaVeterinários",
+      "#ClínicaVeterinária",
+      "#HospitalVeterinário",
+      "#AgendamentoAutomático",
+      "#VetTech",
+      "#Automação"
+    ],
+    "pr": [
+      {
+        "t": "Mídia Meta Oficial",
+        "ar": "9:16",
+        "x": "Publicação real sincronizada via Meta Graph API em 2026-10-11T12:01:12+0000. Link: https://www.instagram.com/reel/DeWnA-LlfHc/"
+      }
+    ],
+    "date": "2026-10-11",
+    "day": 6,
+    "time": "09:01",
+    "ai": "Meta Graph API v22.0",
+    "media": [
+      {
+        "id": "med_vb_18394068235161426_0",
+        "type": "video",
+        "url": "https://instagram.fbfh3-2.fna.fbcdn.net/o1/v/t2/f2/m86/AQOb8PkF3h3AShk5bLSuk_tYd4q0Tkxy4inUXc4oaE2rze-3vEVD11e_XviRtuOU_iNAxLkXQsIkUEo3eyp1v9bcKPZJo7Xoe6OyRXc.mp4?_nc_cat=106&_nc_oc=Ado_vDLxeClq5sc3oSQJ4LtUhqJirc3rOMH2BFuropU-zfUkPskVXhCPxaSznUY7_Uw&_nc_sid=5e9851&_nc_ht=instagram.fbfh3-2.fna.fbcdn.net&_nc_ohc=GrYQ1UU8p1AQ7kNvwG0AC9G&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uQ0xJUFMuQzMuNzIwLmRhc2hfYmFzZWxpbmVfMV92MSIsInhwdl9hc3NldF9pZCI6MTc5OTUyMzY1ODIwNDQyMDUsImFzc2V0X2FnZV9kYXlzIjoyMSwidmlfdXNlY2FzZV9pZCI6MTIzNzQsImR1cmF0aW9uX3MiOjM0LCJ1cmxnZW5fc291cmNlIjoid3d3In0%3D&ccb=17-1&vs=17ffc96d90fc7c2f&_nc_vs=HBksFQIYUmlnX3hwdl9yZWVsc19wZXJtYW5lbnRfc3JfcHJvZC82MTkxMDQxMkFDNzE0Q0RCQUQxOTI0MEZENEVENUE1Ql92aWRlb19kYXNoaW5pdC5tcDQVAALIARIAFQIYUWlnX3hwdl9wbGFjZW1lbnRfcGVybWFuZW50X3YyLzE1MjI5NEE4NEFBQjQzNDdBM0IxNDFBMUUwRDFBRkFFX2F1ZGlvX2Rhc2hpbml0Lm1wNBUCAsgBEgAoABgAGwKIB3VzZV9vaWwBMRJwcm9ncmVzc2l2ZV9yZWNpcGUBMRUAACbayPnB0KT3PxUCKAJDMywXQEEAAAAAAAAYEmRhc2hfYmFzZWxpbmVfMV92MREAdf4HZazBAQA&_nc_gid=XIlMMh4V9_z65tQvhBekIw&edm=AFF3FJ0EAAAA&_nc_map=urlgen_bucketless&_nc_zt=28&_nc_eui2=AeFMe-vzOhOFgP4Ey4KHIM14ooJencq_2buigl6dyr_Zu4iBRS58AI8dgAvCtmqpmTA&oh=00_AQTXB8ChFBS4fJTBCBtxpJFc_54Ao9E3jGNz62blO8f7ZQ&oe=6AE9970B",
+        "thumbnailUrl": "https://scontent.cdninstagram.com/v/t51.82787-15/844252657_17995236747044205_9131563947772237151_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=109&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&_nc_eui2=AeG9FrJWgWWi8Y5M1cr_n4_E-NpdUqgdhRP42l1SqB2FE5IxgxcvNZs7jYJ5-ciqNK4&_nc_ohc=y87O76sU8gAQ7kNvwGtBhhk&_nc_oc=AdqkA07ayRcEt9v7voKQKWOzsUUlEj4hQy4FOe10x4m8tBjnQdcuUtHtlTEYE2hpKOg&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&edm=AFF3FJ0EAAAA&_nc_gid=XIlMMh4V9_z65tQvhBekIw&_nc_tpa=Q5bMBQJyNARRDGbxdtAUj8Oat1lKX4n8APIiuuEl7w_jOKq3_F9YNttxwp0zjZPU3rZIVoOk7hVtKPkrMA&oh=00_AQTGbPGvcqFfvuSPcB9dN9PIglmzkW2nRy1bnV36DXHSYQ&oe=6AED6B3C",
+        "name": "reels.mp4",
+        "aspectRatio": "9:16"
+      }
+    ]
+  },
+  {
+    "id": "live_vb_17930808405162814",
+    "permalink": "https://www.instagram.com/p/DeWm_s_gWC7/",
+    "a": "a_vetbots",
+    "t": "CAROUSEL",
+    "s": "PUBLISHED",
+    "topic": "🐾 IA OU HUMANO? QUANDO PASSAR A CONVERSA PARA A EQUIPE",
+    "cap": "🐾 IA OU HUMANO? QUANDO PASSAR A CONVERSA PARA A EQUIPE\nAutomatizar o atendimento não significa deixar o robô responder tudo. \n\nTem conversa que precisa de gente, e saber quando passar a vez é o que separa uma automação que ajuda de uma que atrapalha.\n\n✅ Quando chamar uma pessoa:\n\n🚨 Urgência ou suspeita de emergência: pet em risco pede gente na conversa\n🙋 O tutor pediu para falar com alguém: respeite o pedido\n📋 O pedido foge das regras da clínica: na exceção, quem decide é a equipe\n🩺 A dúvida é clínica: sintoma, diagnóstico ou medicação não são papel da IA\n🔁 A conversa travou e não avança\n\nO segredo é combinar essas regras antes, com a equipe, e passar o contexto junto. Assim ninguém precisa perguntar tudo de novo.\n\nA IA cuida do repetitivo. Sua equipe cuida do que importa. 💚\n\n🐾 Quer ver na prática? Fala com a gente!\n📲 (41) 9 9823-4643\n🌐 vetbots.com.br\n\n#VetBots #AtendimentoVeterinário #IAparaVeterinários #ClínicaVeterinária #HospitalVeterinário #AgendamentoAutomático #VetTech #Automação #NegócioPet",
+    "tags": [
+      "#VetBots",
+      "#AtendimentoVeterinário",
+      "#IAparaVeterinários",
+      "#ClínicaVeterinária",
+      "#HospitalVeterinário",
+      "#AgendamentoAutomático",
+      "#VetTech",
+      "#Automação"
+    ],
+    "pr": [
+      {
+        "t": "Mídia Meta Oficial",
+        "ar": "4:5",
+        "x": "Publicação real sincronizada via Meta Graph API em 2026-10-11T12:00:33+0000. Link: https://www.instagram.com/p/DeWm_s_gWC7/"
+      }
+    ],
+    "date": "2026-10-11",
+    "day": 6,
+    "time": "09:00",
+    "ai": "Meta Graph API v22.0",
+    "media": [
+      {
+        "id": "med_vb_17930808405162814_0",
+        "type": "image",
+        "url": "https://scontent.cdninstagram.com/v/t39.30808-6/841833812_122284141922035012_4449266050227064000_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=110&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_eui2=AeEN1jtKX4w10Dq9E_GDd8MDzNab9bk9OsPM1pv1uT06w4f8GCePtj2c6YBBVonnBCI&_nc_ohc=kExeFuBBN8oQ7kNvwFmttV-&_nc_oc=AdrjAW0gBJtEzNUsqPki4Z2H7YJVzJ6OaHHa0yy3fyxeReoCR8aBsRR8biVh0IARlNU&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&edm=AFF3FJ0EAAAA&_nc_gid=XIlMMh4V9_z65tQvhBekIw&oh=00_AQSbkcnXvMPk0hOEwh3-71ezzyi0OnB1lnULx_DQl7b_Yw&oe=6AED6FC9",
+        "name": "slide_1.jpg",
+        "aspectRatio": "4:5"
+      },
+      {
+        "id": "med_vb_17930808405162814_1",
+        "type": "image",
+        "url": "https://scontent.cdninstagram.com/v/t39.30808-6/841412594_122284142042035012_8075284812420922890_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=104&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_eui2=AeFvMwFKqGlkQykgcOcjxtC5JscqJ4_ma2gmxyonj-ZraDy7Ru-t5WxKUgeyX7zPShI&_nc_ohc=thaEy2ZniGkQ7kNvwElHfqP&_nc_oc=AdoWI6_iNe3HDXBfAU7UDKsoSN7sbMq-MwawXJQwHBFENslBpr2_VJsAaFvjltqHTLU&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&edm=AFF3FJ0EAAAA&_nc_gid=XIlMMh4V9_z65tQvhBekIw&oh=00_AQQxFoNzkEjkCpEekQkNVFxSixgFjVnpb5eiHF7aTdtsFQ&oe=6AED98B6",
+        "name": "slide_2.jpg",
+        "aspectRatio": "4:5"
+      },
+      {
+        "id": "med_vb_17930808405162814_2",
+        "type": "image",
+        "url": "https://scontent.cdninstagram.com/v/t39.30808-6/841438801_122284141898035012_6844597168940501436_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=107&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_eui2=AeFGiSi0MNElrBUY9Kf5Zalf-tpTudu9eof62lO52716h2WJnBFMj1L3J2_VysUxfLY&_nc_ohc=MV9THzbq_oQQ7kNvwH37Kg8&_nc_oc=AdrDJqoZk56xAt1b9aoG3loclgmtdOC1LqG9JeA8U8N7uJVjeDM_zH4pq2e7pWdbmT8&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&edm=AFF3FJ0EAAAA&_nc_gid=XIlMMh4V9_z65tQvhBekIw&oh=00_AQQ39I6-HTPx0YmWV6iwJSKEZ0RYqPDrkva5y8ITG0LEIA&oe=6AED9119",
+        "name": "slide_3.jpg",
+        "aspectRatio": "4:5"
+      },
+      {
+        "id": "med_vb_17930808405162814_3",
+        "type": "image",
+        "url": "https://scontent.cdninstagram.com/v/t39.30808-6/841412584_122284141988035012_1969987311237677441_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=107&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_eui2=AeHN_GJ47oNF2ykKraICI56LXFu7APi5bixcW7sA-LluLItj8-ga8YYdtxs-ArS8cQo&_nc_ohc=0QaXtSCFrzsQ7kNvwGUL0Vj&_nc_oc=AdrD9lNa0egvX4rGDXEixKRc637tAD_MY20TyerQHBjrYoNVc28E2t_kRBDsZRzcnxM&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&edm=AFF3FJ0EAAAA&_nc_gid=XIlMMh4V9_z65tQvhBekIw&oh=00_AQRY1Eok6uwt9v0wslxZg3CnrtXe8B-YOvgkSLB-3Wdt2Q&oe=6AED7E7C",
+        "name": "slide_4.jpg",
+        "aspectRatio": "4:5"
+      },
+      {
+        "id": "med_vb_17930808405162814_4",
+        "type": "image",
+        "url": "https://scontent.cdninstagram.com/v/t39.30808-6/843495682_122284141970035012_1828021484241570874_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=100&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_eui2=AeGegJxD21ZCVRocz41Mz_i29BDXqx2Vmsn0ENerHZWayZkdTdCVT8oKa11SGMZGsAs&_nc_ohc=YAUTos93GQAQ7kNvwGvt-MC&_nc_oc=AdoGrdKKAmvrG69lBpSl5WWXVSTu9-Jwz9nTafeBwNX41g1HMXbv2Vvmpwqln-hMci0&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&edm=AFF3FJ0EAAAA&_nc_gid=XIlMMh4V9_z65tQvhBekIw&oh=00_AQSmwu70K_hPUVeEKYS9yFnyxcN9p0wMEjp7flHiFmYg9Q&oe=6AED96AC",
+        "name": "slide_5.jpg",
+        "aspectRatio": "4:5"
+      },
+      {
+        "id": "med_vb_17930808405162814_5",
+        "type": "image",
+        "url": "https://scontent.cdninstagram.com/v/t39.30808-6/840334094_122284141880035012_2872431788888192882_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=101&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_eui2=AeFLJOgFoCVMhi21A-YNF5ngJ5nDjD30vWgnmcOMPfS9aJPivt1txz7NN9Bh6WQ-3_Y&_nc_ohc=0jNPh34IDocQ7kNvwHI8eLB&_nc_oc=Adq2EY1ApJJD3nNos1uOTaVnZ8ROnLYVAZTuKkqkSKjbQzxYuJYG4458uGoXqteHd0A&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&edm=AFF3FJ0EAAAA&_nc_gid=XIlMMh4V9_z65tQvhBekIw&oh=00_AQS2Rb1YreiRP-K_Nqf32_3dcszeB-GimzoSOaaiCm3Txg&oe=6AED6E08",
+        "name": "slide_6.jpg",
+        "aspectRatio": "4:5"
+      }
+    ]
+  },
+  {
+    "id": "live_vb_17891609334614388",
+    "permalink": "https://www.instagram.com/p/DeNb0Q9DfFg/",
+    "a": "a_vetbots",
+    "t": "CAROUSEL",
+    "s": "PUBLISHED",
+    "topic": "🐾 AGENDA AQUI, TRIAGEM ALI E A RECEPÇÃO NO MEIO?",
+    "cap": "🐾 AGENDA AQUI, TRIAGEM ALI E A RECEPÇÃO NO MEIO?\n\nQuando cada setor tem o seu caderno, a informação se perde no fluxo da clínica ou hospital veterinário. E quem paga a conta é a equipe, que fica desorganizada e o tutor fica esperando.\n\n💬 O que muda quando os processos se conversam:\n\n🗓️ Agenda: o horário livre aparece na hora, sem \"vou ver com a recepção\"\n💬 WhatsApp: o atendimento digital não disputa contexto com o presencial\n🧑‍⚕️ Recepção: menos recado repetido, mais tempo para cuidar de quem está na clínica\n\nA tecnologia entra para tirar trabalho repetitivo, e o cuidado humano continua no centro. 🐶\n\nQuer conectar a operação da sua clínica, hospital ou laboratório?\n📲 (41) 9 9823-4643\n🌐 vetbots.com.br\n\n#VetBots #AtendimentoVeterinário #ClínicaVeterinária #GestãoVeterinária #AgendamentoAutomático #VetTech #Automação #NegócioPet",
+    "tags": [
+      "#VetBots",
+      "#AtendimentoVeterinário",
+      "#ClínicaVeterinária",
+      "#GestãoVeterinária",
+      "#AgendamentoAutomático",
+      "#VetTech",
+      "#Automação",
+      "#NegócioPet"
+    ],
+    "pr": [
+      {
+        "t": "Mídia Meta Oficial",
+        "ar": "4:5",
+        "x": "Publicação real sincronizada via Meta Graph API em 2026-10-07T22:29:43+0000. Link: https://www.instagram.com/p/DeNb0Q9DfFg/"
+      }
+    ],
+    "date": "2026-10-07",
+    "day": 2,
+    "time": "19:29",
+    "ai": "Meta Graph API v22.0",
+    "media": [
+      {
+        "id": "med_vb_17891609334614388_0",
+        "type": "image",
+        "url": "https://scontent.cdninstagram.com/v/t39.30808-6/837801006_122283775712035012_5088188068701225851_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=107&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_eui2=AeHFz2mlSgGwWoibQBD8pxgDmMN5zbCft9CYw3nNsJ-30AhiO86LC9mpPrlTOuBzL_k&_nc_ohc=H0CXa5H8AVYQ7kNvwF47z1-&_nc_oc=Adrw7XeRV0WmKMPtjVh-Q2g2YcmXsu8NtQsACl12PWqEb3hAN-mTAE-skJH9E8EBZvc&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&edm=AFF3FJ0EAAAA&_nc_gid=XIlMMh4V9_z65tQvhBekIw&oh=00_AQQNdai55zBq9VUco3USx_yI2rG90r_K96PVJ-0cVo7S4w&oe=6AED82BC",
+        "name": "slide_1.jpg",
+        "aspectRatio": "4:5"
+      },
+      {
+        "id": "med_vb_17891609334614388_1",
+        "type": "image",
+        "url": "https://scontent.cdninstagram.com/v/t39.30808-6/840191607_122283775718035012_8831178607169983684_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=100&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_eui2=AeFu4-zicv7naVlWgShpuiUjvyr_VknY7x2_Kv9WSdjvHXGmQvpi00ZmQcqEJm9-74s&_nc_ohc=hawk1EHy2ZoQ7kNvwGO9uzF&_nc_oc=AdrghatatEaNzauR8gnt-QiECMz5ZX2O2daySRWZkCx9nksjmoilVLRfM3b6xJCJWgU&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&edm=AFF3FJ0EAAAA&_nc_gid=XIlMMh4V9_z65tQvhBekIw&oh=00_AQT8i-Sjekf6jsTuEFZ-fVoR28BUtPfJfI-p1bJa_Wc8Qg&oe=6AED9DBC",
+        "name": "slide_2.jpg",
+        "aspectRatio": "4:5"
+      },
+      {
+        "id": "med_vb_17891609334614388_2",
+        "type": "image",
+        "url": "https://scontent.cdninstagram.com/v/t39.30808-6/839181199_122283775736035012_8573270867706793394_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=103&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_eui2=AeGMDbPtvxm-qwITbPo1fASBlsPIhFM_-2OWw8iEUz_7Y_rIrTUjhC-8J0GLPczyrwM&_nc_ohc=CIcpLh29OywQ7kNvwERqKgb&_nc_oc=AdrOHgOx5GdvXEA2JWSiX9BhN2fnzHbGeL_x-QUxa2p4GX1d215UURaGVTMaIe0Az7s&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&edm=AFF3FJ0EAAAA&_nc_gid=XIlMMh4V9_z65tQvhBekIw&oh=00_AQSfHZu4Zt0vOGz2fwsYm4DfYMCFh2xOvhEHOXVTFiFBfA&oe=6AED7C53",
+        "name": "slide_3.jpg",
+        "aspectRatio": "4:5"
+      },
+      {
+        "id": "med_vb_17891609334614388_3",
+        "type": "image",
+        "url": "https://scontent.cdninstagram.com/v/t39.30808-6/836381173_122283775742035012_8909511320619296213_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=100&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_eui2=AeFubGtCTmwUSD3ootRVTq1cZom1bR91URBmibVtH3VREMP8GuwbBSD9kDs50mHHsc0&_nc_ohc=hAEB3ZuHBf0Q7kNvwEZZpN5&_nc_oc=AdqDGo-geaUzfkQAxt9vbqbm_8ju9dxWGZxfXcDqYQLe7qBc72Ivz-EX5s1eStizk9A&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&edm=AFF3FJ0EAAAA&_nc_gid=XIlMMh4V9_z65tQvhBekIw&oh=00_AQQhsaCDSW-SZG6PnKlVGLmS_kl27QflQtbl37dT5M1prQ&oe=6AED86F4",
+        "name": "slide_4.jpg",
+        "aspectRatio": "4:5"
+      }
+    ]
+  },
+  {
+    "id": "live_vb_18117357376953527",
+    "permalink": "https://www.instagram.com/p/Dd6PUhpDkMC/",
+    "a": "a_vetbots",
+    "t": "CAROUSEL",
+    "s": "PUBLISHED",
+    "topic": "WHATSAPP LOTADO? O GARGALO NEM SEMPRE É O WHATSAPP",
+    "cap": "WHATSAPP LOTADO? O GARGALO NEM SEMPRE É O WHATSAPP\nRecepção cheia, tutor no balcão, telefone tocando… e as mensagens se acumulando no WhatsApp. Quem gerencia clínica, hospital ou laboratório veterinário conhece essa cena. 😅\n\nO problema raramente é falta de vontade da equipe. É a mesma pessoa tentando estar em dois lugares ao mesmo tempo.\n\n🔎 Antes de pensar em ferramenta, vale olhar a fila de perto:\n\n🔁 **Perguntas repetidas**: horário, endereço, preparo… sempre as mesmas dúvidas\n📅 **Agenda separada da conversa**: para marcar, alguém precisa sair do chat e abrir outro sistema\n⚖️ **Tudo na mesma fila**: urgência e dúvida simples esperando lado a lado\nMapear isso mostra o que pode ir para o automático e o que precisa continuar com uma pessoa. Na VetBots, a gente trabalha com WhatsApp, agenda, fila presencial e as regras de cada clínica desde 2023, sempre com o mesmo objetivo: tirar o trabalho repetitivo da frente e deixar a equipe livre para cuidar. 🐾\n\nQuer descobrir onde o atendimento da sua clínica trava?\n🐾 Fala com a gente!\n📲 (41) 9 9823-4643\n🌐 vetbots.com.br\n#VetBots #AtendimentoVeterinário #ClínicaVeterinária #HospitalVeterinário #LaboratórioVeterinário #GestãoVeterinária #IAparaVeterinários #VetTech #Automação",
+    "tags": [
+      "#VetBots",
+      "#AtendimentoVeterinário",
+      "#ClínicaVeterinária",
+      "#HospitalVeterinário",
+      "#LaboratórioVeterinário",
+      "#GestãoVeterinária",
+      "#IAparaVeterinários",
+      "#VetTech"
+    ],
+    "pr": [
+      {
+        "t": "Mídia Meta Oficial",
+        "ar": "4:5",
+        "x": "Publicação real sincronizada via Meta Graph API em 2026-09-30T11:34:57+0000. Link: https://www.instagram.com/p/Dd6PUhpDkMC/"
+      }
+    ],
+    "date": "2026-09-30",
+    "day": 2,
+    "time": "08:34",
+    "ai": "Meta Graph API v22.0",
+    "media": [
+      {
+        "id": "med_vb_18117357376953527_0",
+        "type": "image",
+        "url": "https://scontent.cdninstagram.com/v/t39.30808-6/828925724_122282531600035012_2166286406236430500_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=106&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_eui2=AeHd5y5Eb1VIGn_Crjt1xLwkCCynglZcUMUILKeCVlxQxaYnDC7-cot6JslS9XZwKmc&_nc_ohc=UcEG7ws_bA8Q7kNvwFklDcH&_nc_oc=Adq2s3A_BaB4bJSWfLRV_fLyIOrwONQ5MACc4IhbhxNNqK4uEIDFecYb3knS-Mt50Q0&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&edm=AFF3FJ0EAAAA&_nc_gid=XIlMMh4V9_z65tQvhBekIw&oh=00_AQQsR5UorkZzWAiObVMkR13DNs1LebP3s0ry6BTxUotslg&oe=6AED8EC2",
+        "name": "slide_1.jpg",
+        "aspectRatio": "4:5"
+      },
+      {
+        "id": "med_vb_18117357376953527_1",
+        "type": "image",
+        "url": "https://scontent.cdninstagram.com/v/t39.30808-6/825293037_122282531594035012_8519721532251990530_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=106&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_eui2=AeGIs42yCHICqAOdfbowfgjiwziJDgmn2SXDOIkOCafZJUtXmI2Aeg7ZvZFs8rWaUts&_nc_ohc=XOWG1qX0_yUQ7kNvwFlQSpQ&_nc_oc=AdoSkU5ymFnCLQF1s6auOXRcg-ar3AYL7Hd6gBRyzwHdnu3egX6ueXY4zdQmggPVLjM&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&edm=AFF3FJ0EAAAA&_nc_gid=XIlMMh4V9_z65tQvhBekIw&oh=00_AQRFrxeXg9prh1N8PmiZ5EQ9ZetC0L3XUFlailHu7rDqOg&oe=6AED7A97",
+        "name": "slide_2.jpg",
+        "aspectRatio": "4:5"
+      },
+      {
+        "id": "med_vb_18117357376953527_2",
+        "type": "image",
+        "url": "https://scontent.cdninstagram.com/v/t39.30808-6/829115769_122282531552035012_2366008320585041981_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=103&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_eui2=AeEHm4pM6A-eaDWDq_1V6uzCDu0VGc8dGokO7RUZzx0aif7m8WLCO3qkuS8VG4HUWJg&_nc_ohc=sc_MD5jgvqoQ7kNvwFEuZNX&_nc_oc=Ado3psZ8KOSS68EO7YBkw-Oz9bR8j42meWytyRp68uJPIhoxjIRRg2fCqT7UVjfaELA&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&edm=AFF3FJ0EAAAA&_nc_gid=XIlMMh4V9_z65tQvhBekIw&oh=00_AQTS4MnVNO82pBgl4L83RPRMZEHq-_RB5aPUlwHtyZeTBQ&oe=6AED883D",
+        "name": "slide_3.jpg",
+        "aspectRatio": "4:5"
+      }
+    ]
+  },
+  {
+    "id": "live_vb_18145852771599676",
+    "permalink": "https://www.instagram.com/reel/DdjyUlKki1v/",
+    "a": "a_vetbots",
+    "t": "REELS",
+    "s": "PUBLISHED",
+    "topic": "Cadê aquela conversa importante? 👀",
+    "cap": "Cadê aquela conversa importante? 👀\n\nCom dezenas de atendimentos chegando pelo WhatsApp, encontrar rapidamente uma urgência, um agendamento pendente ou um tutor aguardando retorno pode virar um desafio.\n\nCom as tags automáticas da VetBots, cada conversa é identificada e organizada no dashboard pela própria IA.\n\n✅ Urgências em destaque\n✅ Agendamentos organizados\n✅ Retornos sinalizados\n✅ Atendimentos humanos identificados\n✅ Tags personalizadas para a rotina da sua clínica\n\nSua equipe encontra o que precisa com mais rapidez, sem depender de memória ou busca manual.\n\nQual tipo de conversa mais se perde hoje no WhatsApp da sua clínica? Conte nos comentários. 👇\n\nQuer conhecer na prática? Aponte a câmera para o QR Code da última imagem ou fale com a VetBots pelo WhatsApp: (41) 99823-4643.\n\n#VetBots #GestãoVeterinária #ClínicaVeterinária #InteligênciaArtificial #AtendimentoVeterinário #WhatsAppParaEmpresas",
+    "tags": [
+      "#VetBots",
+      "#GestãoVeterinária",
+      "#ClínicaVeterinária",
+      "#InteligênciaArtificial",
+      "#AtendimentoVeterinário",
+      "#WhatsAppParaEmpresas"
+    ],
+    "pr": [
+      {
+        "t": "Mídia Meta Oficial",
+        "ar": "9:16",
+        "x": "Publicação real sincronizada via Meta Graph API em 2026-09-21T18:18:45+0000. Link: https://www.instagram.com/reel/DdjyUlKki1v/"
+      }
+    ],
+    "date": "2026-09-21",
+    "day": 0,
+    "time": "15:18",
+    "ai": "Meta Graph API v22.0",
+    "media": [
+      {
+        "id": "med_vb_18145852771599676_0",
+        "type": "video",
+        "url": "https://instagram.fbfh3-3.fna.fbcdn.net/o1/v/t2/f2/m86/AQNRElJnmRKI245FoSHd0KWYQEJhX1IpGEqt0xzYEooAwl494iNwqEtaoNxeFguLgnvroZlyMgkDa1b05LZtShPwSeB7inmn9M-hrsE.mp4?_nc_cat=107&_nc_oc=AdqMbn8JK7RsBWwyxtlGCRlgTYrCZ15ltL_3uJWng1BcfYyGhAPVSn4rLJDToeR0_Jo&_nc_sid=5e9851&_nc_ht=instagram.fbfh3-3.fna.fbcdn.net&_nc_ohc=ugFvGKBgiNUQ7kNvwGAXkmL&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uQ0xJUFMuQzMuNzIwLmRhc2hfYmFzZWxpbmVfMV92MSIsInhwdl9hc3NldF9pZCI6MTc5OTIzNzg4MjQwNDQyMDUsImFzc2V0X2FnZV9kYXlzIjo0MSwidmlfdXNlY2FzZV9pZCI6MTAwOTksImR1cmF0aW9uX3MiOjQxLCJ1cmxnZW5fc291cmNlIjoid3d3In0%3D&ccb=17-1&vs=b53f4c6ab143b3a7&_nc_vs=HBksFQIYUmlnX3hwdl9yZWVsc19wZXJtYW5lbnRfc3JfcHJvZC80RDQyRENDNjI5OTRGQTg3MEUxNjg4NEYwQkNGQTY4NV92aWRlb19kYXNoaW5pdC5tcDQVAALIARIAFQIYUWlnX3hwdl9wbGFjZW1lbnRfcGVybWFuZW50X3YyLzAyNDBGMzMzNjJDMkU3NjQ1MTY0RDA5QjA5MjRFQTlGX2F1ZGlvX2Rhc2hpbml0Lm1wNBUCAsgBEgAoABgAGwKIB3VzZV9vaWwBMRJwcm9ncmVzc2l2ZV9yZWNpcGUBMRUAACbausXHpP71PxUCKAJDMywXQETAAAAAAAAYEmRhc2hfYmFzZWxpbmVfMV92MREAdf4HZeadAQA&_nc_gid=XIlMMh4V9_z65tQvhBekIw&edm=AFF3FJ0EAAAA&_nc_map=urlgen_bucketless&_nc_zt=28&_nc_eui2=AeFLtuoNSesHBZ_p2qXC6lrrD-DBGBWLlgUP4MEYFYuWBUg5hylelJAW7xNcE77aGw8&oh=00_AQQdop4zwU6rAJDQDmmJGsJjIvjVQw42HLlhgc0AziX0Bw&oe=6AE9A21C",
+        "thumbnailUrl": "https://scontent.cdninstagram.com/v/t51.82787-15/818443128_17992379043044205_6517989653514927328_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=105&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&_nc_eui2=AeF8YKIfYz6eOSvFHWQWrmBSiwo_tt6nPIiLCj-23qc8iCvuYedLY3urBpTk4-NDAE0&_nc_ohc=9zwDdMoA5VAQ7kNvwFnkCpm&_nc_oc=AdpXHSWulAOtW9nJbcPx3GQxtuTr6TUHAFdK5sAPhjgZ3YdZlJ9hN23BE2-NiGEt1hI&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&edm=AFF3FJ0EAAAA&_nc_gid=XIlMMh4V9_z65tQvhBekIw&_nc_tpa=Q5bMBQLHzYVEr6JC3XArnNT15Hdp1dw3DcaK2VvdCmJJr9mSoUzhgr_P054GWjX0P2UT9WegnFGAn3bg4Q&oh=00_AQSxNW_57tVWIB8HTQjEHcqyAHr4mGaXZmLAw8AoPc2x2Q&oe=6AED7A69",
+        "name": "reels.mp4",
+        "aspectRatio": "9:16"
+      }
+    ]
+  },
+  {
+    "id": "live_vb_18092817713157200",
+    "permalink": "https://www.instagram.com/p/Ddjx4ifDGvZ/",
+    "a": "a_vetbots",
+    "t": "CAROUSEL",
+    "s": "PUBLISHED",
+    "topic": "Cadê aquela conversa importante? 👀",
+    "cap": "Cadê aquela conversa importante? 👀\n\nCom dezenas de atendimentos chegando pelo WhatsApp, encontrar rapidamente uma urgência, um agendamento pendente ou um tutor aguardando retorno pode virar um desafio.\n\nCom as tags automáticas da VetBots, cada conversa é identificada e organizada no dashboard pela própria IA.\n\n✅ Urgências em destaque\n✅ Agendamentos organizados\n✅ Retornos sinalizados\n✅ Atendimentos humanos identificados\n✅ Tags personalizadas para a rotina da sua clínica\n\nSua equipe encontra o que precisa com mais rapidez, sem depender de memória ou busca manual.\n\nQual tipo de conversa mais se perde hoje no WhatsApp da sua clínica? Conte nos comentários. 👇\n\nQuer conhecer na prática? Aponte a câmera para o QR Code da última imagem ou fale com a VetBots pelo WhatsApp: (41) 99823-4643.\n\n#VetBots #GestãoVeterinária #ClínicaVeterinária #InteligênciaArtificial #AtendimentoVeterinário #WhatsAppParaEmpresas",
+    "tags": [
+      "#VetBots",
+      "#GestãoVeterinária",
+      "#ClínicaVeterinária",
+      "#InteligênciaArtificial",
+      "#AtendimentoVeterinário",
+      "#WhatsAppParaEmpresas"
+    ],
+    "pr": [
+      {
+        "t": "Mídia Meta Oficial",
+        "ar": "4:5",
+        "x": "Publicação real sincronizada via Meta Graph API em 2026-09-21T18:14:26+0000. Link: https://www.instagram.com/p/Ddjx4ifDGvZ/"
+      }
+    ],
+    "date": "2026-09-21",
+    "day": 0,
+    "time": "15:14",
+    "ai": "Meta Graph API v22.0",
+    "media": [
+      {
+        "id": "med_vb_18092817713157200_0",
+        "type": "image",
+        "url": "https://scontent.cdninstagram.com/v/t39.30808-6/818365620_122281080422035012_4519640536499128237_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=110&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_eui2=AeGNdCk5mcbVUa29m4sPXzdmJW3IpbDDNyglbcilsMM3KGmJm3Dp0X-2NT2C1Wa7IPM&_nc_ohc=XlIf9iBVVOIQ7kNvwHy6rGL&_nc_oc=AdoNcsu21-LyYyyNQhdSCL_TklUBpKI-X-bQ6jyAfCTNWl1L0043H_U2Fqc75kJKUAc&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&edm=AFF3FJ0EAAAA&_nc_gid=XIlMMh4V9_z65tQvhBekIw&oh=00_AQTuSFmQMd5pi6G68PsnEk0KeXpfH8FeAtM1QVANvo-krg&oe=6AED8142",
+        "name": "slide_1.jpg",
+        "aspectRatio": "4:5"
+      },
+      {
+        "id": "med_vb_18092817713157200_1",
+        "type": "image",
+        "url": "https://scontent.cdninstagram.com/v/t39.30808-6/818561997_122281080434035012_7670911228214439824_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=111&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_eui2=AeHfsAmAZxIYV9MAhb1dRfUqVsX2iyIGyEtWxfaLIgbISzolKyoGn8nyfAzicQMlUgw&_nc_ohc=BArvHLzf4i4Q7kNvwFqhQuv&_nc_oc=Adoka0o-WeFhqOits3_gGZBV7kIXlDOagBDxa3xch27TZOu9Io7jj0As6I1pX4sfynU&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&edm=AFF3FJ0EAAAA&_nc_gid=XIlMMh4V9_z65tQvhBekIw&oh=00_AQSDY7f-EZNdZM3bkFfqBDaa6hpA1nQUG29RvH_u1J5J2A&oe=6AED865F",
+        "name": "slide_2.jpg",
+        "aspectRatio": "4:5"
+      },
+      {
+        "id": "med_vb_18092817713157200_2",
+        "type": "image",
+        "url": "https://scontent.cdninstagram.com/v/t39.30808-6/818865606_122281080428035012_387510916222265166_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=101&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_eui2=AeHrhUaNcsLcEeBk1FBgZv8wl_husIEaEhKX-G6wgRoSErUc6aE04BzYUXolLBPWDTA&_nc_ohc=pv3HjNeV0a0Q7kNvwG23Ne2&_nc_oc=Adrw6HOtUzM9EgJeptPpr6XX3l-2959RwteI5X1ip9NKw3mCmtdh5YWeAgvNFTmz88A&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&edm=AFF3FJ0EAAAA&_nc_gid=XIlMMh4V9_z65tQvhBekIw&oh=00_AQRhWTZBKiUDQQL5UZRIxms-UDVHJidKJL2bLlWJGq6e2w&oe=6AED8BE4",
+        "name": "slide_3.jpg",
+        "aspectRatio": "4:5"
+      },
+      {
+        "id": "med_vb_18092817713157200_3",
+        "type": "image",
+        "url": "https://scontent.cdninstagram.com/v/t39.30808-6/818530617_122281080470035012_5465880141772236269_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=102&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_eui2=AeFn9hdKA3Aj8NiX7KqlRBp_6zLopwYbzB7rMuinBhvMHovMnLZiPKuUYWD4gTNbh5k&_nc_ohc=SH8NqATsuAAQ7kNvwFWg1A6&_nc_oc=AdqSgX-LOtMJw7EJKC76gg0pgmn6AMMZDd2ZH_w335ghnuRBUTUICMvtDQKRorcuWkE&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&edm=AFF3FJ0EAAAA&_nc_gid=XIlMMh4V9_z65tQvhBekIw&oh=00_AQS_xizpQoyqLskPzoEOIbshJpbE669kwnFrRen0qeKOMw&oe=6AED8B9A",
+        "name": "slide_4.jpg",
+        "aspectRatio": "4:5"
+      }
+    ]
+  },
+  {
+    "id": "live_vb_18149864902558189",
+    "permalink": "https://www.instagram.com/reel/DdEnl8zjD4s/",
+    "a": "a_vetbots",
+    "t": "REELS",
+    "s": "PUBLISHED",
+    "topic": "Hoje celebramos todos os veterinários e veterinárias que ded",
+    "cap": "Hoje celebramos todos os veterinários e veterinárias que dedicam conhecimento, cuidado e amor à saúde animal. 💚🐾\n\nE, na VetBots, deixamos uma homenagem especial à nossa veterinária, Laura Vitola, que nos ajuda a criar soluções conectadas à realidade de quem vive a rotina veterinária todos os dias.\n\nFeliz Dia do Veterinário! 💚\n\n#DiaDoVeterinário #VetBots #MedicinaVeterinária #Veterinária #SaúdeAnimal",
+    "tags": [
+      "#DiaDoVeterinário",
+      "#VetBots",
+      "#MedicinaVeterinária",
+      "#Veterinária",
+      "#SaúdeAnimal"
+    ],
+    "pr": [
+      {
+        "t": "Mídia Meta Oficial",
+        "ar": "9:16",
+        "x": "Publicação real sincronizada via Meta Graph API em 2026-09-09T15:48:25+0000. Link: https://www.instagram.com/reel/DdEnl8zjD4s/"
+      }
+    ],
+    "date": "2026-09-09",
+    "day": 2,
+    "time": "12:48",
+    "ai": "Meta Graph API v22.0",
+    "media": [
+      {
+        "id": "med_vb_18149864902558189_0",
+        "type": "video",
+        "url": "https://instagram.fbfh3-2.fna.fbcdn.net/o1/v/t2/f2/m86/AQN0EuDNvxYK7LMUr5Dhe_JEfOzJxKwWNlxLDZqFKC0GPxj8u0T0kfcy2KyI4CLmd48cb4tbaikmrr9YkzfdvSL1YQQk5qPF1fK_9eU.mp4?_nc_cat=100&_nc_oc=Adr8DQmBvJ4lsZpU-taWU9UHaYMP2yJAeyfY8mTQx8AHNO1OVziGOQ2ZfdinWpBGCYk&_nc_sid=5e9851&_nc_ht=instagram.fbfh3-2.fna.fbcdn.net&_nc_ohc=UMkt2BvIcj4Q7kNvwEZ713M&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uQ0xJUFMuQzMuNzIwLmRhc2hfYmFzZWxpbmVfMV92MSIsInhwdl9hc3NldF9pZCI6MTc5OTA2MjY5NTAwNDQyMDUsImFzc2V0X2FnZV9kYXlzIjo1MywidmlfdXNlY2FzZV9pZCI6MTAwOTksImR1cmF0aW9uX3MiOjEwLCJ1cmxnZW5fc291cmNlIjoid3d3In0%3D&ccb=17-1&vs=e3bf909431d4de89&_nc_vs=HBksFQIYUmlnX3hwdl9yZWVsc19wZXJtYW5lbnRfc3JfcHJvZC9DODQ5NkQzMjE4QjJGMDIwOTk1MTJDRUY4N0EzMzc5Ml92aWRlb19kYXNoaW5pdC5tcDQVAALIARIAFQIYUWlnX3hwdl9wbGFjZW1lbnRfcGVybWFuZW50X3YyLzgwNDI4Qzg1QTVGRjJCRDIyNTgzQjM2QjA3OTU1NUE2X2F1ZGlvX2Rhc2hpbml0Lm1wNBUCAsgBEgAoABgAGwKIB3VzZV9vaWwBMRJwcm9ncmVzc2l2ZV9yZWNpcGUBMRUAACba6KaKqJj1PxUCKAJDMywXQCXul41P3zsYEmRhc2hfYmFzZWxpbmVfMV92MREAdf4HZeadAQA&_nc_gid=XIlMMh4V9_z65tQvhBekIw&edm=AFF3FJ0EAAAA&_nc_map=urlgen_bucketless&_nc_zt=28&_nc_eui2=AeG6D6dAQHZXKtqbX94kPH3yzteOIE4xYTTO144gTjFhNDyEAQi27e9c3Yskb2Mxn3M&oh=00_AQSAjlE1nt-g9zH4CeX3xvuwi418T8t50M0cD2njRy_Fxg&oe=6AE9881D",
+        "thumbnailUrl": "https://scontent.cdninstagram.com/v/t51.82787-15/801755263_17990627094044205_3222001833951418346_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=102&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&_nc_eui2=AeEvie6NYQsXTaADrBCIXYjKmBNsPXcW2OyYE2w9dxbY7JHT5xAdlcDkJOYfL7kqaCs&_nc_ohc=QIyy-cvUh2MQ7kNvwEfeTdD&_nc_oc=AdrsOmqNMJtLhBzzzzYjknzh2AtQGlj_ZUcTUK7WDqdpG2ubhu3GODv4UYXJ3QonYCM&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&edm=AFF3FJ0EAAAA&_nc_gid=XIlMMh4V9_z65tQvhBekIw&_nc_tpa=Q5bMBQLKdOhsOMotJjbiSzmKXx4nrl0tVH4uhLgPB-9rWSzcIN-tlwBWWEAktwUJmQL1Kuhn3eT5d3mCuQ&oh=00_AQQwEbF78Y1J3YrTp9FyiHXIZne4j3EHLBET8RyqISdXcQ&oe=6AED6BC9",
+        "name": "reels.mp4",
+        "aspectRatio": "9:16"
+      }
+    ]
+  },
+  {
+    "id": "live_vb_17884745559685108",
+    "permalink": "https://www.instagram.com/p/DdEd3KiDjw-/",
+    "a": "a_vetbots",
+    "t": "IMAGE",
+    "s": "PUBLISHED",
+    "topic": "Hoje celebramos o dia de todos os veterinários e veterinária",
+    "cap": "Hoje celebramos o dia de todos os veterinários e veterinárias que dedicam conhecimento, cuidado e amor à saúde animal. 🐾\n\nE, na VetBots, deixamos uma homenagem especial à nossa veterinária,Laura Vitola @lauravitola, que nos ajuda a criar soluções conectadas à realidade de quem vive a rotina veterinária todos os dias.\n\nFeliz Dia do Veterinário! 💚\n\n#DiaDoVeterinário #VetBots #MedicinaVeterinária #Veterinária #SaúdeAnimal",
+    "tags": [
+      "#DiaDoVeterinário",
+      "#VetBots",
+      "#MedicinaVeterinária",
+      "#Veterinária",
+      "#SaúdeAnimal"
+    ],
+    "pr": [
+      {
+        "t": "Mídia Meta Oficial",
+        "ar": "4:5",
+        "x": "Publicação real sincronizada via Meta Graph API em 2026-09-09T14:23:02+0000. Link: https://www.instagram.com/p/DdEd3KiDjw-/"
+      }
+    ],
+    "date": "2026-09-09",
+    "day": 2,
+    "time": "11:23",
+    "ai": "Meta Graph API v22.0",
+    "media": [
+      {
+        "id": "med_vb_17884745559685108_0",
+        "type": "image",
+        "url": "https://scontent.cdninstagram.com/v/t39.30808-6/801883677_122279680928035012_3107905136691396_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=107&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_eui2=AeH-ZWHS0LLCbO61FJmkh-ShZ4Eo0l5oYWZngSjSXmhhZkfruVhiks-BWzQNjoG0M_g&_nc_ohc=o_aPyNnsP4gQ7kNvwHfC1lr&_nc_oc=AdqtoI8sE1TemuQxQD1kGE7ZWwOr8u2N9wDds__eJjVm42VDoaKTO7CqmKmQJBMAu5E&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&edm=AFF3FJ0EAAAA&_nc_gid=XIlMMh4V9_z65tQvhBekIw&oh=00_AQS2K8Jw9QkIUKV729GGDIPnnGqOoUV0v7fnkoAgK0zDPw&oe=6AED949C",
+        "name": "post.jpg",
+        "aspectRatio": "4:5"
+      }
+    ]
+  },
+  {
+    "id": "live_vb_18124430635792477",
+    "permalink": "https://www.instagram.com/reel/Dcrbh-uEwoV/",
+    "a": "a_vetbots",
+    "t": "REELS",
+    "s": "PUBLISHED",
+    "topic": "“Não precisar responder mensagens depois do expediente? Eu a",
+    "cap": "“Não precisar responder mensagens depois do expediente? Eu acho chique.” ✨\n\nMais chique ainda é não depender de alguém ficar no celular para sua clínica continuar atendendo.\n\nEnquanto sua equipe descansa, a VetBots responde clientes, entende a necessidade, apresenta horários disponíveis e ajuda a transformar mensagens em agendamentos. 🐾📲\n\nPorque veterinário deve usar seu tempo para cuidar dos pacientes — não para correr atrás de conversa acumulada no WhatsApp.\n\nAtendimento com IA, 24 horas por dia, 7 dias por semana.\nSua clínica atendendo bem, mesmo quando você não está olhando o celular.\n\nQuer deixar o atendimento da sua clínica mais chique?\n📞 (41) 99823-4643\n🌐 vetbots.com.br",
+    "tags": [],
+    "pr": [
+      {
+        "t": "Mídia Meta Oficial",
+        "ar": "9:16",
+        "x": "Publicação real sincronizada via Meta Graph API em 2026-08-30T21:02:00+0000. Link: https://www.instagram.com/reel/Dcrbh-uEwoV/"
+      }
+    ],
+    "date": "2026-08-30",
+    "day": 6,
+    "time": "18:02",
+    "ai": "Meta Graph API v22.0",
+    "media": [
+      {
+        "id": "med_vb_18124430635792477_0",
+        "type": "video",
+        "url": "https://instagram.fbfh3-3.fna.fbcdn.net/o1/v/t2/f2/m86/AQPCVxspx_-q_ZtP0aR94nhLfvzPeVes3W1655Lceg16AWZJUbr4JC83qN5r1876TvDDsLkBUDp5eFM8DxBLHIEj7FdddDHaC-armLo.mp4?_nc_cat=110&_nc_oc=Adqvf9eevG6ksdYp8jdWowdMfX6nQDAPXtMc9g55PNE5Os8iyFSdAxKolom1UruDGaE&_nc_sid=5e9851&_nc_ht=instagram.fbfh3-3.fna.fbcdn.net&_nc_ohc=IBavXrBBIU8Q7kNvwFGs4_u&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uQ0xJUFMuQzMuNzIwLmRhc2hfYmFzZWxpbmVfMV92MSIsInhwdl9hc3NldF9pZCI6MTc5ODkyNDUxMDUwNDQyMDUsImFzc2V0X2FnZV9kYXlzIjo2MywidmlfdXNlY2FzZV9pZCI6MTAwOTksImR1cmF0aW9uX3MiOjIyLCJ1cmxnZW5fc291cmNlIjoid3d3In0%3D&ccb=17-1&vs=7ebe0e029315711e&_nc_vs=HBksFQIYUmlnX3hwdl9yZWVsc19wZXJtYW5lbnRfc3JfcHJvZC9BMjRDNEEzMkFFMDBBODk4QjU5MTFEQjBBODJGN0RCRV92aWRlb19kYXNoaW5pdC5tcDQVAALIARIAFQIYUWlnX3hwdl9wbGFjZW1lbnRfcGVybWFuZW50X3YyLzU4NDRCMjVFMzU5NjQ4OTVEQzIwOTlBMDA1Q0E4QzgzX2F1ZGlvX2Rhc2hpbml0Lm1wNBUCAsgBEgAoABgAGwKIB3VzZV9vaWwBMRJwcm9ncmVzc2l2ZV9yZWNpcGUBMRUAACba65vE8Mf0PxUCKAJDMywXQDZVP3ztkWgYEmRhc2hfYmFzZWxpbmVfMV92MREAdf4HZeadAQA&_nc_gid=XIlMMh4V9_z65tQvhBekIw&edm=AFF3FJ0EAAAA&_nc_map=urlgen_bucketless&_nc_zt=28&_nc_eui2=AeEDcGJnpbBAXmz2GqZOrOccEP2X5PQxuqsQ_Zfk9DG6q4yNf7NcdxiKGE6PHtKZC5A&oh=00_AQTQlYIOLoVBbjUR3z-Gt6w9r76Dk16LLK3_Lx5nMFWXfg&oe=6AE98927",
+        "thumbnailUrl": "https://scontent.cdninstagram.com/v/t51.82787-15/788764524_17989245237044205_5037086423555726687_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=100&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&_nc_eui2=AeFl9LdeOYJrO5hqpqh3fHODzJ3b7k77dBjMndvuTvt0GJdw2RPqN8v_7sn9wTab-44&_nc_ohc=Wqgl9k0EKIYQ7kNvwGP0dyc&_nc_oc=AdruRsk226c_2Lk32fOpTx4vZtZY6oC_5s5zmFjy-_xDsTbD4VYL7A7E9GZ6DkKNdy0&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&edm=AFF3FJ0EAAAA&_nc_gid=XIlMMh4V9_z65tQvhBekIw&_nc_tpa=Q5bMBQLk-F38WSP_h-__BBaSU2NEz52QlS1LkKu843QmKuYe55CX4tldBmmZNeP-uMrYNvSRwvBgDxoyQQ&oh=00_AQQhq7wERuheKUXHfpVGPIh33u2fDbXT5JhUZBnvfzCgoA&oe=6AED98CD",
+        "name": "reels.mp4",
+        "aspectRatio": "9:16"
       }
     ]
   }

@@ -26,5 +26,10 @@ export const environment = {
       name: 'Duplo D Design & Desenvolvimento',
       user: 'duplod.oficial',
     },
+    vetbots: {
+      id: '134910416362221',
+      name: 'VetBots',
+      user: 'vetbots',
+    },
   },
 };

@@ -1,7 +1,7 @@
 import { Component, inject, signal, computed, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AccountStateService, WorkspaceView } from '../../services/account-state.service';
+import { AccountStateService, CAPTION_MAX, HASHTAGS_MAX, TOPIC_MAX, WorkspaceView } from '../../services/account-state.service';
 import { AiOrchestratorService } from '../../services/ai-orchestrator.service';
 import { CodemixButtonComponent } from '../codemix-button.component';
 import { AccountSwitcherComponent } from '../account-switcher/account-switcher.component';
@@ -12,7 +12,10 @@ import { AiCopilotChatComponent } from '../ai-copilot-chat/ai-copilot-chat.compo
 import { MetaCampaignsComponent } from '../meta-campaigns/meta-campaigns.component';
 import { IcpStudioComponent } from '../icp-studio/icp-studio.component';
 import { MediaUploaderComponent } from '../media-uploader/media-uploader.component';
-import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
+import { ContactItem, InteractionItem, PostFormat, SkillCommand, TWINS, METRICS, EMPTY_TWIN, EMPTY_METRICS } from '../../data/seed-data';
+import { PagerComponent } from '../../shared/pager.component';
+import { cmpNum, cmpText, createPager, createSorter } from '../../shared/list-tools';
+import { addDays, relativeTimeKey, todayIso } from '../../shared/dates';
 
 @Component({
   selector: 'app-workspace-layout',
@@ -28,6 +31,7 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
     MetaCampaignsComponent,
     IcpStudioComponent,
     MediaUploaderComponent,
+    PagerComponent,
   ],
   template: `
     <div
@@ -185,7 +189,7 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
             <div class="user-ava font-bold">IA</div>
             <div class="user-info">
               <div class="user-name">InstAI Studio</div>
-              <div class="user-role">{{ state.accounts().length }} contas conectadas</div>
+              <div class="user-role">{{ state.accounts().length }} contas cadastradas</div>
             </div>
             <button
               type="button"
@@ -385,6 +389,13 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
                 <button
                   type="button"
                   class="subnav-btn"
+                  [class.active]="state.contentSubTab() === 'list'"
+                  (click)="setContentTab('list')">
+                  <span>Lista</span>
+                </button>
+                <button
+                  type="button"
+                  class="subnav-btn"
                   [class.active]="state.contentSubTab() === 'feed'"
                   (click)="setContentTab('feed')">
                   <span>Feed 3x3</span>
@@ -394,7 +405,7 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
                   class="subnav-btn"
                   [class.active]="state.contentSubTab() === 'calendar'"
                   (click)="setContentTab('calendar')">
-                  <span>Calendário Semanal</span>
+                  <span>Calendário</span>
                 </button>
                 <button
                   type="button"
@@ -406,7 +417,7 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
               </div>
 
               <!-- View do Content Studio (Kanban, Grid, Feed, Calendário) -->
-              @if (state.contentSubTab() === 'kanban' || state.contentSubTab() === 'grid' || state.contentSubTab() === 'feed' || state.contentSubTab() === 'calendar') {
+              @if (state.contentSubTab() !== 'prompts') {
                 <app-content-studio />
               }
 
@@ -444,32 +455,53 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
                       </div>
                     </div>
 
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <input
+                        type="search"
+                        class="flex-1 min-w-[180px] px-2.5 py-1.5 rounded-[6px] bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs text-[var(--c-text)] cm-input-focus"
+                        placeholder="Buscar prompt ou tópico..."
+                        aria-label="Buscar prompts"
+                        [ngModel]="promptQuery()"
+                        (ngModelChange)="promptQuery.set($event)" />
+                      <select
+                        class="px-2.5 py-1.5 rounded-[6px] bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs text-[var(--c-text)] cursor-pointer cm-input-focus"
+                        aria-label="Filtrar por proporção"
+                        [ngModel]="promptRatio()"
+                        (ngModelChange)="promptRatio.set($event)">
+                        <option value="ALL">Todas as proporções</option>
+                        @for (r of promptRatios(); track r) {
+                          <option [value]="r">{{ r }}</option>
+                        }
+                      </select>
+                    </div>
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      @for (p of state.accountPosts(); track p.id) {
-                        @for (pr of p.pr; track pr.t) {
-                          <div class="p-3 rounded-[6px] bg-[var(--c-bg-elev)] border border-[var(--c-border)] flex flex-col justify-between gap-2">
-                            <div>
-                              <div class="flex items-center justify-between mb-1">
-                                <span class="text-xs font-semibold text-[var(--c-text)] truncate">{{ p.topic }}</span>
-                                <span class="chip purple">{{ pr.ar }}</span>
-                              </div>
-                              <div class="text-[11px] text-[var(--c-text-muted)] mb-1">{{ pr.t }}</div>
-                              <div class="font-mono text-[11px] text-[var(--c-text-2)] bg-[var(--c-bg)] p-2.5 rounded-[4px] border border-[var(--c-border)] select-all">
-                                {{ pr.x }}
-                              </div>
+                      @for (it of promptItems(); track it.key) {
+                        <div class="p-3 rounded-[6px] bg-[var(--c-bg-elev)] border border-[var(--c-border)] flex flex-col justify-between gap-2">
+                          <div>
+                            <div class="flex items-center justify-between mb-1">
+                              <span class="text-xs font-semibold text-[var(--c-text)] truncate">{{ it.topic }}</span>
+                              <span class="chip purple">{{ it.ar }}</span>
                             </div>
-                            <div class="flex justify-end">
-                              <button
-                                type="button"
-                                class="text-[11px] font-mono text-[var(--c-link)] hover:underline cursor-pointer"
-                                (click)="state.copyText(pr.x, p.id + pr.t)">
-                                {{ state.copied() === p.id + pr.t ? 'copiado!' : 'copiar prompt' }}
-                              </button>
+                            <div class="text-[11px] text-[var(--c-text-muted)] mb-1">{{ it.title }}</div>
+                            <div class="font-mono text-[11px] text-[var(--c-text-2)] bg-[var(--c-bg)] p-2.5 rounded-[4px] border border-[var(--c-border)] select-all">
+                              {{ it.x }}
                             </div>
                           </div>
-                        }
+                          <div class="flex justify-end">
+                            <button
+                              type="button"
+                              class="text-[11px] font-mono text-[var(--c-link)] hover:underline cursor-pointer"
+                              (click)="state.copyText(it.x, it.key)">
+                              {{ state.copied() === it.key ? 'copiado!' : 'copiar prompt' }}
+                            </button>
+                          </div>
+                        </div>
+                      } @empty {
+                        <p class="md:col-span-2 py-8 text-center text-xs text-[var(--c-text-muted)]">Nenhum prompt encontrado.</p>
                       }
                     </div>
+                    <app-pager [pager]="promptPager" label="prompts" />
                   </div>
                 </div>
               }
@@ -551,8 +583,45 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
                     </div>
                   </div>
 
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <input
+                      type="search"
+                      class="flex-1 min-w-[200px] px-2.5 py-1.5 rounded-[6px] bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs text-[var(--c-text)] cm-input-focus"
+                      placeholder="Buscar por usuário ou texto do comentário..."
+                      aria-label="Buscar comentários"
+                      [ngModel]="commentQuery()"
+                      (ngModelChange)="commentQuery.set($event)" />
+                    <select
+                      class="px-2.5 py-1.5 rounded-[6px] bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs text-[var(--c-text)] cursor-pointer cm-input-focus"
+                      aria-label="Filtrar por status"
+                      [ngModel]="commentStatus()"
+                      (ngModelChange)="commentStatus.set($event)">
+                      <option value="ALL">Todos os status</option>
+                      <option value="UNREAD">Não lidos</option>
+                      <option value="AI_REPLIED">Respondidos com IA</option>
+                      <option value="HUMAN_ESCALATED">Escalados</option>
+                      <option value="ARCHIVED">Arquivados</option>
+                    </select>
+                    <select
+                      class="px-2.5 py-1.5 rounded-[6px] bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs text-[var(--c-text)] cursor-pointer cm-input-focus"
+                      aria-label="Ordenar por"
+                      [ngModel]="commentSorter.key()"
+                      (ngModelChange)="commentSorter.set($event, $event === 'recent' ? 'desc' : 'asc')">
+                      @for (o of commentSorter.options; track o.key) {
+                        <option [value]="o.key">Ordenar: {{ o.label }}</option>
+                      }
+                    </select>
+                    <button
+                      type="button"
+                      class="w-8 h-8 rounded-[6px] bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs cursor-pointer hover:border-[var(--c-acc)]"
+                      [attr.aria-label]="commentSorter.dir() === 'asc' ? 'Ordem crescente. Inverter' : 'Ordem decrescente. Inverter'"
+                      (click)="commentSorter.toggleDir()">
+                      {{ commentSorter.dir() === 'asc' ? '▲' : '▼' }}
+                    </button>
+                  </div>
+
                   <div class="grid grid-cols-1 gap-3">
-                    @for (c of filteredComments(); track c.id) {
+                    @for (c of commentItems(); track c.id) {
                       <div class="card-p flex flex-col gap-2.5">
                         <div class="flex items-center justify-between gap-2">
                           <div class="flex items-center gap-2">
@@ -581,8 +650,11 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
                           }
                         </div>
                       </div>
+                    } @empty {
+                      <p class="py-10 text-center text-xs text-[var(--c-text-muted)]">Nenhum comentário encontrado com os filtros atuais.</p>
                     }
                   </div>
+                  <app-pager [pager]="commentPager" label="comentários" />
                 </div>
               }
 
@@ -618,21 +690,50 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
                     <div class="card-head">
                       <div class="card-title">criar novo gatilho</div>
                     </div>
-                    <input
-                      type="text"
-                      class="w-full px-2.5 py-1.5 rounded-[6px] bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs text-[var(--c-text)] cm-input-focus"
-                      placeholder="Palavra-chave (ex: AGENTE)"
-                      [ngModel]="state.newKw()"
-                      (ngModelChange)="state.newKw.set($event)" />
-                    <input
-                      type="text"
-                      class="w-full px-2.5 py-1.5 rounded-[6px] bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs text-[var(--c-text)] cm-input-focus"
-                      placeholder="Link para enviar por DM"
-                      [ngModel]="state.newLink()"
-                      (ngModelChange)="state.newLink.set($event)" />
-                    <cm-button variant="primary" size="sm" [fullWidth]="true" (clicked)="state.addKeywordRule('todos os posts')">
-                      + ativar regra
-                    </cm-button>
+                    <form class="flex flex-col gap-3" novalidate (submit)="$event.preventDefault(); state.addKeywordRule('todos os posts')">
+                      <div class="flex flex-col gap-1">
+                        <label for="rule-kw" class="text-[11px] font-mono text-[var(--c-text-muted)]">Palavra-chave</label>
+                        <input
+                          id="rule-kw"
+                          name="ruleKw"
+                          type="text"
+                          maxlength="30"
+                          autocomplete="off"
+                          autocapitalize="characters"
+                          class="w-full px-2.5 py-1.5 rounded-[6px] bg-[var(--c-bg-elev)] border text-xs text-[var(--c-text)] cm-input-focus"
+                          [style.border-color]="state.ruleTried() && state.ruleIssues().kw ? 'var(--c-err)' : 'var(--c-border)'"
+                          [attr.aria-invalid]="state.ruleTried() && !!state.ruleIssues().kw"
+                          [attr.aria-describedby]="'rule-kw-err'"
+                          placeholder="ex: AGENTE"
+                          [ngModel]="state.newKw()"
+                          (ngModelChange)="state.newKw.set($event)" />
+                        <p id="rule-kw-err" class="text-[11px] text-[var(--c-err)] min-h-[14px]" role="alert">
+                          {{ state.ruleTried() ? state.ruleIssues().kw : '' }}
+                        </p>
+                      </div>
+                      <div class="flex flex-col gap-1">
+                        <label for="rule-link" class="text-[11px] font-mono text-[var(--c-text-muted)]">Link enviado por DM</label>
+                        <input
+                          id="rule-link"
+                          name="ruleLink"
+                          type="url"
+                          inputmode="url"
+                          autocomplete="off"
+                          class="w-full px-2.5 py-1.5 rounded-[6px] bg-[var(--c-bg-elev)] border text-xs text-[var(--c-text)] cm-input-focus"
+                          [style.border-color]="state.ruleTried() && state.ruleIssues().link ? 'var(--c-err)' : 'var(--c-border)'"
+                          [attr.aria-invalid]="state.ruleTried() && !!state.ruleIssues().link"
+                          [attr.aria-describedby]="'rule-link-err'"
+                          placeholder="https://..."
+                          [ngModel]="state.newLink()"
+                          (ngModelChange)="state.newLink.set($event)" />
+                        <p id="rule-link-err" class="text-[11px] text-[var(--c-err)] min-h-[14px]" role="alert">
+                          {{ state.ruleTried() ? state.ruleIssues().link : '' }}
+                        </p>
+                      </div>
+                      <cm-button variant="primary" size="sm" [fullWidth]="true" (clicked)="state.addKeywordRule('todos os posts')">
+                        + ativar regra
+                      </cm-button>
+                    </form>
                   </div>
                 </div>
               }
@@ -661,20 +762,59 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
                     </div>
                   </div>
 
+                  <div class="flex items-center gap-2 flex-wrap mb-3">
+                    <input
+                      type="search"
+                      class="flex-1 min-w-[200px] px-2.5 py-1.5 rounded-[6px] bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs text-[var(--c-text)] cm-input-focus"
+                      placeholder="Buscar por usuário, e-mail ou tag..."
+                      aria-label="Buscar leads"
+                      [ngModel]="crmQuery()"
+                      (ngModelChange)="crmQuery.set($event)" />
+                    <select
+                      class="px-2.5 py-1.5 rounded-[6px] bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs text-[var(--c-text)] cursor-pointer cm-input-focus"
+                      aria-label="Filtrar por origem"
+                      [ngModel]="crmSource()"
+                      (ngModelChange)="crmSource.set($event)">
+                      <option value="ALL">Todas as origens</option>
+                      @for (src of crmSources(); track src) {
+                        <option [value]="src">{{ src }}</option>
+                      }
+                    </select>
+                    <select
+                      class="px-2.5 py-1.5 rounded-[6px] bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs text-[var(--c-text)] cursor-pointer cm-input-focus"
+                      aria-label="Filtrar por tier"
+                      [ngModel]="crmTier()"
+                      (ngModelChange)="crmTier.set($event)">
+                      <option value="ALL">Todos os tiers</option>
+                      <option value="TIER_1_OURO">Ouro</option>
+                      <option value="TIER_2_PRATA">Prata</option>
+                    </select>
+                    <select
+                      class="px-2.5 py-1.5 rounded-[6px] bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs text-[var(--c-text)] cursor-pointer cm-input-focus"
+                      aria-label="Filtrar por sincronização"
+                      [ngModel]="crmSync()"
+                      (ngModelChange)="crmSync.set($event)">
+                      <option value="ALL">Meta Ads: todos</option>
+                      <option value="SYNCED">Sincronizados</option>
+                      <option value="PENDING">Pendentes</option>
+                    </select>
+                  </div>
+
                   <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse text-xs">
                       <thead>
                         <tr class="border-b border-[var(--c-border)] text-[11px] font-mono uppercase text-[var(--c-text-muted)]">
-                          <th class="py-2.5 px-3">Usuário</th>
-                          <th class="py-2.5 px-3">E-mail</th>
-                          <th class="py-2.5 px-3">Origem</th>
-                          <th class="py-2.5 px-3">ICP Score</th>
-                          <th class="py-2.5 px-3">Meta Ads</th>
-                          <th class="py-2.5 px-3">Última Interação</th>
+                          @for (col of crmColumns; track col.key) {
+                            <th class="py-2.5 px-3" [attr.aria-sort]="crmSorter.ariaSort(col.key)">
+                              <button type="button" class="uppercase cursor-pointer hover:text-[var(--c-text)]" (click)="crmSorter.toggle(col.key)">
+                                {{ col.label }} {{ crmSorter.indicator(col.key) }}
+                              </button>
+                            </th>
+                          }
                         </tr>
                       </thead>
                       <tbody>
-                        @for (ct of accountContacts(); track ct.id) {
+                        @for (ct of crmItems(); track ct.id) {
                           <tr class="border-b border-[var(--c-border)] hover:bg-[var(--c-surface)]">
                             <td class="py-2.5 px-3 font-mono font-semibold text-[var(--c-text)]">&#64;{{ ct.u }}</td>
                             <td class="py-2.5 px-3 font-mono text-[11px] text-[var(--c-text-muted)]">{{ ct.email || '—' }}</td>
@@ -693,10 +833,15 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
                             </td>
                             <td class="py-2.5 px-3 font-mono text-[var(--c-text-muted)]">{{ ct.last }}</td>
                           </tr>
+                        } @empty {
+                          <tr>
+                            <td colspan="6" class="py-10 text-center text-[var(--c-text-muted)]">Nenhum lead encontrado com os filtros atuais.</td>
+                          </tr>
                         }
                       </tbody>
                     </table>
                   </div>
+                  <app-pager [pager]="crmPager" label="leads" />
                 </div>
               }
             </div>
@@ -900,8 +1045,44 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
                       <div class="card-sub">integradas com Claude 3.7, Codex GPT-4o e Gemini 2.5 Pro</div>
                     </div>
                   </div>
+                  <div class="flex items-center gap-2 flex-wrap mb-3">
+                    <input
+                      type="search"
+                      class="flex-1 min-w-[200px] px-2.5 py-1.5 rounded-[6px] bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs text-[var(--c-text)] cm-input-focus"
+                      placeholder="Buscar comando ou descrição..."
+                      aria-label="Buscar skills"
+                      [ngModel]="skillQuery()"
+                      (ngModelChange)="skillQuery.set($event)" />
+                    <select
+                      class="px-2.5 py-1.5 rounded-[6px] bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs text-[var(--c-text)] cursor-pointer cm-input-focus"
+                      aria-label="Filtrar por engine"
+                      [ngModel]="skillEngine()"
+                      (ngModelChange)="skillEngine.set($event)">
+                      <option value="ALL">Todas as engines</option>
+                      <option value="claude">Claude</option>
+                      <option value="codex">Codex</option>
+                      <option value="gemini">Gemini</option>
+                      <option value="auto">Auto</option>
+                    </select>
+                    <select
+                      class="px-2.5 py-1.5 rounded-[6px] bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs text-[var(--c-text)] cursor-pointer cm-input-focus"
+                      aria-label="Ordenar por"
+                      [ngModel]="skillSorter.key()"
+                      (ngModelChange)="skillSorter.set($event, 'asc')">
+                      @for (o of skillSorter.options; track o.key) {
+                        <option [value]="o.key">Ordenar: {{ o.label }}</option>
+                      }
+                    </select>
+                    <button
+                      type="button"
+                      class="w-8 h-8 rounded-[6px] bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs cursor-pointer hover:border-[var(--c-acc)]"
+                      [attr.aria-label]="skillSorter.dir() === 'asc' ? 'Ordem crescente. Inverter' : 'Ordem decrescente. Inverter'"
+                      (click)="skillSorter.toggleDir()">
+                      {{ skillSorter.dir() === 'asc' ? '▲' : '▼' }}
+                    </button>
+                  </div>
                   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                    @for (sk of state.allCommands(true); track sk.c) {
+                    @for (sk of skillItems(); track sk.c) {
                       <div class="p-3 rounded-[6px] bg-[var(--c-bg-elev)] border border-[var(--c-border)] flex flex-col justify-between gap-2">
                         <div>
                           <div class="flex items-center justify-between mb-1">
@@ -917,8 +1098,11 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
                           executar »
                         </button>
                       </div>
+                    } @empty {
+                      <p class="md:col-span-2 lg:col-span-3 py-10 text-center text-xs text-[var(--c-text-muted)]">Nenhuma skill encontrada.</p>
                     }
                   </div>
+                  <app-pager [pager]="skillPager" label="skills" />
                 </div>
               }
 
@@ -1033,6 +1217,7 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
                     [style.background]="isAccountSelectedInComposer(acc.id) ? 'rgba(246,188,3,0.18)' : 'var(--c-surface)'"
                     [style.border]="isAccountSelectedInComposer(acc.id) ? '1px solid #f1a10b' : '1px solid var(--c-border)'"
                     [style.color]="isAccountSelectedInComposer(acc.id) ? 'var(--c-acc)' : 'var(--c-text2)'"
+                    [attr.aria-pressed]="isAccountSelectedInComposer(acc.id)"
                     (click)="toggleComposerAccount(acc.id)">
                     <span class="w-1.5 h-1.5 rounded-full bg-[var(--c-acc)]"></span>
                     <span>&#64;{{ acc.user }}</span>
@@ -1054,6 +1239,7 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
                   [style.background]="comp.t === 'CAROUSEL' ? 'rgba(246,188,3,0.16)' : 'var(--c-bg-elev)'"
                   [style.border]="comp.t === 'CAROUSEL' ? '1px solid #f1a10b' : '1px solid var(--c-border)'"
                   [style.color]="comp.t === 'CAROUSEL' ? 'var(--c-acc)' : 'var(--c-text2)'"
+                  [attr.aria-pressed]="comp.t === 'CAROUSEL'"
                   (click)="setComposerFormat('CAROUSEL')">
                   <span class="text-base">🗂</span>
                   <span class="font-semibold text-[11.5px]">Carrossel</span>
@@ -1065,6 +1251,7 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
                   [style.background]="comp.t === 'REELS' ? 'rgba(246,188,3,0.16)' : 'var(--c-bg-elev)'"
                   [style.border]="comp.t === 'REELS' ? '1px solid #f1a10b' : '1px solid var(--c-border)'"
                   [style.color]="comp.t === 'REELS' ? 'var(--c-acc)' : 'var(--c-text2)'"
+                  [attr.aria-pressed]="comp.t === 'REELS'"
                   (click)="setComposerFormat('REELS')">
                   <span class="text-base">🎬</span>
                   <span class="font-semibold text-[11.5px]">Reels</span>
@@ -1076,6 +1263,7 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
                   [style.background]="comp.t === 'IMAGE' ? 'rgba(246,188,3,0.16)' : 'var(--c-bg-elev)'"
                   [style.border]="comp.t === 'IMAGE' ? '1px solid #f1a10b' : '1px solid var(--c-border)'"
                   [style.color]="comp.t === 'IMAGE' ? 'var(--c-acc)' : 'var(--c-text2)'"
+                  [attr.aria-pressed]="comp.t === 'IMAGE'"
                   (click)="setComposerFormat('IMAGE')">
                   <span class="text-base">📸</span>
                   <span class="font-semibold text-[11.5px]">Imagem Feed</span>
@@ -1087,6 +1275,7 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
                   [style.background]="comp.t === 'STORIES' ? 'rgba(246,188,3,0.16)' : 'var(--c-bg-elev)'"
                   [style.border]="comp.t === 'STORIES' ? '1px solid #f1a10b' : '1px solid var(--c-border)'"
                   [style.color]="comp.t === 'STORIES' ? 'var(--c-acc)' : 'var(--c-text2)'"
+                  [attr.aria-pressed]="comp.t === 'STORIES'"
                   (click)="setComposerFormat('STORIES')">
                   <span class="text-base">⚡</span>
                   <span class="font-semibold text-[11.5px]">Stories</span>
@@ -1095,44 +1284,84 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
               </div>
             </div>
 
-            <!-- Horário com atalhos rápidos -->
-            <div>
-              <div class="flex items-center justify-between mb-1">
-                <label class="text-[11px] font-mono text-[var(--c-text-muted)]">Horário de Disparo</label>
-                <span class="text-[10px] font-mono text-[var(--c-dim)]">UTC-3 (Brasília)</span>
-              </div>
-              <div class="flex items-center gap-2">
-                <input
-                  type="text"
-                  class="w-28 px-3 py-1.5 rounded-lg bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs text-[var(--c-text)] font-mono cm-input-focus"
-                  placeholder="18:00"
-                  [ngModel]="comp.time"
-                  (ngModelChange)="state.patchComposer({ time: $event })" />
-                <div class="flex items-center gap-1.5 flex-wrap">
+            @let issues = state.composerIssues(true);
+            @let showErr = !!comp.tried;
+
+            <!-- Data e horário reais -->
+            <fieldset class="flex flex-col gap-1.5">
+              <legend class="text-[11px] font-mono text-[var(--c-text-muted)] mb-1">Data e horário de disparo <span class="text-[var(--c-dim)]">· Brasília (UTC-3)</span></legend>
+              <div class="flex items-start gap-2 flex-wrap">
+                <div class="flex flex-col gap-1">
+                  <label for="cmp-date" class="text-[10px] font-mono text-[var(--c-dim)]">Data</label>
+                  <input
+                    id="cmp-date"
+                    type="date"
+                    required
+                    [attr.min]="todayIso"
+                    class="px-3 py-1.5 rounded-lg bg-[var(--c-bg-elev)] border text-xs text-[var(--c-text)] font-mono cm-input-focus"
+                    [style.border-color]="showErr && issues.date ? 'var(--c-err)' : 'var(--c-border)'"
+                    [attr.aria-invalid]="showErr && !!issues.date"
+                    [attr.aria-describedby]="'cmp-sched-err'"
+                    [ngModel]="comp.date"
+                    (ngModelChange)="state.patchComposer({ date: $event })" />
+                </div>
+                <div class="flex flex-col gap-1">
+                  <label for="cmp-time" class="text-[10px] font-mono text-[var(--c-dim)]">Hora</label>
+                  <input
+                    id="cmp-time"
+                    type="time"
+                    required
+                    class="px-3 py-1.5 rounded-lg bg-[var(--c-bg-elev)] border text-xs text-[var(--c-text)] font-mono cm-input-focus"
+                    [style.border-color]="showErr && issues.time ? 'var(--c-err)' : 'var(--c-border)'"
+                    [attr.aria-invalid]="showErr && !!issues.time"
+                    [attr.aria-describedby]="'cmp-sched-err'"
+                    [ngModel]="comp.time"
+                    (ngModelChange)="state.patchComposer({ time: $event })" />
+                </div>
+                <div class="flex items-end gap-1.5 flex-wrap self-end pb-0.5">
+                  <button type="button" class="text-[11px] font-mono px-2 py-1 rounded bg-[var(--c-surface)] hover:bg-[var(--c-surface-hover)] text-[var(--c-text2)] cursor-pointer transition-all" (click)="setQuickDate(0)">Hoje</button>
+                  <button type="button" class="text-[11px] font-mono px-2 py-1 rounded bg-[var(--c-surface)] hover:bg-[var(--c-surface-hover)] text-[var(--c-text2)] cursor-pointer transition-all" (click)="setQuickDate(1)">Amanhã</button>
+                  <button type="button" class="text-[11px] font-mono px-2 py-1 rounded bg-[var(--c-surface)] hover:bg-[var(--c-surface-hover)] text-[var(--c-text2)] cursor-pointer transition-all" (click)="setQuickDate(7)">+7 dias</button>
+                  <span class="w-px h-4 bg-[var(--c-border)] mx-0.5" aria-hidden="true"></span>
                   <button type="button" class="text-[11px] font-mono px-2 py-1 rounded bg-[var(--c-surface)] hover:bg-[var(--c-surface-hover)] text-[var(--c-text2)] cursor-pointer transition-all" (click)="setQuickSchedule('12:00')">12:00</button>
                   <button type="button" class="text-[11px] font-mono px-2 py-1 rounded bg-[var(--c-surface)] hover:bg-[var(--c-surface-hover)] text-[var(--c-text2)] cursor-pointer transition-all" (click)="setQuickSchedule('18:00')">18:00</button>
                   <button type="button" class="text-[11px] font-mono px-2 py-1 rounded bg-[var(--c-surface)] hover:bg-[var(--c-surface-hover)] text-[var(--c-text2)] cursor-pointer transition-all" (click)="setQuickSchedule('20:30')">20:30 (Pico)</button>
                 </div>
               </div>
-            </div>
+              <p id="cmp-sched-err" class="text-[11px] text-[var(--c-err)] min-h-[14px]" role="alert">
+                {{ showErr ? (issues.date || issues.time || '') : '' }}
+              </p>
+            </fieldset>
 
             <!-- Tópico com botão IA -->
             <div>
               <div class="flex items-center justify-between mb-1">
-                <label class="text-[11px] font-mono text-[var(--c-text-muted)]">Tópico / Hook Principal</label>
-                <button
-                  type="button"
-                  class="text-[11px] font-mono text-[var(--c-link)] hover:underline flex items-center gap-1 cursor-pointer"
-                  (click)="suggestHook()">
-                  <span>🪄 Sugerir hook com IA</span>
-                </button>
+                <label for="cmp-topic" class="text-[11px] font-mono text-[var(--c-text-muted)]">Tópico / Hook Principal</label>
+                <div class="flex items-center gap-3">
+                  <span class="text-[10px] font-mono" [style.color]="comp.topic.length > topicMax ? 'var(--c-err)' : 'var(--c-dim)'">
+                    {{ comp.topic.length }} / {{ topicMax }}
+                  </span>
+                  <button
+                    type="button"
+                    class="text-[11px] font-mono text-[var(--c-link)] hover:underline flex items-center gap-1 cursor-pointer"
+                    (click)="suggestHook()">
+                    <span>🪄 Sugerir hook com IA</span>
+                  </button>
+                </div>
               </div>
               <input
+                id="cmp-topic"
                 type="text"
-                class="w-full px-3 py-2 rounded-lg bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs text-[var(--c-text)] cm-input-focus font-medium"
+                autocomplete="off"
+                class="w-full px-3 py-2 rounded-lg bg-[var(--c-bg-elev)] border text-xs text-[var(--c-text)] cm-input-focus font-medium"
+                [style.border-color]="issues.topic ? 'var(--c-err)' : 'var(--c-border)'"
+                [attr.aria-invalid]="!!issues.topic"
                 placeholder="Ex: 3 sinais silenciosos de que sua operação precisa de IA"
                 [ngModel]="comp.topic"
                 (ngModelChange)="state.patchComposer({ topic: $event })" />
+              @if (issues.topic) {
+                <p class="text-[11px] text-[var(--c-err)] mt-1" role="alert">{{ issues.topic }}</p>
+              }
             </div>
 
             <!-- Módulo de Upload de Mídias -->
@@ -1154,9 +1383,9 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
             <div>
               <div class="flex items-center justify-between mb-1">
                 <div class="flex items-center gap-2">
-                  <label class="text-[11px] font-mono text-[var(--c-text-muted)]">Legenda & Copywriting</label>
-                  <span class="text-[10px] font-mono text-[var(--c-dim)]">
-                    {{ comp.cap ? comp.cap.length : 0 }} / 2.200 caracteres
+                  <label for="cmp-cap" class="text-[11px] font-mono text-[var(--c-text-muted)]">Legenda & Copywriting</label>
+                  <span class="text-[10px] font-mono" [style.color]="comp.cap.length > captionMax ? 'var(--c-err)' : 'var(--c-dim)'">
+                    {{ comp.cap.length }} / {{ captionMax }} caracteres
                   </span>
                 </div>
                 <button
@@ -1167,11 +1396,38 @@ import { PostFormat, TWINS, METRICS } from '../../data/seed-data';
                 </button>
               </div>
               <textarea
+                id="cmp-cap"
                 rows="3"
-                class="w-full px-3 py-2 rounded-lg bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs text-[var(--c-text)] leading-relaxed cm-input-focus"
+                class="w-full px-3 py-2 rounded-lg bg-[var(--c-bg-elev)] border text-xs text-[var(--c-text)] leading-relaxed cm-input-focus"
+                [style.border-color]="(showErr || comp.cap.length > captionMax) && issues.cap ? 'var(--c-err)' : 'var(--c-border)'"
+                [attr.aria-invalid]="(showErr || comp.cap.length > captionMax) && !!issues.cap"
                 placeholder="Escreva a legenda ou gere com IA respeitando a Brand Voice..."
                 [ngModel]="comp.cap"
                 (ngModelChange)="state.patchComposer({ cap: $event })"></textarea>
+              @if ((showErr || comp.cap.length > captionMax) && issues.cap) {
+                <p class="text-[11px] text-[var(--c-err)] mt-1" role="alert">{{ issues.cap }}</p>
+              }
+            </div>
+
+            <!-- Hashtags -->
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label for="cmp-tags" class="text-[11px] font-mono text-[var(--c-text-muted)]">Hashtags</label>
+                <span class="text-[10px] font-mono text-[var(--c-dim)]">{{ tagCount(comp.tags) }} / {{ hashtagsMax }}</span>
+              </div>
+              <input
+                id="cmp-tags"
+                type="text"
+                autocomplete="off"
+                class="w-full px-3 py-2 rounded-lg bg-[var(--c-bg-elev)] border text-xs text-[var(--c-text)] font-mono cm-input-focus"
+                [style.border-color]="issues.tags ? 'var(--c-err)' : 'var(--c-border)'"
+                [attr.aria-invalid]="!!issues.tags"
+                placeholder="#marca #tema #cidade"
+                [ngModel]="comp.tags"
+                (ngModelChange)="state.patchComposer({ tags: $event })" />
+              @if (issues.tags) {
+                <p class="text-[11px] text-[var(--c-err)] mt-1" role="alert">{{ issues.tags }}</p>
+              }
             </div>
 
             <!-- Rodapé de Ações do Modal -->
@@ -1344,12 +1600,173 @@ export class WorkspaceLayoutComponent {
 
   readonly totalUnread = computed(() => this.state.unreadCommentsCount() + this.state.unreadDmsCount());
 
+  readonly captionMax = CAPTION_MAX;
+  readonly topicMax = TOPIC_MAX;
+  readonly hashtagsMax = HASHTAGS_MAX;
+  readonly todayIso = todayIso();
+
   readonly filteredComments = computed(() => {
     const f = this.state.cFilter();
     const list = this.state.accountInts().filter((i) => i.t === 'COMMENT' && !i.hidden);
     if (f === 'todos') return list;
     return list.filter((c) => c.cat === f);
   });
+
+  // ----- Comentários: busca, status, ordenação e paginação -----
+  readonly commentQuery = signal('');
+  readonly commentStatus = signal('ALL');
+  readonly commentSorter = createSorter<InteractionItem>(
+    [
+      {
+        key: 'recent',
+        label: 'mais recentes',
+        compare: (a, b) => cmpNum(relativeTimeKey(a.time) ?? 0, relativeTimeKey(b.time) ?? 0),
+        isEmpty: (c) => relativeTimeKey(c.time) === null,
+      },
+      { key: 'user', label: 'usuário (A–Z)', compare: (a, b) => cmpText(a.u, b.u) },
+      { key: 'category', label: 'categoria', compare: (a, b) => cmpText(a.cat ?? '', b.cat ?? '') },
+      { key: 'status', label: 'status', compare: (a, b) => cmpText(a.s, b.s) },
+    ],
+    'recent',
+    'desc'
+  );
+  readonly commentsSorted = computed(() => {
+    const q = this.commentQuery().trim().toLowerCase();
+    const st = this.commentStatus();
+    let list = this.filteredComments();
+    if (q) list = list.filter((c) => c.u.toLowerCase().includes(q) || c.c.toLowerCase().includes(q));
+    if (st !== 'ALL') list = list.filter((c) => c.s === st);
+    return this.commentSorter.apply(list);
+  });
+  readonly commentPager = createPager(() => this.commentsSorted().length, {
+    sizes: [5, 10, 20, 50],
+    size: 10,
+    resetOn: () => [
+      this.state.activeAccount().id,
+      this.state.cFilter(),
+      this.commentQuery(),
+      this.commentStatus(),
+      this.commentSorter.key(),
+      this.commentSorter.dir(),
+    ],
+  });
+  readonly commentItems = computed(() => this.commentPager.slice(this.commentsSorted()));
+
+  // ----- CRM de leads -----
+  readonly crmColumns = [
+    { key: 'user', label: 'Usuário' },
+    { key: 'email', label: 'E-mail' },
+    { key: 'source', label: 'Origem' },
+    { key: 'score', label: 'ICP Score' },
+    { key: 'sync', label: 'Meta Ads' },
+    { key: 'last', label: 'Última Interação' },
+  ];
+  readonly crmQuery = signal('');
+  readonly crmSource = signal('ALL');
+  readonly crmTier = signal('ALL');
+  readonly crmSync = signal('ALL');
+  readonly crmSorter = createSorter<ContactItem>(
+    [
+      { key: 'user', label: 'Usuário', compare: (a, b) => cmpText(a.u, b.u) },
+      { key: 'email', label: 'E-mail', compare: (a, b) => cmpText(a.email ?? '', b.email ?? ''), isEmpty: (c) => !c.email },
+      { key: 'source', label: 'Origem', compare: (a, b) => cmpText(a.src, b.src) },
+      { key: 'score', label: 'ICP Score', compare: (a, b) => cmpNum(a.icpScore ?? 0, b.icpScore ?? 0), isEmpty: (c) => c.icpScore === undefined },
+      { key: 'sync', label: 'Meta Ads', compare: (a, b) => cmpNum(a.metaSynced ? 1 : 0, b.metaSynced ? 1 : 0) },
+      {
+        key: 'last',
+        label: 'Última Interação',
+        compare: (a, b) => cmpNum(relativeTimeKey(a.last) ?? 0, relativeTimeKey(b.last) ?? 0),
+        isEmpty: (c) => relativeTimeKey(c.last) === null,
+      },
+    ],
+    'score',
+    'desc'
+  );
+  readonly crmSources = computed(() => [...new Set(this.accountContacts().map((c) => c.src))].sort(cmpText));
+  readonly crmSorted = computed(() => {
+    const q = this.crmQuery().trim().toLowerCase();
+    const src = this.crmSource();
+    const tier = this.crmTier();
+    const sync = this.crmSync();
+    let list = this.accountContacts();
+    if (q) {
+      list = list.filter(
+        (c) =>
+          c.u.toLowerCase().includes(q) ||
+          (c.email ?? '').toLowerCase().includes(q) ||
+          c.tags.some((t) => t.toLowerCase().includes(q))
+      );
+    }
+    if (src !== 'ALL') list = list.filter((c) => c.src === src);
+    if (tier !== 'ALL') list = list.filter((c) => c.icpTier === tier);
+    if (sync !== 'ALL') list = list.filter((c) => (sync === 'SYNCED') === !!c.metaSynced);
+    return this.crmSorter.apply(list);
+  });
+  readonly crmPager = createPager(() => this.crmSorted().length, {
+    sizes: [5, 10, 25, 50],
+    size: 10,
+    resetOn: () => [
+      this.state.activeAccount().id,
+      this.crmQuery(),
+      this.crmSource(),
+      this.crmTier(),
+      this.crmSync(),
+      this.crmSorter.key(),
+      this.crmSorter.dir(),
+    ],
+  });
+  readonly crmItems = computed(() => this.crmPager.slice(this.crmSorted()));
+
+  // ----- Catálogo de skills -----
+  readonly skillQuery = signal('');
+  readonly skillEngine = signal('ALL');
+  readonly skillSorter = createSorter<SkillCommand>(
+    [
+      { key: 'command', label: 'comando (A–Z)', compare: (a, b) => cmpText(a.c, b.c) },
+      { key: 'engine', label: 'engine', compare: (a, b) => cmpText(a.e, b.e) },
+    ],
+    'command',
+    'asc'
+  );
+  readonly skillsSorted = computed(() => {
+    const q = this.skillQuery().trim().toLowerCase();
+    const eng = this.skillEngine();
+    let list = this.state.allCommands(true);
+    if (q) list = list.filter((k) => k.c.toLowerCase().includes(q) || k.d.toLowerCase().includes(q));
+    if (eng !== 'ALL') list = list.filter((k) => k.e === eng);
+    return this.skillSorter.apply(list);
+  });
+  readonly skillPager = createPager(() => this.skillsSorted().length, {
+    sizes: [9, 18, 36],
+    size: 9,
+    resetOn: () => [this.skillQuery(), this.skillEngine(), this.skillSorter.key(), this.skillSorter.dir()],
+  });
+  readonly skillItems = computed(() => this.skillPager.slice(this.skillsSorted()));
+
+  // ----- Prompts de imagem vinculados aos posts -----
+  readonly promptQuery = signal('');
+  readonly promptRatio = signal('ALL');
+  private readonly allPrompts = computed(() =>
+    this.state.accountPosts().flatMap((p) =>
+      p.pr.map((pr, i) => ({ key: `${p.id}:${i}`, topic: p.topic, title: pr.t, ar: pr.ar, x: pr.x }))
+    )
+  );
+  readonly promptRatios = computed(() => [...new Set(this.allPrompts().map((p) => p.ar))].sort(cmpText));
+  private readonly promptsFiltered = computed(() => {
+    const q = this.promptQuery().trim().toLowerCase();
+    const ratio = this.promptRatio();
+    return this.allPrompts().filter(
+      (p) =>
+        (ratio === 'ALL' || p.ar === ratio) &&
+        (!q || p.topic.toLowerCase().includes(q) || p.title.toLowerCase().includes(q) || p.x.toLowerCase().includes(q))
+    );
+  });
+  readonly promptPager = createPager(() => this.promptsFiltered().length, {
+    sizes: [6, 12, 24],
+    size: 6,
+    resetOn: () => [this.state.activeAccount().id, this.promptQuery(), this.promptRatio()],
+  });
+  readonly promptItems = computed(() => this.promptPager.slice(this.promptsFiltered()));
 
   readonly accountRules = computed(() =>
     this.state.rules().filter((r) => r.a === this.state.activeAccount().id)
@@ -1364,11 +1781,11 @@ export class WorkspaceLayoutComponent {
   );
 
   readonly activeTwin = computed(
-    () => TWINS[this.state.activeAccount().id] || TWINS['a_amaral']
+    () => TWINS[this.state.activeAccount().id] || EMPTY_TWIN
   );
 
   readonly activeMetrics = computed(
-    () => METRICS[this.state.activeAccount().id] || METRICS['a_amaral']
+    () => METRICS[this.state.activeAccount().id] || EMPTY_METRICS
   );
 
   readonly currentBreadcrumb = computed(() => {
@@ -1384,9 +1801,11 @@ export class WorkspaceLayoutComponent {
             ? 'prompts de imagem'
             : sub === 'grid'
               ? 'grid de mídia'
-              : sub === 'feed'
-                ? 'feed 3x3'
-                : 'kanban';
+              : sub === 'list'
+                ? 'lista'
+                : sub === 'feed'
+                  ? 'feed 3x3'
+                  : 'kanban';
       return { l: 'estúdio de ', b: 'conteúdo', sub: subName };
     }
     if (v === 'inbox') {
@@ -1424,9 +1843,9 @@ export class WorkspaceLayoutComponent {
     return { l: 'visão ', b: 'geral', sub: `@${acc}` };
   });
 
-  setContentTab(tab: 'kanban' | 'grid' | 'feed' | 'calendar' | 'prompts'): void {
+  setContentTab(tab: 'kanban' | 'grid' | 'list' | 'feed' | 'calendar' | 'prompts'): void {
     this.state.contentSubTab.set(tab);
-    if (tab === 'kanban' || tab === 'grid' || tab === 'feed' || tab === 'calendar') {
+    if (tab !== 'prompts') {
       this.state.contentMode.set(tab);
     }
   }
@@ -1463,6 +1882,14 @@ export class WorkspaceLayoutComponent {
   setQuickSchedule(timeStr: string): void {
     this.state.patchComposer({ time: timeStr });
     this.state.toast(`Horário definido para ${timeStr}`);
+  }
+
+  setQuickDate(offsetDays: number): void {
+    this.state.patchComposer({ date: addDays(todayIso(), offsetDays) });
+  }
+
+  tagCount(raw: string): number {
+    return raw.split(/[\s,]+/).filter(Boolean).length;
   }
 
   suggestHook(): void {
@@ -1529,7 +1956,7 @@ export class WorkspaceLayoutComponent {
 
   updateStyleRef(value: string): void {
     const id = this.state.activeAccount().id;
-    this.state.styleOverrides.update((prev) => ({ ...prev, [id]: value }));
+    this.state.patchAccount(id, { style: value });
   }
 
   setComposerFormat(fmt: PostFormat): void {

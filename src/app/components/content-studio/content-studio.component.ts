@@ -1,13 +1,27 @@
 import { Component, inject, computed, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgClass } from '@angular/common';
-import { AccountStateService } from '../../services/account-state.service';
+import { AccountStateService, CAPTION_MAX } from '../../services/account-state.service';
 import { PostFormat, PostItem, PostStatus } from '../../data/seed-data';
 import { MediaUploaderComponent } from '../media-uploader/media-uploader.component';
+import { ContentCalendarComponent } from './content-calendar.component';
+import { PagerComponent } from '../../shared/pager.component';
+import { cmpNum, cmpText, createPager, createSorter } from '../../shared/list-tools';
+import { isValidIsoDate, isValidTime, postDateKey, postWhen, todayIso } from '../../shared/dates';
+import {
+  FORMAT_ICON,
+  FORMAT_LABEL,
+  STATUS_BG,
+  STATUS_COLOR,
+  STATUS_LABEL,
+  STATUS_OPTIONS,
+  STATUS_ORDER,
+  formatBadgeClass as formatBadge,
+} from '../../shared/post-ui';
 
 @Component({
   selector: 'app-content-studio',
-  imports: [FormsModule, NgClass, MediaUploaderComponent],
+  imports: [FormsModule, NgClass, MediaUploaderComponent, ContentCalendarComponent, PagerComponent],
   template: `
     <div class="flex flex-col gap-4 w-full">
       <!-- ==================== TOOLBAR SUPERIOR DINÂMICA ==================== -->
@@ -44,6 +58,22 @@ import { MediaUploaderComponent } from '../media-uploader/media-uploader.compone
           <button
             type="button"
             class="px-3 py-1.5 rounded-md text-xs font-medium transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
+            [ngClass]="activeMode() === 'list' ? 'bg-[var(--c-panel)] text-[var(--c-acc)] font-bold shadow-sm border border-[rgba(var(--ov),.15)]' : 'text-[var(--c-text-muted)] hover:text-[var(--c-text)]'"
+            (click)="setMode('list')">
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="8" y1="6" x2="21" y2="6"/>
+              <line x1="8" y1="12" x2="21" y2="12"/>
+              <line x1="8" y1="18" x2="21" y2="18"/>
+              <line x1="3" y1="6" x2="3.01" y2="6"/>
+              <line x1="3" y1="12" x2="3.01" y2="12"/>
+              <line x1="3" y1="18" x2="3.01" y2="18"/>
+            </svg>
+            <span>Lista</span>
+          </button>
+
+          <button
+            type="button"
+            class="px-3 py-1.5 rounded-md text-xs font-medium transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
             [ngClass]="activeMode() === 'feed' ? 'bg-[var(--c-panel)] text-[var(--c-acc)] font-bold shadow-sm border border-[rgba(var(--ov),.15)]' : 'text-[var(--c-text-muted)] hover:text-[var(--c-text)]'"
             (click)="setMode('feed')">
             <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -70,13 +100,14 @@ import { MediaUploaderComponent } from '../media-uploader/media-uploader.compone
         </div>
 
         <!-- Controles de Busca e Filtro -->
-        <div class="flex items-center gap-2 flex-wrap md:flex-nowrap">
+        <div class="flex items-center gap-2 flex-wrap md:justify-end md:flex-1 min-w-0">
           <!-- Input de Busca -->
           <div class="relative min-w-[200px] flex-1">
             <input
               type="text"
               class="w-full pl-8 pr-7 py-1.5 rounded-lg bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs text-[var(--c-text)] placeholder-[var(--c-text-muted)] cm-input-focus"
-              placeholder="Buscar por tópico ou copy..."
+              placeholder="Buscar por tópico, copy ou hashtag..."
+              aria-label="Buscar posts"
               [ngModel]="searchQuery()"
               (ngModelChange)="searchQuery.set($event)" />
             <svg class="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--c-dim)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -96,6 +127,7 @@ import { MediaUploaderComponent } from '../media-uploader/media-uploader.compone
           <!-- Filtro por Formato -->
           <select
             class="px-2.5 py-1.5 rounded-lg bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs text-[var(--c-text)] cursor-pointer cm-input-focus"
+            aria-label="Filtrar por formato"
             [ngModel]="formatFilter()"
             (ngModelChange)="formatFilter.set($event)">
             <option value="ALL">Todos os Formatos</option>
@@ -104,6 +136,43 @@ import { MediaUploaderComponent } from '../media-uploader/media-uploader.compone
             <option value="IMAGE">Imagem Feed</option>
             <option value="STORIES">Stories</option>
           </select>
+
+          <!-- Filtro por Status (o Kanban já separa por status) -->
+          @if (activeMode() !== 'kanban') {
+            <select
+              class="px-2.5 py-1.5 rounded-lg bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs text-[var(--c-text)] cursor-pointer cm-input-focus"
+              aria-label="Filtrar por status"
+              [ngModel]="statusFilter()"
+              (ngModelChange)="statusFilter.set($event)">
+              <option value="ALL">Todos os Status</option>
+              @for (s of statusOptions; track s.value) {
+                <option [value]="s.value">{{ s.label }}</option>
+              }
+            </select>
+          }
+
+          <!-- Ordenação (Grid, Lista e Feed) -->
+          @if (activeMode() === 'grid' || activeMode() === 'list' || activeMode() === 'feed') {
+            <div class="flex items-center gap-1 shrink-0">
+              <select
+                class="px-2.5 py-1.5 rounded-lg bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs text-[var(--c-text)] cursor-pointer cm-input-focus"
+                aria-label="Ordenar por"
+                [ngModel]="sorter.key()"
+                (ngModelChange)="onSortChange($event)">
+                @for (o of sorter.options; track o.key) {
+                  <option [value]="o.key">Ordenar: {{ o.label }}</option>
+                }
+              </select>
+              <button
+                type="button"
+                class="w-8 h-8 rounded-lg bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-xs text-[var(--c-text)] cursor-pointer hover:border-[var(--c-acc)]"
+                [attr.aria-label]="sorter.dir() === 'asc' ? 'Ordem crescente. Inverter' : 'Ordem decrescente. Inverter'"
+                [title]="sorter.dir() === 'asc' ? 'Crescente' : 'Decrescente'"
+                (click)="sorter.toggleDir()">
+                {{ sorter.dir() === 'asc' ? '▲' : '▼' }}
+              </button>
+            </div>
+          }
 
           <!-- Ação Rápida: Novo Post -->
           <button
@@ -244,6 +313,27 @@ import { MediaUploaderComponent } from '../media-uploader/media-uploader.compone
                       </p>
                     }
 
+                    <!-- Link direto da publicação na Meta (só existe em posts já publicados) -->
+                    @if (p.permalink) {
+                      <a
+                        [href]="p.permalink"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        (click)="$event.stopPropagation()"
+                        [attr.aria-label]="'Abrir publicação de ' + p.topic + ' em nova aba'"
+                        class="flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-md bg-[rgba(123,191,74,.12)] border border-[rgba(123,191,74,.3)] hover:bg-[rgba(123,191,74,.22)] transition-colors">
+                        <span class="flex items-center gap-1.5 text-[11px] font-semibold text-[var(--c-ok)]">
+                          <span>ver publicação</span>
+                          <svg class="w-3 h-3 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                            <polyline points="15 3 21 3 21 9"/>
+                            <line x1="10" y1="14" x2="21" y2="3"/>
+                          </svg>
+                        </span>
+                        <span class="text-[10px] font-mono text-[var(--c-dim)] truncate">facebook</span>
+                      </a>
+                    }
+
                     <!-- Rodapé do Card com Ações Rápidas -->
                     <div class="flex items-center justify-between pt-2 border-t border-[rgba(var(--ov),.08)] mt-1 text-[11px]">
                       <span class="text-[10px] font-mono text-[var(--c-dim)]">
@@ -301,7 +391,7 @@ import { MediaUploaderComponent } from '../media-uploader/media-uploader.compone
       <!-- ==================== 2. VIEW: GRID DE MÍDIA COMPLETO ==================== -->
       @if (activeMode() === 'grid') {
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 w-full">
-          @for (p of filteredPosts(); track p.id) {
+          @for (p of gridItems(); track p.id) {
             <article
               class="cm-card-interactive group rounded-xl overflow-hidden bg-[var(--c-panel)] border transition-all flex flex-col justify-between cursor-pointer"
               [style.border-color]="state.selId() === p.id ? 'var(--c-acc)' : 'var(--c-border)'"
@@ -378,6 +468,26 @@ import { MediaUploaderComponent } from '../media-uploader/media-uploader.compone
                   }
                 </div>
 
+                @if (p.permalink) {
+                  <a
+                    [href]="p.permalink"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    (click)="$event.stopPropagation()"
+                    [attr.aria-label]="'Abrir publicação de ' + p.topic + ' em nova aba'"
+                    class="flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-md bg-[rgba(123,191,74,.12)] border border-[rgba(123,191,74,.3)] hover:bg-[rgba(123,191,74,.22)] transition-colors">
+                    <span class="flex items-center gap-1.5 text-[11px] font-semibold text-[var(--c-ok)]">
+                      <span>ver publicação</span>
+                      <svg class="w-3 h-3 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                        <polyline points="15 3 21 3 21 9"/>
+                        <line x1="10" y1="14" x2="21" y2="3"/>
+                      </svg>
+                    </span>
+                    <span class="text-[10px] font-mono text-[var(--c-dim)] truncate">facebook</span>
+                  </a>
+                }
+
                 <div class="flex items-center justify-between pt-2 border-t border-[rgba(var(--ov),.08)] text-[10.5px] font-mono text-[var(--c-dim)]">
                   <span>{{ postMeta(p) }}</span>
                   <span>{{ p.pr.length > 0 ? p.pr.length + ' prompts' : 'Copy pronto' }}</span>
@@ -399,6 +509,89 @@ import { MediaUploaderComponent } from '../media-uploader/media-uploader.compone
             </div>
           }
         </div>
+        <app-pager [pager]="gridPager" label="posts" />
+      }
+
+      <!-- ==================== 2.1 VIEW: LISTA (TABELA ORDENÁVEL) ==================== -->
+      @if (activeMode() === 'list') {
+        <div class="rounded-xl bg-[var(--c-panel)] border border-[var(--c-border)] overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr class="border-b border-[var(--c-border)] text-[11px] font-mono uppercase text-[var(--c-text-muted)]">
+                  <th class="py-2.5 px-3 w-14"><span class="sr-only">Mídia</span></th>
+                  <th class="py-2.5 px-3" [attr.aria-sort]="sorter.ariaSort('topic')">
+                    <button type="button" class="uppercase cursor-pointer hover:text-[var(--c-text)]" (click)="sorter.toggle('topic')">Tópico {{ sorter.indicator('topic') }}</button>
+                  </th>
+                  <th class="py-2.5 px-3" [attr.aria-sort]="sorter.ariaSort('format')">
+                    <button type="button" class="uppercase cursor-pointer hover:text-[var(--c-text)]" (click)="sorter.toggle('format')">Formato {{ sorter.indicator('format') }}</button>
+                  </th>
+                  <th class="py-2.5 px-3" [attr.aria-sort]="sorter.ariaSort('status')">
+                    <button type="button" class="uppercase cursor-pointer hover:text-[var(--c-text)]" (click)="sorter.toggle('status')">Status {{ sorter.indicator('status') }}</button>
+                  </th>
+                  <th class="py-2.5 px-3" [attr.aria-sort]="sorter.ariaSort('date')">
+                    <button type="button" class="uppercase cursor-pointer hover:text-[var(--c-text)]" (click)="sorter.toggle('date')">Data {{ sorter.indicator('date') }}</button>
+                  </th>
+                  <th class="py-2.5 px-3 text-right" [attr.aria-sort]="sorter.ariaSort('media')">
+                    <button type="button" class="uppercase cursor-pointer hover:text-[var(--c-text)]" (click)="sorter.toggle('media')">Mídias {{ sorter.indicator('media') }}</button>
+                  </th>
+                  <th class="py-2.5 px-3 text-right"><span class="sr-only">Ações</span></th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (p of listItems(); track p.id) {
+                  <tr
+                    class="border-b border-[var(--c-border)] hover:bg-[var(--c-surface)] cursor-pointer"
+                    [style.background]="state.selId() === p.id ? 'rgba(246,188,3,.08)' : ''"
+                    (click)="openPost(p.id)">
+                    <td class="py-2 px-3">
+                      <div class="w-10 h-10 rounded-md overflow-hidden bg-black/50 flex items-center justify-center text-sm">
+                        @if (p.media && p.media.length > 0) {
+                          <img [src]="p.media[0].thumbnailUrl || p.media[0].url" [alt]="p.topic" class="w-full h-full object-cover" loading="lazy" />
+                        } @else {
+                          <span aria-hidden="true">{{ formatIcon(p.t) }}</span>
+                        }
+                      </div>
+                    </td>
+                    <td class="py-2 px-3 max-w-[340px]">
+                      <div class="font-semibold text-[var(--c-text)] truncate">{{ p.topic }}</div>
+                      @if (p.cap) {
+                        <div class="text-[11px] text-[var(--c-text-muted)] truncate">{{ p.cap }}</div>
+                      }
+                    </td>
+                    <td class="py-2 px-3 whitespace-nowrap">
+                      <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase flex items-center gap-1 w-fit" [ngClass]="formatBadgeClass(p.t)">
+                        <span>{{ formatIcon(p.t) }}</span><span>{{ formatLabel(p.t) }}</span>
+                      </span>
+                    </td>
+                    <td class="py-2 px-3 whitespace-nowrap">
+                      <span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold inline-flex items-center gap-1" [style.background]="statusBg(p.s)" [style.color]="statusColor(p.s)">
+                        <span class="w-1.5 h-1.5 rounded-full" [style.background]="statusColor(p.s)"></span>{{ statusLabel(p.s) }}
+                      </span>
+                    </td>
+                    <td class="py-2 px-3 font-mono text-[11px] text-[var(--c-text-2)] whitespace-nowrap">{{ postMeta(p) }}</td>
+                    <td class="py-2 px-3 font-mono text-right">{{ p.media?.length || 0 }}</td>
+                    <td class="py-2 px-3 text-right whitespace-nowrap">
+                      @if (p.permalink) {
+                        <a [href]="p.permalink" target="_blank" rel="noopener noreferrer" class="text-[var(--c-link)] hover:underline mr-3" [attr.aria-label]="'Abrir publicação de ' + p.topic + ' em nova aba'" (click)="$event.stopPropagation()">ver</a>
+                      }
+                      <button type="button" class="text-[var(--c-dim)] hover:text-[var(--c-text)] cursor-pointer" [attr.aria-label]="'Duplicar ' + p.topic" title="Duplicar post" (click)="$event.stopPropagation(); state.duplicatePost(p.id)">⧉</button>
+                    </td>
+                  </tr>
+                }
+                @if (filteredPosts().length === 0) {
+                  <tr>
+                    <td colspan="7" class="py-12 text-center text-[var(--c-text-muted)]">
+                      Nenhum post encontrado com os filtros atuais.
+                      <button type="button" class="ml-2 text-[var(--c-acc)] hover:underline cursor-pointer" (click)="resetFilters()">Limpar filtros</button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <app-pager [pager]="listPager" label="posts" />
       }
 
       <!-- ==================== 3. VIEW: FEED INSTAGRAM 3X3 ==================== -->
@@ -451,7 +644,7 @@ import { MediaUploaderComponent } from '../media-uploader/media-uploader.compone
 
           <!-- Grid 3x3 do Instagram Realista -->
           <div class="grid grid-cols-3 gap-1.5 sm:gap-2 w-full">
-            @for (p of state.accountPosts(); track p.id) {
+            @for (p of feedItems(); track p.id) {
               <div
                 class="relative aspect-square bg-[var(--c-bg-elev)] overflow-hidden cursor-pointer group rounded-[2px]"
                 (click)="openPost(p.id)">
@@ -488,59 +681,16 @@ import { MediaUploaderComponent } from '../media-uploader/media-uploader.compone
               </div>
             }
           </div>
+          <app-pager [pager]="feedPager" label="posts" />
         </div>
       }
 
-      <!-- ==================== 4. VIEW: CALENDÁRIO SEMANAL ==================== -->
+      <!-- ==================== 4. VIEW: CALENDÁRIO (MÊS / SEMANA) ==================== -->
       @if (activeMode() === 'calendar') {
-        <div class="flex flex-col gap-3">
-          <div class="flex items-center justify-between text-xs text-[var(--c-text-muted)]">
-            <span class="font-medium text-[var(--c-text)]">Semana Atual · 26 out – 01 nov 2026</span>
-            <span>Planejamento de disparo sincronizado</span>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-7 gap-2.5">
-            @for (d of calendarDays(); track d.index) {
-              <div
-                class="rounded-xl p-2.5 flex flex-col gap-2 min-h-[180px] bg-[var(--c-panel)] border transition-all"
-                [style.border-color]="d.index === 4 ? 'var(--c-acc)' : 'var(--c-border)'"
-                [style.box-shadow]="d.index === 4 ? '0 0 12px rgba(246,188,3,.15)' : 'none'">
-                <div
-                  class="font-display font-semibold text-xs tracking-wider uppercase pb-1.5 border-b border-[var(--c-border)] flex items-center justify-between"
-                  [style.color]="d.index === 4 ? 'var(--c-acc)' : 'var(--c-text-muted)'">
-                  <span>{{ d.label }}</span>
-                  <span class="text-[10px] font-mono">{{ d.posts.length }}</span>
-                </div>
-
-                <div class="flex flex-col gap-1.5 flex-1">
-                  @for (p of d.posts; track p.id) {
-                    <button
-                      type="button"
-                      class="flex flex-col gap-1 items-start p-2 rounded-lg cursor-pointer w-full text-left bg-[var(--c-bg-elev)] border hover:border-[var(--c-acc)] transition-all"
-                      [style.border-color]="state.selId() === p.id ? 'var(--c-acc)' : 'var(--c-border)'"
-                      (click)="openPost(p.id)">
-                      <span class="text-[10px] font-mono text-[var(--c-text-muted)] flex items-center gap-1">
-                        <span class="w-1.5 h-1.5 rounded-full" [style.background]="statusColor(p.s)"></span>
-                        <span>{{ p.time || '18:00' }}</span>
-                        <span>·</span>
-                        <span class="font-bold">{{ p.t }}</span>
-                      </span>
-                      <span class="text-xs font-medium text-[var(--c-text)] line-clamp-2 leading-tight">
-                        {{ p.topic }}
-                      </span>
-                    </button>
-                  }
-
-                  @if (d.posts.length === 0) {
-                    <div class="flex-1 flex items-center justify-center text-[11px] text-[var(--c-dim)] border border-dashed border-[rgba(var(--ov),.1)] rounded-md py-4">
-                      livre
-                    </div>
-                  }
-                </div>
-              </div>
-            }
-          </div>
-        </div>
+        <app-content-calendar
+          [posts]="filteredPosts()"
+          (openPost)="openPost($event)"
+          (createOn)="newPostOn($event)" />
       }
     </div>
 
@@ -643,10 +793,18 @@ import { MediaUploaderComponent } from '../media-uploader/media-uploader.compone
         <!-- Conteúdo Interno da Aba -->
         <div class="flex-1 min-h-0 overflow-y-auto p-4 flex flex-col gap-3">
           @if (state.drawerTab() === 'cap') {
-            <label class="text-[11px] font-mono text-[var(--c-text-muted)] block">
-              Texto da Legenda
-            </label>
+            <div class="flex items-center justify-between">
+              <label for="drawer-cap" class="text-[11px] font-mono text-[var(--c-text-muted)] block">
+                Texto da Legenda
+              </label>
+              <span
+                class="text-[10px] font-mono"
+                [style.color]="selectedCaption(sel).length > captionMax ? 'var(--c-err)' : 'var(--c-dim)'">
+                {{ selectedCaption(sel).length }} / {{ captionMax }}
+              </span>
+            </div>
             <textarea
+              id="drawer-cap"
               rows="10"
               class="w-full resize-y rounded-xl p-3 text-xs leading-relaxed bg-[var(--c-bg-elev)] border border-[var(--c-border)] text-[var(--c-text)] cm-input-focus"
               [value]="selectedCaption(sel)"
@@ -663,6 +821,51 @@ import { MediaUploaderComponent } from '../media-uploader/media-uploader.compone
             <div class="text-xs text-[var(--c-dim)] p-2.5 rounded-lg bg-[rgba(var(--ov),.03)] border border-[rgba(var(--ov),.08)]">
               IA: {{ sel.ai }} · Brand Voice aplicada de &#64;{{ state.activeAccount().user }}
             </div>
+
+            <!-- Agendamento (posts já publicados não podem ser reagendados) -->
+            @if (sel.s !== 'PUBLISHED') {
+              <form
+                class="p-3 rounded-xl bg-[var(--c-bg-elev)] border border-[var(--c-border)] flex flex-col gap-2"
+                (submit)="$event.preventDefault(); saveSchedule(sel.id)"
+                novalidate>
+                <div class="text-[11px] font-mono text-[var(--c-text-muted)]">
+                  Agendamento · {{ sel.date ? postMeta(sel) : 'sem data definida' }}
+                </div>
+                <div class="flex items-start gap-2 flex-wrap">
+                  <div class="flex flex-col gap-1">
+                    <label for="sched-date" class="text-[10px] font-mono text-[var(--c-dim)]">Data</label>
+                    <input
+                      id="sched-date"
+                      type="date"
+                      required
+                      [attr.min]="today"
+                      class="px-2.5 py-1.5 rounded-lg bg-[var(--c-panel)] border border-[var(--c-border)] text-xs text-[var(--c-text)] font-mono cm-input-focus"
+                      [ngModel]="schedDate()"
+                      (ngModelChange)="schedDate.set($event); schedError.set('')"
+                      name="schedDate" />
+                  </div>
+                  <div class="flex flex-col gap-1">
+                    <label for="sched-time" class="text-[10px] font-mono text-[var(--c-dim)]">Hora</label>
+                    <input
+                      id="sched-time"
+                      type="time"
+                      required
+                      class="px-2.5 py-1.5 rounded-lg bg-[var(--c-panel)] border border-[var(--c-border)] text-xs text-[var(--c-text)] font-mono cm-input-focus"
+                      [ngModel]="schedTime()"
+                      (ngModelChange)="schedTime.set($event); schedError.set('')"
+                      name="schedTime" />
+                  </div>
+                  <button
+                    type="submit"
+                    class="self-end px-3 py-1.5 rounded-lg bg-[var(--c-surface)] hover:bg-[rgba(246,188,3,.2)] text-xs font-mono text-[var(--c-acc)] cursor-pointer">
+                    Salvar agendamento
+                  </button>
+                </div>
+                @if (schedError()) {
+                  <p class="text-[11px] text-[var(--c-err)]" role="alert">{{ schedError() }}</p>
+                }
+              </form>
+            }
           } @else if (state.drawerTab() === 'media') {
             <app-media-uploader
               [mediaList]="sel.media || []"
@@ -744,15 +947,48 @@ export class ContentStudioComponent {
   // Filtros Reativos
   readonly searchQuery = signal<string>('');
   readonly formatFilter = signal<string>('ALL');
+  readonly statusFilter = signal<string>('ALL');
+  readonly statusOptions = STATUS_OPTIONS;
+  readonly captionMax = CAPTION_MAX;
+  readonly today = todayIso();
+
+  // Agendamento no painel do post
+  readonly schedDate = signal<string>('');
+  readonly schedTime = signal<string>('18:00');
+  readonly schedError = signal<string>('');
 
   // Modo ativo sincronizado com o State
-  readonly activeMode = computed<'kanban' | 'grid' | 'feed' | 'calendar'>(() => {
+  readonly activeMode = computed<'kanban' | 'grid' | 'list' | 'feed' | 'calendar'>(() => {
     const sub = this.state.contentSubTab();
     if (sub === 'calendar') return 'calendar';
     if (sub === 'grid') return 'grid';
+    if (sub === 'list') return 'list';
     if (sub === 'feed') return 'feed';
     return 'kanban';
   });
+
+  // Ordenação sempre sobre chaves cruas (data ISO, ordem do fluxo, contagem), nunca sobre texto exibido.
+  readonly sorter = createSorter<PostItem>(
+    [
+      {
+        key: 'date',
+        label: 'data',
+        compare: (a, b) => cmpText(postDateKey(a), postDateKey(b)),
+        isEmpty: (p) => !p.date,
+      },
+      { key: 'topic', label: 'tópico (A–Z)', compare: (a, b) => cmpText(a.topic, b.topic) },
+      { key: 'format', label: 'formato', compare: (a, b) => cmpText(FORMAT_LABEL[a.t], FORMAT_LABEL[b.t]) },
+      { key: 'status', label: 'status', compare: (a, b) => cmpNum(STATUS_ORDER[a.s], STATUS_ORDER[b.s]) },
+      { key: 'media', label: 'nº de mídias', compare: (a, b) => cmpNum(a.media?.length ?? 0, b.media?.length ?? 0) },
+    ],
+    'date',
+    'desc'
+  );
+
+  onSortChange(key: string): void {
+    const textual = key === 'topic' || key === 'format' || key === 'status';
+    this.sorter.set(key, textual ? 'asc' : 'desc');
+  }
 
   readonly statusMoves: { status: PostStatus; label: string }[] = [
     { status: 'DRAFT', label: 'Rascunho' },
@@ -761,13 +997,13 @@ export class ContentStudioComponent {
     { status: 'PUBLISHED', label: 'Publicado' },
   ];
 
-  setMode(mode: 'kanban' | 'grid' | 'feed' | 'calendar'): void {
+  setMode(mode: 'kanban' | 'grid' | 'list' | 'feed' | 'calendar'): void {
     this.state.contentSubTab.set(mode);
     this.state.contentMode.set(mode);
   }
 
-  // Posts filtrados por busca e formato
-  readonly filteredPosts = computed<PostItem[]>(() => {
+  // Busca + formato (o Kanban usa só isto: as colunas já são os status)
+  readonly searchedPosts = computed<PostItem[]>(() => {
     let list = this.state.accountPosts();
     const q = this.searchQuery().trim().toLowerCase();
     const fmt = this.formatFilter();
@@ -788,9 +1024,36 @@ export class ContentStudioComponent {
     return list;
   });
 
+  // Busca + formato + status (Grid, Lista, Feed e Calendário)
+  readonly filteredPosts = computed<PostItem[]>(() => {
+    const st = this.statusFilter();
+    const list = this.searchedPosts();
+    return st === 'ALL' ? list : list.filter((p) => p.s === st);
+  });
+
+  readonly sortedPosts = computed<PostItem[]>(() => this.sorter.apply(this.filteredPosts()));
+
+  // Qualquer mudança de filtro/ordenação/conta volta a paginação para a página 1.
+  private readonly resetKey = () => [
+    this.state.activeAccount().id,
+    this.searchQuery(),
+    this.formatFilter(),
+    this.statusFilter(),
+    this.sorter.key(),
+    this.sorter.dir(),
+  ];
+
+  readonly gridPager = createPager(() => this.sortedPosts().length, { sizes: [8, 12, 24, 48], size: 12, resetOn: this.resetKey });
+  readonly listPager = createPager(() => this.sortedPosts().length, { sizes: [10, 25, 50, 100], size: 10, resetOn: this.resetKey });
+  readonly feedPager = createPager(() => this.sortedPosts().length, { sizes: [9, 18, 36], size: 9, resetOn: this.resetKey });
+
+  readonly gridItems = computed(() => this.gridPager.slice(this.sortedPosts()));
+  readonly listItems = computed(() => this.listPager.slice(this.sortedPosts()));
+  readonly feedItems = computed(() => this.feedPager.slice(this.sortedPosts()));
+
   // Colunas do Kanban dinâmico
   readonly kanbanCols = computed(() => {
-    const posts = this.filteredPosts();
+    const posts = this.searchedPosts();
     const defs: { key: PostStatus; title: string; icon: string; accentColor: string }[] = [
       { key: 'DRAFT', title: 'Rascunho', icon: '📝', accentColor: '#f1a10b' },
       { key: 'PROMPT_READY', title: 'Prompt Pronto', icon: '🎨', accentColor: '#6fb0d6' },
@@ -806,17 +1069,6 @@ export class ContentStudioComponent {
     }));
   });
 
-  readonly calendarDays = computed(() => {
-    const posts = this.filteredPosts();
-    return this.state.days.map((label, index) => ({
-      index,
-      label,
-      posts: posts
-        .filter((p) => p.day === index)
-        .sort((a, b) => (a.time < b.time ? -1 : 1)),
-    }));
-  });
-
   countByStatus(status: PostStatus): number {
     return this.state.accountPosts().filter((p) => p.s === status).length;
   }
@@ -824,6 +1076,29 @@ export class ContentStudioComponent {
   resetFilters(): void {
     this.searchQuery.set('');
     this.formatFilter.set('ALL');
+    this.statusFilter.set('ALL');
+  }
+
+  newPostOn(date: string): void {
+    this.state.openComposer('IMAGE', '', date);
+  }
+
+  saveSchedule(postId: string): void {
+    const date = this.schedDate();
+    const time = this.schedTime();
+    if (!isValidIsoDate(date)) {
+      this.schedError.set('Informe uma data válida');
+      return;
+    }
+    if (!isValidTime(time)) {
+      this.schedError.set('Informe a hora no formato HH:MM');
+      return;
+    }
+    if (`${date} ${time}` <= `${todayIso()} ${new Date().toTimeString().slice(0, 5)}`) {
+      this.schedError.set('Escolha um horário no futuro');
+      return;
+    }
+    this.schedError.set(this.state.schedulePost(postId, date, time) ?? '');
   }
 
   quickAddForColumn(status: PostStatus): void {
@@ -841,6 +1116,10 @@ export class ContentStudioComponent {
   openPost(postId: string): void {
     this.state.selId.set(postId);
     this.state.drawerTab.set('cap');
+    const post = this.state.accountPosts().find((p) => p.id === postId);
+    this.schedDate.set(post?.date && post.date >= todayIso() ? post.date : '');
+    this.schedTime.set(post?.time && isValidTime(post.time) ? post.time : '18:00');
+    this.schedError.set('');
   }
 
   selectedCaption(p: PostItem): string {
@@ -853,80 +1132,31 @@ export class ContentStudioComponent {
   }
 
   formatLabel(t: PostFormat): string {
-    const map: Record<PostFormat, string> = {
-      IMAGE: 'Imagem Feed',
-      CAROUSEL: 'Carrossel',
-      REELS: 'Reels',
-      STORIES: 'Stories',
-    };
-    return map[t] || t;
+    return FORMAT_LABEL[t] || t;
   }
 
   formatIcon(t: PostFormat): string {
-    const map: Record<PostFormat, string> = {
-      IMAGE: '📸',
-      CAROUSEL: '🗂',
-      REELS: '🎬',
-      STORIES: '⚡',
-    };
-    return map[t] || '📄';
+    return FORMAT_ICON[t] || '📄';
   }
 
   formatBadgeClass(t: PostFormat): string {
-    switch (t) {
-      case 'CAROUSEL':
-        return 'bg-purple-500/15 text-purple-400 border border-purple-500/30';
-      case 'REELS':
-        return 'bg-blue-500/15 text-blue-400 border border-blue-500/30';
-      case 'IMAGE':
-        return 'bg-amber-500/15 text-amber-400 border border-amber-500/30';
-      case 'STORIES':
-        return 'bg-pink-500/15 text-pink-400 border border-pink-500/30';
-      default:
-        return 'bg-gray-500/15 text-gray-400';
-    }
+    return formatBadge(t);
   }
 
   statusLabel(s: PostStatus): string {
-    const map: Record<PostStatus, string> = {
-      DRAFT: 'Rascunho',
-      PROMPT_READY: 'Prompt Pronto',
-      SCHEDULED: 'Agendado',
-      PUBLISHED: 'Publicado',
-      FAILED: 'Falhou',
-    };
-    return map[s] || s;
+    return STATUS_LABEL[s] || s;
   }
 
   statusColor(s: PostStatus): string {
-    const map: Record<PostStatus, string> = {
-      DRAFT: '#f1a10b',
-      PROMPT_READY: '#6fb0d6',
-      SCHEDULED: '#a855f7',
-      PUBLISHED: '#7bbf4a',
-      FAILED: '#e8604f',
-    };
-    return map[s] || 'var(--c-muted)';
+    return STATUS_COLOR[s] || 'var(--c-muted)';
   }
 
   statusBg(s: PostStatus): string {
-    const map: Record<PostStatus, string> = {
-      DRAFT: 'rgba(241, 161, 11, 0.15)',
-      PROMPT_READY: 'rgba(111, 176, 214, 0.15)',
-      SCHEDULED: 'rgba(168, 85, 247, 0.15)',
-      PUBLISHED: 'rgba(123, 191, 74, 0.15)',
-      FAILED: 'rgba(232, 96, 79, 0.15)',
-    };
-    return map[s] || 'rgba(var(--ov), .1)';
+    return STATUS_BG[s] || 'rgba(var(--ov), .1)';
   }
 
   postMeta(p: PostItem): string {
-    if (p.day !== null) {
-      return this.state.days[p.day] + (p.time ? ` · ${p.time}` : '');
-    }
-    if (p.time) {
-      return p.time;
-    }
+    if (p.date || p.time) return postWhen(p);
     if (p.pr && p.pr.length > 0) {
       return `${p.pr.length} prompt${p.pr.length > 1 ? 's' : ''}`;
     }

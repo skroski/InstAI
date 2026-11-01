@@ -3,6 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PostFormat, PostMedia } from '../../data/seed-data';
 import { MediaUploadService } from '../../services/media-upload.service';
+import { isHttpUrl } from '../../shared/validators';
+
+const MAX_MEDIA = 10;
 
 @Component({
   selector: 'app-media-uploader',
@@ -193,11 +196,17 @@ import { MediaUploadService } from '../../services/media-upload.service';
         <!-- Opção alternativa: Inserir via URL direta -->
         <div class="flex items-center gap-1.5 pt-1">
           <input
-            type="text"
-            class="flex-1 px-2.5 py-1.5 rounded-[4px] text-[12px] bg-[var(--c-bg-elev)] border border-[rgba(var(--ov),.15)] text-[var(--c-text)] cm-input-focus"
-            placeholder="Ou cole o link de uma imagem ou vídeo público..."
-            [(ngModel)]="urlInput"
-            (keydown.enter)="addFromUrl()"
+            type="url"
+            inputmode="url"
+            autocomplete="off"
+            aria-label="Link de uma imagem ou vídeo público"
+            class="flex-1 px-2.5 py-1.5 rounded-[4px] text-[12px] bg-[var(--c-bg-elev)] border text-[var(--c-text)] cm-input-focus"
+            [style.border-color]="urlError() ? 'var(--c-err)' : 'rgba(var(--ov),.15)'"
+            [attr.aria-invalid]="!!urlError()"
+            placeholder="Ou cole o link de uma imagem ou vídeo público (https://...)"
+            [ngModel]="urlInput"
+            (ngModelChange)="urlInput = $event; urlError.set('')"
+            (keydown.enter)="$event.preventDefault(); addFromUrl()"
           />
           <button
             type="button"
@@ -207,6 +216,9 @@ import { MediaUploadService } from '../../services/media-upload.service';
             Adicionar URL
           </button>
         </div>
+        @if (urlError()) {
+          <p class="text-[11px] pt-0.5" style="color: var(--c-err);" role="alert">{{ urlError() }}</p>
+        }
       }
     </div>
   `,
@@ -299,9 +311,23 @@ export class MediaUploaderComponent {
     }
   }
 
+  readonly urlError = signal<string>('');
+
   addFromUrl(): void {
     const url = this.urlInput.trim();
-    if (!url) return;
+    if (!url) {
+      this.urlError.set('Cole o link da mídia');
+      return;
+    }
+    if (!isHttpUrl(url)) {
+      this.urlError.set('Use um link completo e público, começando com https://');
+      return;
+    }
+    if (this.mediaList().length >= MAX_MEDIA) {
+      this.urlError.set(`O limite é de ${MAX_MEDIA} mídias por publicação`);
+      return;
+    }
+    this.urlError.set('');
     const media = this.uploadService.createMediaFromUrl(url, undefined, undefined, this.format());
     this.mediaAdded.emit([media]);
     this.mediaChange.emit([...this.mediaList(), media]);

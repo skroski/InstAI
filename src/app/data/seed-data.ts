@@ -1,6 +1,6 @@
 import { REAL_META_POSTS } from './real-posts';
 
-export type AccountStatus = 'ativo' | 'expirando' | 'erro';
+export type AccountStatus = 'ativo' | 'expirando' | 'erro' | 'pendente';
 
 export interface BrandVoice {
   tom: string;
@@ -20,6 +20,7 @@ export interface Account {
   voice: BrandVoice;
   style: string;
   pageId?: string;
+  adAccountId?: string; // conta de anúncios principal deste cliente (ver MetaAdAccount.a)
 }
 
 export type PostFormat = 'IMAGE' | 'CAROUSEL' | 'REELS' | 'STORIES';
@@ -52,10 +53,12 @@ export interface PostItem {
   cap: string;
   tags: string[];
   pr: ImagePrompt[];
-  day: number | null;
-  time: string;
+  day: number | null; // 0 = segunda … 6 = domingo (legado; a data real fica em `date`)
+  date?: string; // YYYY-MM-DD, horário de Brasília
+  time: string; // HH:MM
   ai: string;
   media?: PostMedia[];
+  permalink?: string; // URL pública da publicação na Meta (quando já publicada)
 }
 
 export interface TwinField {
@@ -85,6 +88,17 @@ export interface TwinConfig {
   presets: string[];
   qa: Record<string, TwinQA>;
 }
+
+// Configuração vazia para contas novas. Usada quando a conta não tem TWINS próprio.
+export const EMPTY_TWIN: TwinConfig = {
+  kpi: [],
+  sources: [],
+  fields: [],
+  out: '',
+  offers: [],
+  presets: [],
+  qa: {},
+};
 
 export type FlowNodeType =
   | 'trigger'
@@ -255,10 +269,14 @@ export interface AccountMetrics {
   p: string[];
 }
 
+// Valores vazios para contas novas: sem isso, a conta herdaria os dados do Amaral.
+export const EMPTY_METRICS: AccountMetrics = { k: [], f: [], h: [], p: [] };
+
 export const ACCS: Account[] = [
   {
     id: 'a_amaral',
     pageId: '185387824832414',
+    adAccountId: 'act_1124982890873935',
     user: 'amaralnatacao',
     name: 'Amaral Natação',
     ini: 'AN',
@@ -277,6 +295,7 @@ export const ACCS: Account[] = [
   {
     id: 'a2',
     pageId: '184846338220933',
+    adAccountId: 'act_891826527522907',
     user: 'duplod.oficial',
     name: 'Duplo D Design & Dev',
     ini: 'DD',
@@ -291,6 +310,24 @@ export const ACCS: Account[] = [
     },
     style:
       'sleek dark UI design canvas, subtle geometric grid overlay, neon coral and deep violet gradients (#ff477e, #7928ca), clean typography, modern tech aesthetic --style raw',
+  },
+  {
+    id: 'a_vetbots',
+    pageId: '134910416362221',
+    user: 'vetbots',
+    name: 'VetBots',
+    ini: 'VB',
+    st: 'ativo',
+    days: 60,
+    perms: 4,
+    wh: true,
+    voice: {
+      tom: 'Próximo, prático e confiável. Fala com o gestor da clínica sem jargão, com dado concreto e sem promessa exagerada.',
+      pub: 'Donos de clínicas e hospitais veterinários que querem automatizar atendimento, agendamento e recepção.',
+      regras: 'Nunca substituir o veterinário: orientações de saúde sempre remetem à consulta presencial. Focar em redução de faltas e automação humanizada no WhatsApp.',
+    },
+    style:
+      'editorial photography, strong natural window light at late afternoon, shallow depth of field, petrol blue and warm light wood tones, cream walls, golden retriever, candid genuine expression, premium veterinary clinic --style raw',
   },
 ];
 
@@ -371,6 +408,26 @@ export const METRICS: Record<string, AccountMetrics> = {
       'Carrosséis técnicos sobre grids, tipografia e design visual retêm 71% dos leitores.',
       'Publicar estudos de caso práticos de código e design.',
       'Manter estilo visual consistente de acordo com o Brand Voice.',
+    ],
+  },
+  a_vetbots: {
+    k: [
+      ['seguidores', '302', '302'],
+      ['alcance 30d', '24,8 mil', '+15%'],
+      ['engajamento', '5,8%', '+1,2 pp'],
+      ['salvamentos', '420', '+18%'],
+    ],
+    f: [
+      ['Reels', 75],
+      ['Carrossel', 68],
+      ['Imagem', 36],
+      ['Stories', 31],
+    ],
+    h: ['seg 19h', 'qua 12h', 'qui 18h'],
+    p: [
+      'Reels e demonstrações práticas da IA no WhatsApp retêm 75% mais atenção.',
+      'Focar em conteúdos sobre redução de faltas (no-show) e fila presencial.',
+      'Direcionar chamadas de ação para o WhatsApp (41) 99823-4643.',
     ],
   },
 };
@@ -508,6 +565,67 @@ export const TWINS: Record<string, TwinConfig> = {
       },
     },
   },
+  a_vetbots: {
+    kpi: [
+      ['conversas 30d', '540'],
+      ['resolvidas sem humano', '89%'],
+      ['tempo de resposta', '2 s'],
+      ['demonstrações agendadas', '64'],
+    ],
+    sources: [
+      ['INSTAGRAM', '73 publicações sobre automação para clínicas veterinárias', 'indexado'],
+      ['PRODUTO', 'VetBots I.A. Atendimento, Agendamentos e Fila Presencial', 'indexado'],
+      ['SUPORTE', 'WhatsApp Comercial (41) 99823-4643', 'indexado'],
+    ],
+    fields: [
+      { l: 'automação whatsapp veterinária', on: true },
+      { l: 'agendamentos inteligentes', on: true },
+      { l: 'redução de no-show', on: true },
+      { l: 'fila presencial inteligente', on: true },
+      { l: 'triagem e lembretes', on: true },
+      { l: 'diagnóstico clínico', on: false },
+    ],
+    out: 'A VetBots é focada na gestão de atendimento e automação para clínicas veterinárias. Não realizamos consultas médicas ou diagnósticos veterinários.',
+    offers: [
+      {
+        n: 'Demonstração VetBots I.A.',
+        k: 'demonstracao',
+        link: 'https://wa.me/5541998234643?text=Olá!%20Gostaria%20de%20agendar%20uma%20demonstração%20da%20VetBots%20I.A.',
+        when: 'pergunta sobre como funciona ou quer testar na clínica',
+      },
+      {
+        n: 'Fila Presencial Inteligente Grátis',
+        k: 'fila_gratis',
+        link: 'https://wa.me/5541998234643?text=Quero%20baixar%20a%20Fila%20Presencial%20Inteligente%20grátis',
+        when: 'menciona fila de espera ou tv na recepção',
+      },
+    ],
+    presets: [
+      'Como a VetBots reduz as faltas nas consultas?',
+      'A IA se integra ao WhatsApp da clínica?',
+      'Como funciona a fila presencial na TV?',
+    ],
+    qa: {
+      'Como a VetBots reduz as faltas nas consultas?': {
+        g: 'Enviamos lembretes interativos e automáticos no WhatsApp confirmando 24h e 2h antes da consulta. O tutor confirma com 1 clique e, caso desmarque, a recepção é avisada imediatamente.',
+        t: [
+          'Nosso sistema envia lembretes interativos com confirmação em 1 clique pelo WhatsApp, reduzindo o no-show em até 70%. Quer ver funcionando?',
+          'Sim! Como fazemos para testar na nossa clínica?',
+          'Posso te passar para nosso time de implantação agora mesmo no WhatsApp (41) 99823-4643!',
+        ],
+        offer: 0,
+      },
+      'A IA se integra ao WhatsApp da clínica?': {
+        g: 'Sim! A VetBots conecta diretamente ao número oficial da sua clínica, respondendo dúvidas frequentes, agendando consultas e direcionando casos urgentes para a recepção humana.',
+        t: [
+          'Conecta direto ao WhatsApp da clínica! A IA faz a triagem 24h e passa para a equipe humana sempre que necessário.',
+          'E se o tutor fizer uma pergunta médica?',
+          'A IA é treinada para nunca dar diagnósticos: ela acolhe o tutor e orienta a trazer o paciente imediatamente para a consulta presencial.',
+        ],
+        offer: 0,
+      },
+    },
+  },
 };
 
 export const SEED_FLOWS: FlowItem[] = [
@@ -581,6 +699,12 @@ export const SEED_CONTACTS: ContactItem[] = [
   { id: 'c_dd_2', a: 'a2', u: 'marina.castro.ux', email: 'marina@fintechalpha.com.br', phone: '+5511976543210', tags: ['lead quente', 'tier_1', 'design_system'], src: 'dm', last: 'hoje 09:50', metaSynced: true, icpScore: 92, icpTier: 'TIER_1_OURO' },
   { id: 'c_dd_3', a: 'a2', u: 'thiago.mendes.dev', email: 'thiago@inovasaas.com', phone: '+5541991122334', tags: ['cliente', 'tier_1'], src: 'comentário', last: 'ontem 18:20', metaSynced: true, icpScore: 89, icpTier: 'TIER_1_OURO' },
   { id: 'c_dd_4', a: 'a2', u: 'beatriz.lima.mkt', email: 'beatriz@scalegrowth.com.br', phone: '+5531988776655', tags: ['novo', 'tier_2', 'landing_page'], src: 'resposta story', last: 'ontem 15:40', metaSynced: false, icpScore: 78, icpTier: 'TIER_2_PRATA' },
+
+  // --- VetBots (a_vetbots) ---
+  { id: 'c_vb_1', a: 'a_vetbots', u: 'dr_marcelo_vetcampinas', email: 'marcelo@hospitalvetcampinas.com.br', phone: '+5519998811223', tags: ['lead quente', 'tier_1', 'hospital_vet'], src: 'BLACK NOVEMBER . Reels', last: 'hoje 11:40', metaSynced: true, icpScore: 97, icpTier: 'TIER_1_OURO' },
+  { id: 'c_vb_2', a: 'a_vetbots', u: 'clinica_bichos_curitiba', email: 'contato@bichoscuritiba.vet.br', phone: '+5541991234567', tags: ['lead quente', 'tier_1', 'fila_inteligente'], src: 'EU QUERO . Post', last: 'hoje 10:15', metaSynced: true, icpScore: 94, icpTier: 'TIER_1_OURO' },
+  { id: 'c_vb_3', a: 'a_vetbots', u: 'dra_camila_vetcare', email: 'camila@vetcare.med.br', phone: '+5511987654321', tags: ['lead quente', 'tier_1', 'whatsapp_ia'], src: 'dm', last: 'ontem 18:20', metaSynced: true, icpScore: 91, icpTier: 'TIER_1_OURO' },
+  { id: 'c_vb_4', a: 'a_vetbots', u: 'petcenter_maringa', email: 'adm@petcentermaringa.com.br', phone: '+5544998765432', tags: ['novo', 'tier_2', 'triagem'], src: 'comentário', last: 'ontem 14:10', metaSynced: false, icpScore: 76, icpTier: 'TIER_2_PRATA' },
 ];
 
 export const SEED_INTS: InteractionItem[] = [
@@ -677,6 +801,34 @@ export const SEED_INTS: InteractionItem[] = [
     c: 'Olá! Quanto tempo em média vocês levam para desenvolver uma landing page institucional de alto padrão?',
     media: 'Post · Landing Pages que Convertem',
     ai: 'Olá Beatriz! Nossos sprints de landing page de alta conversão costumam durar de 2 a 3 semanas, cobrindo copy estruturada, UI visual e código otimizado com Core Web Vitals perfeitos. Vamos conversar pelo formulário de briefing?',
+  },
+
+  // --- VetBots (a_vetbots) ---
+  {
+    id: 'i_vb_1',
+    cat: 'duvida',
+    a: 'a_vetbots',
+    u: 'dr_marcelo_vetcampinas',
+    t: 'DM',
+    s: 'UNREAD',
+    sent: 'positivo',
+    time: '11:40',
+    c: 'Olá! Vi a campanha da Black November sobre a Fila Presencial na TV. Como funciona o download da licença gratuita?',
+    media: 'Reels · Black November Fila Presencial',
+    ai: 'Olá Dr. Marcelo! É super simples: o sistema roda direto no computador da recepção conectado à TV via HDMI ou rede local. Sem limite de pacientes e sem custo de licença! Te mandei o link no WhatsApp da clínica.',
+  },
+  {
+    id: 'i_vb_2',
+    cat: 'gatilho',
+    a: 'a_vetbots',
+    u: 'clinica_bichos_curitiba',
+    t: 'COMMENT',
+    s: 'UNREAD',
+    sent: 'positivo',
+    time: '10:15',
+    c: 'EU QUERO',
+    media: 'Carrossel · Black November Fila Presencial Grátis',
+    ai: 'Enviamos no seu Direct todos os detalhes e o link para download da Fila Inteligente! 🐾 Dá uma olhadinha lá!',
   },
 ];
 

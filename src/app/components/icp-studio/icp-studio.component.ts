@@ -47,11 +47,11 @@ type IcpTab = 'matrix' | 'scoring' | 'simulator' | 'hooks';
             <select
               class="h-8 px-2.5 rounded-[4px] text-xs font-mono cursor-pointer"
               style="background: rgba(var(--ov), .06); border: 1px solid rgba(var(--ov), .15); color: var(--c-text);"
-              [value]="state.activeIcpId()"
+              aria-label="Perfil de ICP ativo"
               (change)="onIcpChange($event)"
             >
               @for (p of state.accountIcps(); track p.id) {
-                <option [value]="p.id" style="background: #2b2b2b; color: #fefefe;">
+                <option [value]="p.id" [selected]="p.id === state.activeIcpId()" style="background: #2b2b2b; color: #fefefe;">
                   {{ p.name }}
                 </option>
               }
@@ -368,6 +368,7 @@ type IcpTab = 'matrix' | 'scoring' | 'simulator' | 'hooks';
 
             <textarea
               rows="6"
+              aria-label="Mensagem do lead para simular"
               class="w-full p-3 rounded-[6px] text-xs font-mono bg-[rgba(var(--ov),.06)] border border-[rgba(var(--ov),.15)] text-[var(--c-text)]"
               placeholder="Ex: 'Oi, tenho uma clínica com 3 veterinários faturando 70k e perdemos muitas consultas por no-show. Quero implementar um bot para confirmar no WhatsApp. Vocês têm vaga essa semana?'"
               [(ngModel)]="simLeadText"
@@ -470,10 +471,10 @@ type IcpTab = 'matrix' | 'scoring' | 'simulator' | 'hooks';
 
             <div class="flex flex-col gap-3 py-3 text-xs">
               <div>
-                <label class="block font-mono uppercase text-[11px] text-[var(--c-muted)] mb-1">
+                <label for="icp-segment" class="block font-mono uppercase text-[11px] text-[var(--c-muted)] mb-1">
                   Segmento de Mercado
                 </label>
-                <select class="modal-input" [(ngModel)]="aiSegment">
+                <select id="icp-segment" class="modal-input" [(ngModel)]="aiSegment">
                   <option value="B2B">B2B (Empresas vendendo para empresas)</option>
                   <option value="B2C">B2C (Consumidor final)</option>
                   <option value="D2C">D2C (E-commerce / Marca direta)</option>
@@ -482,10 +483,11 @@ type IcpTab = 'matrix' | 'scoring' | 'simulator' | 'hooks';
               </div>
 
               <div>
-                <label class="block font-mono uppercase text-[11px] text-[var(--c-muted)] mb-1">
+                <label for="icp-desc" class="block font-mono uppercase text-[11px] text-[var(--c-muted)] mb-1">
                   Descreva o que você vende e qual seu produto/serviço
                 </label>
                 <textarea
+                  id="icp-desc"
                   rows="4"
                   class="w-full p-2.5 rounded-[4px] text-xs font-mono bg-[rgba(var(--ov),.06)] border border-[rgba(var(--ov),.15)] text-[var(--c-text)]"
                   placeholder="Ex: 'Vendo implantação de agentes de inteligência artificial para SaaS e empresas de tecnologia automatizarem atendimento no WhatsApp e Instagram'"
