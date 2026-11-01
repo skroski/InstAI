@@ -56,6 +56,7 @@ export interface PostItem {
   time: string;
   ai: string;
   media?: PostMedia[];
+  permalink?: string; // URL pública da publicação na Meta (quando já publicada)
 }
 
 export interface TwinField {

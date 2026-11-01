@@ -145,6 +145,7 @@ export class LiveApiService {
           s: 'PUBLISHED' as const,
           topic,
           cap: msg,
+          permalink: rawPost.permalink_url || undefined,
           tags: hashtags,
           pr: [
             {

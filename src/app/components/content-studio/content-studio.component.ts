@@ -244,6 +244,27 @@ import { MediaUploaderComponent } from '../media-uploader/media-uploader.compone
                       </p>
                     }
 
+                    <!-- Link direto da publicação na Meta (só existe em posts já publicados) -->
+                    @if (p.permalink) {
+                      <a
+                        [href]="p.permalink"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        (click)="$event.stopPropagation()"
+                        [attr.aria-label]="'Abrir publicação de ' + p.topic + ' em nova aba'"
+                        class="flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-md bg-[rgba(123,191,74,.12)] border border-[rgba(123,191,74,.3)] hover:bg-[rgba(123,191,74,.22)] transition-colors">
+                        <span class="flex items-center gap-1.5 text-[11px] font-semibold text-[var(--c-ok)]">
+                          <span>ver publicação</span>
+                          <svg class="w-3 h-3 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                            <polyline points="15 3 21 3 21 9"/>
+                            <line x1="10" y1="14" x2="21" y2="3"/>
+                          </svg>
+                        </span>
+                        <span class="text-[10px] font-mono text-[var(--c-dim)] truncate">facebook</span>
+                      </a>
+                    }
+
                     <!-- Rodapé do Card com Ações Rápidas -->
                     <div class="flex items-center justify-between pt-2 border-t border-[rgba(var(--ov),.08)] mt-1 text-[11px]">
                       <span class="text-[10px] font-mono text-[var(--c-dim)]">
@@ -377,6 +398,26 @@ import { MediaUploaderComponent } from '../media-uploader/media-uploader.compone
                     </p>
                   }
                 </div>
+
+                @if (p.permalink) {
+                  <a
+                    [href]="p.permalink"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    (click)="$event.stopPropagation()"
+                    [attr.aria-label]="'Abrir publicação de ' + p.topic + ' em nova aba'"
+                    class="flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-md bg-[rgba(123,191,74,.12)] border border-[rgba(123,191,74,.3)] hover:bg-[rgba(123,191,74,.22)] transition-colors">
+                    <span class="flex items-center gap-1.5 text-[11px] font-semibold text-[var(--c-ok)]">
+                      <span>ver publicação</span>
+                      <svg class="w-3 h-3 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                        <polyline points="15 3 21 3 21 9"/>
+                        <line x1="10" y1="14" x2="21" y2="3"/>
+                      </svg>
+                    </span>
+                    <span class="text-[10px] font-mono text-[var(--c-dim)] truncate">facebook</span>
+                  </a>
+                }
 
                 <div class="flex items-center justify-between pt-2 border-t border-[rgba(var(--ov),.08)] text-[10.5px] font-mono text-[var(--c-dim)]">
                   <span>{{ postMeta(p) }}</span>

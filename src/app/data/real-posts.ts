@@ -7,6 +7,7 @@ import { PostItem } from "./seed-data";
 export const REAL_META_POSTS: PostItem[] = [
   {
     "id": "live_185387824832414_1544580937713912",
+    "permalink": "https://www.facebook.com/1547166704122002/posts/1544580937713912",
     "a": "a_amaral",
     "t": "CAROUSEL",
     "s": "PUBLISHED",
@@ -77,6 +78,7 @@ export const REAL_META_POSTS: PostItem[] = [
   },
   {
     "id": "live_185387824832414_1536187241886615",
+    "permalink": "https://www.facebook.com/1547166704122002/posts/1536187241886615",
     "a": "a_amaral",
     "t": "CAROUSEL",
     "s": "PUBLISHED",
@@ -140,6 +142,7 @@ export const REAL_META_POSTS: PostItem[] = [
   },
   {
     "id": "live_185387824832414_1530456235793049",
+    "permalink": "https://www.facebook.com/1547166704122002/posts/1530456235793049",
     "a": "a_amaral",
     "t": "IMAGE",
     "s": "PUBLISHED",
@@ -179,6 +182,7 @@ export const REAL_META_POSTS: PostItem[] = [
   },
   {
     "id": "live_185387824832414_1523450623160277",
+    "permalink": "https://www.facebook.com/1547166704122002/posts/1523450623160277",
     "a": "a_amaral",
     "t": "CAROUSEL",
     "s": "PUBLISHED",
@@ -251,6 +255,7 @@ export const REAL_META_POSTS: PostItem[] = [
   },
   {
     "id": "live_185387824832414_1516510073854332",
+    "permalink": "https://www.facebook.com/1547166704122002/posts/1516510073854332",
     "a": "a_amaral",
     "t": "CAROUSEL",
     "s": "PUBLISHED",
@@ -322,6 +327,7 @@ export const REAL_META_POSTS: PostItem[] = [
   },
   {
     "id": "live_185387824832414_1510306677808005",
+    "permalink": "https://www.facebook.com/1547166704122002/posts/1510306677808005",
     "a": "a_amaral",
     "t": "CAROUSEL",
     "s": "PUBLISHED",
@@ -398,6 +404,7 @@ export const REAL_META_POSTS: PostItem[] = [
   },
   {
     "id": "live_185387824832414_1502140571957949",
+    "permalink": "https://www.facebook.com/reel/38430698076577270/",
     "a": "a_amaral",
     "t": "REELS",
     "s": "PUBLISHED",
@@ -432,6 +439,7 @@ export const REAL_META_POSTS: PostItem[] = [
   },
   {
     "id": "live_185387824832414_1502135521958454",
+    "permalink": "https://www.facebook.com/1547166704122002/posts/1502135521958454",
     "a": "a_amaral",
     "t": "CAROUSEL",
     "s": "PUBLISHED",
@@ -522,6 +530,7 @@ export const REAL_META_POSTS: PostItem[] = [
   },
   {
     "id": "live_185387824832414_1493924909446182",
+    "permalink": "https://www.facebook.com/1547166704122002/posts/1493924909446182",
     "a": "a_amaral",
     "t": "IMAGE",
     "s": "PUBLISHED",
@@ -558,6 +567,7 @@ export const REAL_META_POSTS: PostItem[] = [
   },
   {
     "id": "live_185387824832414_1489474206557919",
+    "permalink": "https://www.facebook.com/1547166704122002/posts/1489474206557919",
     "a": "a_amaral",
     "t": "IMAGE",
     "s": "PUBLISHED",
@@ -597,6 +607,7 @@ export const REAL_META_POSTS: PostItem[] = [
   },
   {
     "id": "live_184846338220933_1088367546782510",
+    "permalink": "https://www.facebook.com/1437305638555364/posts/1088367546782510",
     "a": "a2",
     "t": "IMAGE",
     "s": "PUBLISHED",
@@ -620,6 +631,7 @@ export const REAL_META_POSTS: PostItem[] = [
   },
   {
     "id": "live_184846338220933_925522019733731",
+    "permalink": "https://www.facebook.com/1437305638555364/posts/925522019733731",
     "a": "a2",
     "t": "CAROUSEL",
     "s": "PUBLISHED",
@@ -693,6 +705,7 @@ export const REAL_META_POSTS: PostItem[] = [
   },
   {
     "id": "live_184846338220933_923962869889646",
+    "permalink": "https://www.facebook.com/1437305638555364/posts/923962869889646",
     "a": "a2",
     "t": "CAROUSEL",
     "s": "PUBLISHED",
@@ -766,6 +779,7 @@ export const REAL_META_POSTS: PostItem[] = [
   },
   {
     "id": "live_184846338220933_922622686690331",
+    "permalink": "https://www.facebook.com/1437305638555364/posts/922622686690331",
     "a": "a2",
     "t": "CAROUSEL",
     "s": "PUBLISHED",
@@ -829,6 +843,7 @@ export const REAL_META_POSTS: PostItem[] = [
   },
   {
     "id": "live_184846338220933_456701769949094",
+    "permalink": "https://www.facebook.com/1437305638555364/posts/456701769949094",
     "a": "a2",
     "t": "CAROUSEL",
     "s": "PUBLISHED",
@@ -881,6 +896,7 @@ export const REAL_META_POSTS: PostItem[] = [
   },
   {
     "id": "live_184846338220933_455798136706124",
+    "permalink": "https://www.facebook.com/1437305638555364/posts/455798136706124",
     "a": "a2",
     "t": "IMAGE",
     "s": "PUBLISHED",
@@ -916,6 +932,7 @@ export const REAL_META_POSTS: PostItem[] = [
   },
   {
     "id": "live_184846338220933_453294860289785",
+    "permalink": "https://www.facebook.com/1437305638555364/posts/453294860289785",
     "a": "a2",
     "t": "CAROUSEL",
     "s": "PUBLISHED",
@@ -996,6 +1013,7 @@ export const REAL_META_POSTS: PostItem[] = [
   },
   {
     "id": "live_184846338220933_2415437848495093",
+    "permalink": "https://www.facebook.com/1437305638555364/posts/2415437848495093",
     "a": "a2",
     "t": "CAROUSEL",
     "s": "PUBLISHED",
@@ -1090,6 +1108,7 @@ export const REAL_META_POSTS: PostItem[] = [
   },
   {
     "id": "live_184846338220933_1222428605201759",
+    "permalink": "https://www.facebook.com/184846338220933/posts/1460154680690086/",
     "a": "a2",
     "t": "IMAGE",
     "s": "PUBLISHED",
@@ -1121,6 +1140,7 @@ export const REAL_META_POSTS: PostItem[] = [
   },
   {
     "id": "live_184846338220933_489157263055311",
+    "permalink": "https://www.facebook.com/184846338220933/posts/1460150560690498/",
     "a": "a2",
     "t": "IMAGE",
     "s": "PUBLISHED",
