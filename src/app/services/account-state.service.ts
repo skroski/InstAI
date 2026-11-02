@@ -236,7 +236,7 @@ export class AccountStateService {
   readonly bcast = signal<string>('');
 
   // Meta Marketing API & Lookalike Signals
-  readonly adAccounts = signal<MetaAdAccount[]>(this.stored?.adAccounts ?? SEED_AD_ACCOUNTS);
+  readonly adAccounts = signal<MetaAdAccount[]>(this.restoreAdAccounts(this.stored));
   readonly activeAdAccountId = signal<string>(this.accounts()[0]?.adAccountId ?? '');
   readonly audiences = signal<MetaAudience[]>(SEED_AUDIENCES);
   readonly campaigns = signal<MetaCampaign[]>(SEED_CAMPAIGNS);
@@ -696,6 +696,20 @@ export class AccountStateService {
   }
 
   /**
+   * Contas de anúncio salvas antes da primeira sincronização com a Meta não têm portfolioId:
+   * podem trazer saldo e pixel inventados. Essas voltam ao seed, só com os IDs reais.
+   */
+  private restoreAdAccounts(stored: StoredWorkspace | null): MetaAdAccount[] {
+    if (!stored) return SEED_AD_ACCOUNTS;
+    const seeds = new Map(SEED_AD_ACCOUNTS.map((seed) => [seed.id, seed] as const));
+    return stored.adAccounts.flatMap((ad) => {
+      if (ad.portfolioId) return [ad];
+      const seed = seeds.get(ad.id);
+      return seed ? [{ ...seed, a: ad.a || seed.a }] : [];
+    });
+  }
+
+  /**
    * Junta o que foi salvo no navegador com o seed. O seed manda no status e nos dados da Meta
    * (assim uma mudança em seed-data.ts não fica escondida); o salvo manda nos campos editáveis.
    */
@@ -826,7 +840,7 @@ export class AccountStateService {
           audienceId: 'aud_meta_live',
           audienceName: 'Público Meta Ads',
           isLookalike: false,
-          dailyBudget: lc.daily_budget ? Number(lc.daily_budget) / 100 : 50,
+          dailyBudget: lc.daily_budget ? Number(lc.daily_budget) / 100 : 0,
           spend: lc.spend ? Number(lc.spend) : (lc.insights?.data?.[0]?.spend ? Number(lc.insights.data[0].spend) : 0),
           impressions: lc.insights?.data?.[0]?.impressions ? Number(lc.insights.data[0].impressions) : 0,
           clicks: lc.insights?.data?.[0]?.clicks ? Number(lc.insights.data[0].clicks) : 0,
@@ -875,37 +889,15 @@ export class AccountStateService {
         }
       }
 
-      // 2. Varia dados ricos para a conta ativa
-      const activeAcc = this.activeAccount();
-      const varied = this.liveApi.generateVariedDataForAccount(activeAcc, this.seq);
-      this.seq += 10;
-
-      // Adiciona posts sem duplicatas
-      this.posts.update((prev) => {
-        const existingTopics = new Set(prev.map((p) => p.topic));
-        const fresh = varied.posts.filter((p) => !existingTopics.has(p.topic));
-        return [...fresh, ...prev];
-      });
-
-      // Adiciona interações sem duplicatas
-      this.ints.update((prev) => {
-        const existingIds = new Set(prev.map((i) => i.id));
-        const fresh = varied.ints.filter((i) => !existingIds.has(i.id));
-        return [...fresh, ...prev];
-      });
-
-      // Adiciona campanhas sem duplicatas
-      this.campaigns.update((prev) => {
-        const existingNames = new Set(prev.map((c) => c.name));
-        const fresh = varied.campaigns.filter((c) => !existingNames.has(c.name));
-        return [...fresh, ...prev];
-      });
-
-      this.liveApi.lastSyncTime.set('agora mesmo');
-      this.toast('✨ Dados sincronizados e variados da API com sucesso!');
+      if (portfolios) {
+        this.liveApi.lastSyncTime.set(new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }));
+        this.toast('Contas, campanhas e publicações atualizadas pela Meta Graph API');
+      } else {
+        this.toast('Não foi possível falar com a Meta Graph API. Confira a conexão da conta.');
+      }
     } catch (err) {
-      console.warn('Erro ao variar dados da API:', err);
-      this.toast('Dados atualizados com sucesso!');
+      console.warn('Falha ao sincronizar com a Meta:', err);
+      this.toast('Falha ao sincronizar com a Meta. Tente de novo.');
     } finally {
       this.liveApi.isSyncing.set(false);
     }
@@ -1494,17 +1486,15 @@ export class AccountStateService {
       name,
       type: 'LOOKALIKE',
       size: estReach,
-      status: 'READY',
+      status: 'SYNCING',
       lookalikeRatio: ratio,
       originAudienceName: sourceAudienceName,
       country,
-      lastSync: 'agora mesmo',
+      lastSync: 'enviando',
     };
 
     this.audiences.update((prev) => [newAud, ...prev]);
-    this.toast(`Público Lookalike ${ratio}% criado na Meta (~${(estReach / 1000000).toFixed(1)}M pessoas)`);
 
-    // Notificação assíncrona com Edge Function
     this.supabase
       .invokeEdgeFunction('meta-marketing-api', {
         action: 'create_lookalike_audience',
@@ -1516,7 +1506,18 @@ export class AccountStateService {
           sourceAudienceName,
         },
       })
-      .catch(() => {});
+      .then(() => {
+        this.audiences.update((prev) =>
+          prev.map((x) => (x.id === newAud.id ? { ...x, status: 'READY', lastSync: 'agora mesmo' } : x))
+        );
+        this.toast(`Público Lookalike ${ratio}% criado na Meta`);
+      })
+      .catch(() => {
+        this.audiences.update((prev) =>
+          prev.map((x) => (x.id === newAud.id ? { ...x, status: 'ERROR', lastSync: 'falhou' } : x))
+        );
+        this.toast('Não foi possível criar o público Lookalike na Meta');
+      });
 
     return newAud;
   }
@@ -1533,18 +1534,12 @@ export class AccountStateService {
       name,
       type: 'CUSTOM_LIST',
       size,
-      status: 'READY',
+      status: 'SYNCING',
       country: 'BR',
-      lastSync: 'agora mesmo',
+      lastSync: 'enviando',
     };
 
-    // Marca contatos como sincronizados
-    this.contacts.update((prev) =>
-      prev.map((c) => (contactIds.includes(c.id) ? { ...c, metaSynced: true } : c))
-    );
-
     this.audiences.update((prev) => [newAud, ...prev]);
-    this.toast(`Lista de ${size} contatos enviada para Meta Ads com hash SHA-256!`);
 
     this.supabase
       .invokeEdgeFunction('meta-marketing-api', {
@@ -1555,7 +1550,21 @@ export class AccountStateService {
           description: `Importação de ${size} contatos via InstaAI Hub`,
         },
       })
-      .catch(() => {});
+      .then(() => {
+        this.contacts.update((prev) =>
+          prev.map((c) => (contactIds.includes(c.id) ? { ...c, metaSynced: true } : c))
+        );
+        this.audiences.update((prev) =>
+          prev.map((x) => (x.id === newAud.id ? { ...x, status: 'READY', lastSync: 'agora mesmo' } : x))
+        );
+        this.toast(`Lista de ${size} contatos enviada para a Meta Ads`);
+      })
+      .catch(() => {
+        this.audiences.update((prev) =>
+          prev.map((x) => (x.id === newAud.id ? { ...x, status: 'ERROR', lastSync: 'falhou' } : x))
+        );
+        this.toast('Não foi possível criar a lista na Meta Ads');
+      });
 
     return newAud;
   }
@@ -1565,16 +1574,6 @@ export class AccountStateService {
     const adAccountId = this.requireAdAccount().id;
     const accContacts = this.contacts().filter((c) => c.a === accId);
     
-    this.contacts.update((prev) =>
-      prev.map((c) => (c.a === accId ? { ...c, metaSynced: true } : c))
-    );
-
-    this.audiences.update((prev) =>
-      prev.map((a) => (a.id === audienceId ? { ...a, lastSync: 'agora mesmo', status: 'READY' } : a))
-    );
-
-    this.toast(`${accContacts.length} contatos sincronizados na Meta Marketing API!`);
-
     this.supabase
       .invokeEdgeFunction('meta-marketing-api', {
         action: 'sync_contacts_to_audience',
@@ -1588,7 +1587,21 @@ export class AccountStateService {
           })),
         },
       })
-      .catch(() => {});
+      .then(() => {
+        this.contacts.update((prev) =>
+          prev.map((x) => (x.a === accId ? { ...x, metaSynced: true } : x))
+        );
+        this.audiences.update((prev) =>
+          prev.map((x) => (x.id === audienceId ? { ...x, lastSync: 'agora mesmo', status: 'READY' } : x))
+        );
+        this.toast(`${accContacts.length} contatos sincronizados na Meta Marketing API`);
+      })
+      .catch(() => {
+        this.audiences.update((prev) =>
+          prev.map((x) => (x.id === audienceId ? { ...x, status: 'ERROR' } : x))
+        );
+        this.toast('Não foi possível sincronizar os contatos com a Meta');
+      });
   }
 
   /**
@@ -1722,9 +1735,9 @@ export class AccountStateService {
       name: customAudName,
       type: 'CUSTOM_LIST',
       size: parsedCount,
-      status: 'READY',
+      status: 'SYNCING',
       country: 'BR',
-      lastSync: 'agora mesmo',
+      lastSync: 'enviando',
     };
     this.audiences.update((prev) => [customAud, ...prev]);
 
@@ -1752,7 +1765,17 @@ export class AccountStateService {
           },
         });
       })
-      .catch(() => {});
+      .then(() => {
+        this.audiences.update((prev) =>
+          prev.map((x) => (x.id === customAud.id ? { ...x, status: 'READY', lastSync: 'agora mesmo' } : x))
+        );
+      })
+      .catch(() => {
+        this.audiences.update((prev) =>
+          prev.map((x) => (x.id === customAud.id ? { ...x, status: 'ERROR', lastSync: 'falhou' } : x))
+        );
+        this.toast('Não foi possível enviar a lista importada para a Meta');
+      });
 
     // 4. Se solicitado, gera automaticamente o Lookalike
     let lookalikeAud: MetaAudience | undefined;
@@ -1966,7 +1989,7 @@ Retorne APENAS um JSON válido no formato:
       `Lookalike ${ratio}% Brasil — Super ICP (${icp.name.slice(0, 20)})`
     );
 
-    this.toast(`🚀 Público Lookalike criado na Meta baseado exclusivamente nos seus leads Tier 1!`);
+    this.toast('Enviando a lista ICP Ouro e o Lookalike para a Meta…');
     this.setView('campaigns');
   }
 }

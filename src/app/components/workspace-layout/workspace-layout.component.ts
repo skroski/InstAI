@@ -228,24 +228,27 @@ import { addDays, relativeTimeKey, todayIso } from '../../shared/dates';
 
           <div class="head-actions">
             <!-- Indicador Live da Meta Graph API -->
-            <span class="live-status-chip hidden sm:inline-flex" title="Meta Graph API v26.0 ativa">
-              <span class="live-dot"></span>
-              <span>Meta API Live</span>
+            <span
+              class="live-status-chip hidden sm:inline-flex"
+              [title]="state.liveApi.metaApiConnected() ? 'Meta Graph API v22.0 respondeu na última sincronização' : 'Meta Graph API ainda não sincronizada nesta sessão'"
+            >
+              <span class="live-dot" [style.opacity]="state.liveApi.metaApiConnected() ? 1 : 0.35"></span>
+              <span>{{ state.liveApi.metaApiConnected() ? 'Meta API conectada' : 'Meta API não sincronizada' }}</span>
               <span class="live-sync-time">· {{ state.liveApi.lastSyncTime() }}</span>
             </span>
 
-            <!-- Botão de Sincronizar e Variar Dados da API -->
+            <!-- Botão de sincronização com a Meta Graph API -->
             <button
               type="button"
               class="sync-api-btn"
               [class.loading]="state.liveApi.isSyncing()"
               (click)="state.syncWithLiveApiAndVaryData()"
               [disabled]="state.liveApi.isSyncing()"
-              title="Consulta Meta Graph API e gera dados variados">
+              title="Busca contas, campanhas e publicações na Meta Graph API">
               <svg class="ico" [class.animate-spin]="state.liveApi.isSyncing()" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
               </svg>
-              <span>{{ state.liveApi.isSyncing() ? 'Sincronizando...' : 'Variar Dados da API' }}</span>
+              <span>{{ state.liveApi.isSyncing() ? 'Sincronizando...' : 'Sincronizar com a Meta' }}</span>
             </button>
 
             <!-- Botão Copilot Chat -->
@@ -1899,7 +1902,7 @@ export class WorkspaceLayoutComponent {
       'O maior erro no Instagram que coaches e agências ainda cometem',
       'Pare de postar todo dia: o framework de 3 passos para retenção',
       'Por que a automação no Direct é a maior máquina de vendas de 2026',
-      'Case Real: do zero a R$ 50k em vendas com carrossel técnico',
+      'Como estruturar um carrossel técnico que gera conversas no Direct',
     ];
     const picked = hooks[Math.floor(Math.random() * hooks.length)];
     this.state.patchComposer({ topic: picked });
@@ -1931,11 +1934,8 @@ export class WorkspaceLayoutComponent {
       this.state.toast('Nenhum spam pendente para ocultar');
       return;
     }
-    this.state.updateInteractionStatus(
-      spamIds,
-      { s: 'ARCHIVED', hidden: true },
-      `${spamIds.length} spam(s) ocultado(s) via Graph API`
-    );
+    // Ocultar no Instagram ainda não está ligado: nada é marcado como feito.
+    this.state.toast(`Ocultar ${spamIds.length} comentário(s) ainda não está ligado a este painel`);
   }
 
   batchApproveComments(): void {

@@ -6,6 +6,7 @@ import { SupabaseService } from '../../services/supabase.service';
 import { CodemixButtonComponent } from '../codemix-button.component';
 import { LoginPanelComponent } from '../login-panel/login-panel.component';
 import { PagerComponent } from '../../shared/pager.component';
+import { PlatformLinksComponent } from '../platform-links.component';
 import { cmpNum, cmpText, createPager, createSorter } from '../../shared/list-tools';
 import { MetaAdAccount, MetaCampaign, MetaAudience, MetaCampaignObjective } from '../../data/seed-data';
 
@@ -13,7 +14,7 @@ type MetaSubTab = 'campaigns' | 'audiences' | 'sync' | 'ai-assistant';
 
 @Component({
   selector: 'app-meta-campaigns',
-  imports: [CommonModule, FormsModule, CodemixButtonComponent, LoginPanelComponent, PagerComponent],
+  imports: [CommonModule, FormsModule, CodemixButtonComponent, LoginPanelComponent, PagerComponent, PlatformLinksComponent],
   template: `
     <div class="flex flex-col gap-5">
       <!-- LOGIN: alterações na Meta exigem usuário autorizado -->
@@ -42,7 +43,7 @@ type MetaSubTab = 'campaigns' | 'audiences' | 'sync' | 'ai-assistant';
                 style="background: rgba(63, 122, 28, 0.15); color: #4ade80; border: 1px solid rgba(63, 122, 28, 0.3);"
               >
                 <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                Graph API v22.0 Conectada
+                {{ state.liveApi.metaApiConnected() ? 'Graph API v22.0 conectada' : 'Graph API sem sincronização' }}
               </span>
               <span
                 class="px-2 py-0.5 rounded text-[11px] font-mono text-[var(--c-muted)]"
@@ -235,6 +236,14 @@ type MetaSubTab = 'campaigns' | 'audiences' | 'sync' | 'ai-assistant';
 
       <!-- ================= ABA 1: TABELA DE CAMPANHAS ================= -->
       @if (activeTab() === 'campaigns') {
+        @if (campItems().length === 0) {
+          <div class="card-p flex flex-col gap-3 items-start">
+            <p class="text-xs text-[var(--c-muted)]">
+              Nenhuma campanha carregada. Sincronize com a Meta ou confira as campanhas no Gerenciador de Anúncios.
+            </p>
+            <app-platform-links [account]="state.activeAccount()" />
+          </div>
+        }
         <div class="card-p">
           <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse text-xs">
@@ -643,82 +652,15 @@ type MetaSubTab = 'campaigns' | 'audiences' | 'sync' | 'ai-assistant';
         </div>
       }
 
-      <!-- ================= ABA 4: ASSISTENTE IA DE ANÚNCIOS ================= -->
+      <!-- ================= ABA 4: ASSISTENTE IA DE ANÚNCIOS =================
+           Sem recomendações prontas: o painel ainda não calcula desempenho real. -->
       @if (activeTab() === 'ai-assistant') {
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <!-- Recomendação 1: Post com Alto Engajamento -->
-          <div class="card-p flex flex-col gap-3">
-            <div class="flex items-center justify-between">
-              <span class="px-2 py-0.5 rounded text-[10px] font-mono uppercase bg-amber-500/20 text-amber-400 border border-amber-500/30">
-                Oportunidade de Escala
-              </span>
-              <span class="text-xs text-[var(--c-muted)] font-mono">IA Copilot</span>
-            </div>
-
-            <h4 class="text-sm font-bold text-[var(--c-text)]">
-              Transformar Reels "3 Sinais de que seu produto precisa de um agente" em Anúncio Lookalike
-            </h4>
-
-            <p class="text-xs text-[var(--c-muted)]">
-              Este post gerou <strong>48 leads qualificados</strong> organicamente via palavra-chave "AGENTE". A IA recomenda criar um Lookalike de 1% no Brasil e injetar R$ 50/dia para capturar novos clientes no Direct.
-            </p>
-
-            <div class="rounded p-2.5 bg-[rgba(var(--ov),.04)] text-xs flex flex-col gap-1 border border-[rgba(var(--ov),.08)]">
-              <div class="flex justify-between">
-                <span class="text-[var(--c-muted)]">Público sugerido:</span>
-                <span class="font-bold text-[var(--c-text)]">Lookalike 1% Brasil (1.6M)</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-[var(--c-muted)]">CPA Estimado:</span>
-                <span class="font-bold text-emerald-400 font-mono">R$ 6,50 - R$ 9,00 / lead</span>
-              </div>
-            </div>
-
-            <cm-button
-              variant="primary"
-              size="sm"
-              (clicked)="state.quickPromoteWithLookalike('3 sinais de que seu produto precisa de um agente', 'p1')"
-            >
-              <span>🚀 aplicar recomendação e ativar anúncio</span>
-            </cm-button>
-          </div>
-
-          <!-- Recomendação 2: Remarketing da Caixa de Entrada -->
-          <div class="card-p flex flex-col gap-3">
-            <div class="flex items-center justify-between">
-              <span class="px-2 py-0.5 rounded text-[10px] font-mono uppercase bg-sky-500/20 text-sky-400 border border-sky-500/30">
-                Remarketing de Alta Conversão
-              </span>
-              <span class="text-xs text-[var(--c-muted)] font-mono">IA Copilot</span>
-            </div>
-
-            <h4 class="text-sm font-bold text-[var(--c-text)]">
-              Anunciar para quem comentou mas ainda não fechou
-            </h4>
-
-            <p class="text-xs text-[var(--c-muted)]">
-              Você tem 420 pessoas que interagiram nos comentários e inbox nos últimos 30 dias. Um anúncio de remarketing com chamada para oferta especial costuma ter ROAS acima de 6x.
-            </p>
-
-            <div class="rounded p-2.5 bg-[rgba(var(--ov),.04)] text-xs flex flex-col gap-1 border border-[rgba(var(--ov),.08)]">
-              <div class="flex justify-between">
-                <span class="text-[var(--c-muted)]">Público:</span>
-                <span class="font-bold text-[var(--c-text)]">Lista VIP — Leads Inbox</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-[var(--c-muted)]">ROAS Estimado:</span>
-                <span class="font-bold text-emerald-400 font-mono">5.8x - 7.2x</span>
-              </div>
-            </div>
-
-            <cm-button
-              variant="ghost"
-              size="sm"
-              (clicked)="state.quickPromoteWithLookalike('Remarketing Leads Inbox', 'p2')"
-            >
-              <span>🎯 criar campanha de remarketing</span>
-            </cm-button>
-          </div>
+        <div class="card-p flex flex-col gap-3 items-start">
+          <h4 class="text-sm font-bold text-[var(--c-text)]">Recomendações indisponíveis</h4>
+          <p class="text-xs text-[var(--c-muted)]">
+            Este painel ainda não calcula recomendações de público ou orçamento. Veja o desempenho real no Gerenciador de Anúncios.
+          </p>
+          <app-platform-links [account]="state.activeAccount()" />
         </div>
       }
 

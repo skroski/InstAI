@@ -8,6 +8,7 @@ import { ContentCalendarComponent } from './content-calendar.component';
 import { PagerComponent } from '../../shared/pager.component';
 import { cmpNum, cmpText, createPager, createSorter } from '../../shared/list-tools';
 import { isValidIsoDate, isValidTime, postDateKey, postWhen, todayIso } from '../../shared/dates';
+import { PlatformLinksComponent } from '../platform-links.component';
 import {
   FORMAT_ICON,
   FORMAT_LABEL,
@@ -21,7 +22,7 @@ import {
 
 @Component({
   selector: 'app-content-studio',
-  imports: [FormsModule, NgClass, MediaUploaderComponent, ContentCalendarComponent, PagerComponent],
+  imports: [FormsModule, NgClass, MediaUploaderComponent, ContentCalendarComponent, PagerComponent, PlatformLinksComponent],
   template: `
     <div class="flex flex-col gap-4 w-full">
       <!-- ==================== TOOLBAR SUPERIOR DINÂMICA ==================== -->
@@ -330,7 +331,7 @@ import {
                             <line x1="10" y1="14" x2="21" y2="3"/>
                           </svg>
                         </span>
-                        <span class="text-[10px] font-mono text-[var(--c-dim)] truncate">facebook</span>
+                        <span class="text-[10px] font-mono text-[var(--c-dim)] truncate">{{ p.permalink.includes('instagram.com') ? 'instagram' : 'facebook' }}</span>
                       </a>
                     }
 
@@ -500,6 +501,7 @@ import {
             <div class="col-span-full py-16 text-center flex flex-col items-center justify-center gap-3">
               <span class="text-3xl">🔍</span>
               <p class="text-sm font-medium text-[var(--c-text-muted)]">Nenhum post encontrado com os filtros atuais.</p>
+              <app-platform-links [account]="state.activeAccount()" />
               <button
                 type="button"
                 class="px-3 py-1.5 rounded-lg bg-[var(--c-surface)] hover:bg-[var(--c-surface-hover)] text-xs text-[var(--c-acc)] cursor-pointer"
@@ -931,7 +933,7 @@ import {
               [style.background]="(sel.media?.length || 0) > 0 ? 'var(--grad-brand)' : 'var(--c-surface)'"
               [style.color]="(sel.media?.length || 0) > 0 ? '#1f1f1f' : 'var(--c-dim)'"
               [style.cursor]="(sel.media?.length || 0) > 0 ? 'pointer' : 'not-allowed'"
-              (click)="state.toast('Post com ' + (sel.media?.length || 0) + ' mídia(s) disparado com sucesso via Graph API!')">
+              (click)="state.toast('Publicação direta ainda não está ligada a este painel. Publique pelo Instagram ou pelo Meta Business Suite.')">
               <span>Publicar Agora</span>
               <span>➔</span>
             </button>

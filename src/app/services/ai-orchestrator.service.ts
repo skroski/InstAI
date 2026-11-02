@@ -1,7 +1,8 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { AccountStateService } from './account-state.service';
 import { LiveApiService } from './live-api.service';
-import { Account, ENG, METRICS, PostFormat, SkillCommand } from '../data/seed-data';
+import { Account, ENG, PostFormat, SkillCommand } from '../data/seed-data';
+import { platformLinks } from '../shared/platform-links';
 
 export type EngineChoice = 'auto' | 'claude' | 'codex' | 'gemini';
 
@@ -336,43 +337,27 @@ export class AiOrchestratorService {
                 ? 'Atenção: assunto sensível. Recomendo transbordo para humano.'
                 : 'Pode enviar pelo Inbox em 1 clique.'
             }`
-          : `Nenhuma DM não lida em ${u}.`;
+          : `Nenhuma DM não lida carregada para ${u}. O painel ainda não importa DMs do Instagram: veja o Direct em https://www.instagram.com/direct/inbox/`;
       }
 
-      case 'moderar-comentarios': {
-        const sc = this.getModerationScope(acc, a);
-        if (!sc.length) {
-          return `Moderação · ${u}\n\nNenhum comentário pendente para este filtro.`;
-        }
-        const sp = sc.filter((x) => x.cat === 'spam').length;
-        const gt = sc.filter((x) => x.cat === 'gatilho').length;
-        const rs = sc.length - sp;
-        return `Moderação · ${u}\nfiltro: ${a || 'todos'}\n\n${sp} spam oculto(s) (POST /{comment-id}?hide=true)\n${rs} resposta(s) pública(s) publicada(s)\n${gt} Private Reply enviada(s) por DM a leads com palavra-chave\n\nAplicado na aba comentários.`;
-      }
+      case 'moderar-comentarios':
+        return `Moderação · ${u}\n\nO painel ainda não importa comentários do Instagram, então nada foi ocultado nem respondido.\nModere direto na plataforma: https://www.instagram.com/${acc.user}/`;
 
       case 'automacao-gatilho':
-        return `Regra criada · ${u}\ngatilho: comentário com "${a.split(' ')[0] || 'QUERO'}"\nação: DM automática com link ${a.split(' ')[1] || '(informar destino)'}\nwebhook: ativo`;
+        return `Regra não criada · ${u}\nA automação por palavra-chave não está ligada ao Instagram neste painel, então nenhuma DM será enviada.\nGatilho pedido: comentário com "${a.split(' ')[0] || 'QUERO'}" → ${a.split(' ')[1] || '(informar destino)'}`;
 
       case 'conta-status':
         return (
-          `Saúde dos tokens · tenant Codemix\n\n` +
+          `Status salvo no painel · tenant Codemix\n\n` +
           this.state
             .accounts()
-            .map(
-              (x) =>
-                `@${x.user} · ${x.st} · ${x.days} dias · ${x.perms}/4 permissões · webhook ${x.wh ? 'ok' : 'falha'}`
-            )
+            .map((x) => `@${x.user} · ${x.st}`)
             .join('\n') +
-          `\n\nTodas as contas conectadas e operacionais via Meta Graph API v22.0.`
+          `\n\nNão é uma checagem ao vivo na Meta. Use Sincronizar para confirmar a conexão de cada conta.`
         );
 
-      case 'auditoria-perfil': {
-        const m = METRICS[acc.id];
-        return m
-          ? `Auditoria · ${u} · 30 dias\n\nengajamento ${m.k[0][1]} (${m.k[0][2]})\nformato campeão: ${m.f[0][0]} (${m.f[0][1]}% de retenção)\nmelhores horários: ${m.h.join(', ')}\n\nPlano de ação\n` +
-              m.p.map((x, i) => `${i + 1}. ${x}`).join('\n')
-          : `Sem dados: token de ${u} com erro.`;
-      }
+      case 'auditoria-perfil':
+        return `Auditoria · ${u} · 30 dias\n\nO painel ainda não busca insights da Meta, então não há números para auditar.\nVeja o desempenho real em: ${platformLinks(acc).businessHome ?? `https://www.instagram.com/${acc.user}/`}`;
 
       case 'publicar-agora':
         return `Post ${a || '(informe o id)'} sem mídia vinculada.\nAnexe a arte final no editor do post; depois executo /media → /media_publish.`;

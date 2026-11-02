@@ -1,27 +1,25 @@
 import { Component, inject } from '@angular/core';
 import { AccountStateService } from '../../services/account-state.service';
 import { CodemixButtonComponent } from '../codemix-button.component';
+import { PlatformLinksComponent } from '../platform-links.component';
 import { InteractionItem, InteractionStatus, InteractionType, Sentiment } from '../../data/seed-data';
 
 @Component({
   selector: 'app-unified-inbox',
-  imports: [CodemixButtonComponent],
+  imports: [CodemixButtonComponent, PlatformLinksComponent],
   template: `
     @if (state.accountInts().length === 0) {
-      <div
-        class="py-[60px] px-5 text-center flex flex-col gap-[6px]"
-        style="color: var(--c-muted);"
-      >
+      <div class="py-[60px] px-5 flex flex-col items-center gap-[14px] text-center" style="color: var(--c-muted);">
         <div class="text-[18px] font-medium" style="color: var(--c-text);">
-          Sem interações para @{{ state.activeAccount().user }}
+          Nenhuma DM ou comentário carregado para @{{ state.activeAccount().user }}
         </div>
-        <div>
-          {{
-            state.activeAccount().st === 'erro'
-              ? 'Token com erro: reconecte a conta para receber webhooks.'
-              : 'Nenhuma DM ou comentário recente.'
-          }}
+        <div class="max-w-[520px] leading-[1.5]">
+          Este painel ainda não importa mensagens nem comentários do Instagram. Veja as conversas direto na plataforma.
+          @if (state.activeAccount().st === 'erro') {
+            <br />A conta está com erro de token: reconecte para a Meta enviar os eventos.
+          }
         </div>
+        <app-platform-links [account]="state.activeAccount()" />
       </div>
     } @else {
       <div
@@ -249,10 +247,11 @@ export class UnifiedInboxComponent {
         return;
       }
     }
-    this.state.updateInteractionStatus(
-      [cur.id],
-      { s: 'AI_REPLIED' },
-      cur.spam ? 'Comentário ocultado (hide=true)' : 'Resposta enviada via Graph API'
+    // Envio para o Instagram ainda não está ligado: não marca nada como respondido.
+    this.state.toast(
+      cur.spam
+        ? 'Ocultar comentário ainda não está ligado a este painel'
+        : 'Envio de resposta ainda não está ligado a este painel. Responda no Instagram.'
     );
   }
 

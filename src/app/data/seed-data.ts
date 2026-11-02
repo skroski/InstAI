@@ -369,68 +369,7 @@ export const ENG: Record<string, string> = {
 
 export const DAYS = ['seg 26', 'ter 27', 'qua 28', 'qui 29', 'sex 30', 'sáb 31', 'dom 01'];
 
-export const METRICS: Record<string, AccountMetrics> = {
-  a_amaral: {
-    k: [
-      ['seguidores', '11,4 mil', '11.380'],
-      ['alcance 30d', '94,6 mil', '+18%'],
-      ['engajamento', '5,2%', '+0,8 pp'],
-      ['salvamentos', '1.820', '+24%'],
-    ],
-    f: [
-      ['Carrossel', 78],
-      ['Reels', 62],
-      ['Imagem', 41],
-      ['Stories', 35],
-    ],
-    h: ['qui 20h', 'qua 18h', 'sáb 10h'],
-    p: [
-      'Carrosséis educativos sobre técnica de nado e adaptação infantil geram 78% mais salvamentos.',
-      'Concentrar posts de família e rotina às quintas e sextas.',
-      'Reforçar o convite para aula experimental gratuita via WhatsApp (41) 98516-9970.',
-    ],
-  },
-  a2: {
-    k: [
-      ['seguidores', '614', '614'],
-      ['alcance 30d', '18,4 mil', '+6%'],
-      ['engajamento', '4,3%', '+0,5 pp'],
-      ['salvamentos', '390', '+11%'],
-    ],
-    f: [
-      ['Carrossel', 71],
-      ['Reels', 54],
-      ['Imagem', 38],
-      ['Stories', 22],
-    ],
-    h: ['sex 19h', 'ter 18h', 'dom 11h'],
-    p: [
-      'Carrosséis técnicos sobre grids, tipografia e design visual retêm 71% dos leitores.',
-      'Publicar estudos de caso práticos de código e design.',
-      'Manter estilo visual consistente de acordo com o Brand Voice.',
-    ],
-  },
-  a_vetbots: {
-    k: [
-      ['seguidores', '302', '302'],
-      ['alcance 30d', '24,8 mil', '+15%'],
-      ['engajamento', '5,8%', '+1,2 pp'],
-      ['salvamentos', '420', '+18%'],
-    ],
-    f: [
-      ['Reels', 75],
-      ['Carrossel', 68],
-      ['Imagem', 36],
-      ['Stories', 31],
-    ],
-    h: ['seg 19h', 'qua 12h', 'qui 18h'],
-    p: [
-      'Reels e demonstrações práticas da IA no WhatsApp retêm 75% mais atenção.',
-      'Focar em conteúdos sobre redução de faltas (no-show) e fila presencial.',
-      'Direcionar chamadas de ação para o WhatsApp (41) 99823-4643.',
-    ],
-  },
-};
+export const METRICS: Record<string, AccountMetrics> = {};
 
 export const SEED_POSTS: PostItem[] = [
   ...REAL_META_POSTS,
@@ -438,14 +377,8 @@ export const SEED_POSTS: PostItem[] = [
 
 export const TWINS: Record<string, TwinConfig> = {
   a_amaral: {
-    kpi: [
-      ['conversas 30d', '940'],
-      ['resolvidas sem humano', '88%'],
-      ['tempo de resposta', '2 s'],
-      ['aulas agendadas', '142'],
-    ],
+    kpi: [],
     sources: [
-      ['INSTAGRAM', '20 posts e carrosséis sincronizados', 'indexado'],
       ['HISTÓRIA', '47 anos de tradição na água em Curitiba', 'indexado'],
       ['INFRA', '7 piscinas aquecidas e tratadas com ozônio', 'indexado'],
       ['MÉTODO', 'Metodologia Gustavo Borges e acompanhamento por níveis', 'indexado'],
@@ -513,14 +446,8 @@ export const TWINS: Record<string, TwinConfig> = {
     },
   },
   a2: {
-    kpi: [
-      ['conversas 30d', '210'],
-      ['resolvidas sem humano', '82%'],
-      ['tempo de resposta', '3 s'],
-      ['propostas geradas', '48'],
-    ],
+    kpi: [],
     sources: [
-      ['INSTAGRAM', 'Posts e estudos de caso de UI/UX e desenvolvimento', 'indexado'],
       ['DESIGN SYSTEM', 'Diretrizes de tipografia, grids e componentes', 'indexado'],
       ['SERVIÇOS', 'Design de Interfaces, Desenvolvimento Web, Automações e IA', 'indexado'],
       ['CONTATO', 'contato@duplod.com.br', 'indexado'],
@@ -566,14 +493,8 @@ export const TWINS: Record<string, TwinConfig> = {
     },
   },
   a_vetbots: {
-    kpi: [
-      ['conversas 30d', '540'],
-      ['resolvidas sem humano', '89%'],
-      ['tempo de resposta', '2 s'],
-      ['demonstrações agendadas', '64'],
-    ],
+    kpi: [],
     sources: [
-      ['INSTAGRAM', '73 publicações sobre automação para clínicas veterinárias', 'indexado'],
       ['PRODUTO', 'VetBots I.A. Atendimento, Agendamentos e Fila Presencial', 'indexado'],
       ['SUPORTE', 'WhatsApp Comercial (41) 99823-4643', 'indexado'],
     ],
@@ -628,244 +549,13 @@ export const TWINS: Record<string, TwinConfig> = {
   },
 };
 
-export const SEED_FLOWS: FlowItem[] = [
-  {
-    id: 'f_amaral_1',
-    a: 'a_amaral',
-    name: 'Aula Experimental . Palavra AULA',
-    on: true,
-    stats: { sent: 248, open: '89%', clicks: 142, leads: 96 },
-    nodes: [
-      { id: 'n1', t: 'trigger', kind: 'comentário', text: 'AULA', extra: 'Qualquer post ou Reels sobre Natação' },
-      { id: 'n2', t: 'message', text: 'Olá! Ficamos muito felizes com seu interesse na Amaral Natação! 🏊‍♂️ Temos 47 anos de tradição e 7 piscinas aquecidas com ozônio.', extra: '' },
-      { id: 'n3', t: 'buttons', text: 'Para quem seria a aula experimental gratuita?', extra: 'Bebê / Criança, Hidroginástica, Natação Adulto' },
-      { id: 'n4', t: 'condition', text: 'qualquer opção selecionada', extra: 'continuar' },
-      { id: 'n5', t: 'tag', text: 'lead-aula-experimental', extra: '' },
-      { id: 'n6', t: 'link', text: 'https://wa.me/5541985169970?text=Olá!%20Vim%20do%20Instagram%20e%20gostaria%20de%20agendar%20minha%20aula%20experimental%20gratuita!', extra: 'Agendar no WhatsApp' },
-    ],
-  },
-  {
-    id: 'f_amaral_2',
-    a: 'a_amaral',
-    name: 'Boas-vindas a menções de Stories',
-    on: true,
-    stats: { sent: 112, open: '94%', clicks: 35, leads: 28 },
-    nodes: [
-      { id: 'n7', t: 'trigger', kind: 'menção', text: 'qualquer menção', extra: 'stories' },
-      { id: 'n8', t: 'message', text: 'Adoramos ver você na água com a gente! 💙 Compartilhamos momentos especiais nos nossos Stories.', extra: '' },
-      { id: 'n9', t: 'delay', text: '15 min', extra: '' },
-      { id: 'n10', t: 'ai', text: 'Agradecer a presença na Amaral e perguntar se a experiência de hoje na piscina foi agradável.', extra: 'Claude' },
-    ],
-  },
-  {
-    id: 'f_duplod_1',
-    a: 'a2',
-    name: 'Solicitação de Orçamento . Palavra PROJETO',
-    on: true,
-    stats: { sent: 94, open: '76%', clicks: 42, leads: 31 },
-    nodes: [
-      { id: 'n11', t: 'trigger', kind: 'comentário', text: 'PROJETO', extra: 'Reels ou Carrossel de UI/UX e Software' },
-      { id: 'n12', t: 'message', text: 'Olá! Obrigado pelo interesse na Duplo D. Unimos design de interface de alto impacto com engenharia de software sob medida.', extra: '' },
-      { id: 'n13', t: 'buttons', text: 'Qual o foco principal do seu projeto?', extra: 'UI/UX Design, Desenvolvimento Web, Ambos' },
-      { id: 'n14', t: 'link', text: 'https://duplod.com.br/contato', extra: 'Enviar briefing' },
-    ],
-  },
-  {
-    id: 'f_duplod_2',
-    a: 'a2',
-    name: 'Agradecimento por menção em Stories',
-    on: true,
-    stats: { sent: 48, open: '82%', clicks: 16, leads: 12 },
-    nodes: [
-      { id: 'n15', t: 'trigger', kind: 'menção', text: 'qualquer menção', extra: 'stories' },
-      { id: 'n16', t: 'message', text: 'Valeu demais pela menção! É sempre um prazer trocar ideia com a comunidade de design e tecnologia.', extra: '' },
-      { id: 'n17', t: 'delay', text: '5 min', extra: '' },
-      { id: 'n18', t: 'ai', text: 'Perguntar sobre o projeto que o usuário está desenvolvendo.', extra: 'Claude' },
-    ],
-  },
-];
+export const SEED_FLOWS: FlowItem[] = [];
 
-export const SEED_CONTACTS: ContactItem[] = [
-  // --- Amaral Natação (a_amaral) ---
-  { id: 'c_am_1', a: 'a_amaral', u: 'camila.rodrigues.cwb', email: 'camila.rodrigues@gmail.com', phone: '+5541991234567', tags: ['lead quente', 'tier_1', 'natacao_infantil'], src: 'AULA . Reels', last: 'hoje 10:24', metaSynced: true, icpScore: 96, icpTier: 'TIER_1_OURO' },
-  { id: 'c_am_2', a: 'a_amaral', u: 'marcos.vinicius.eng', email: 'marcos.vinicius@curitibatech.com.br', phone: '+5541998765432', tags: ['lead quente', 'tier_1', 'natacao_adulto'], src: 'AULA . Reels', last: 'hoje 09:15', metaSynced: true, icpScore: 92, icpTier: 'TIER_1_OURO' },
-  { id: 'c_am_3', a: 'a_amaral', u: 'fernanda.souza.saude', email: 'fernanda.souza@clinicas.com.br', phone: '+5541996543210', tags: ['lead quente', 'tier_1', 'hidroginastica'], src: 'dm', last: 'hoje 08:40', metaSynced: true, icpScore: 90, icpTier: 'TIER_1_OURO' },
-  { id: 'c_am_4', a: 'a_amaral', u: 'juliana.silveira.mamae', email: 'juliana.silveira@outlook.com', phone: '+5541997891234', tags: ['lead quente', 'tier_1', 'bebes'], src: 'menção de story', last: 'ontem 17:30', metaSynced: true, icpScore: 95, icpTier: 'TIER_1_OURO' },
-  { id: 'c_am_5', a: 'a_amaral', u: 'roberto.alencar.cwb', email: 'roberto.alencar@advocacia.com.br', phone: '+5541992345678', tags: ['aluno', 'tier_1'], src: 'comentário', last: 'ontem 14:10', metaSynced: true, icpScore: 88, icpTier: 'TIER_1_OURO' },
-  { id: 'c_am_6', a: 'a_amaral', u: 'patricia.mello', email: 'patricia.mello@educacao.com.br', phone: '+5541988112233', tags: ['novo', 'tier_2'], src: 'comentário', last: 'ontem 11:20', metaSynced: false, icpScore: 75, icpTier: 'TIER_2_PRATA' },
+export const SEED_CONTACTS: ContactItem[] = [];
 
-  // --- Duplo D Design & Dev (a2) ---
-  { id: 'c_dd_1', a: 'a2', u: 'lucas.prado.tech', email: 'lucas@vortexsoftware.io', phone: '+5511987654321', tags: ['lead quente', 'tier_1', 'saas_redesign'], src: 'PROJETO . Reels', last: 'hoje 11:15', metaSynced: true, icpScore: 95, icpTier: 'TIER_1_OURO' },
-  { id: 'c_dd_2', a: 'a2', u: 'marina.castro.ux', email: 'marina@fintechalpha.com.br', phone: '+5511976543210', tags: ['lead quente', 'tier_1', 'design_system'], src: 'dm', last: 'hoje 09:50', metaSynced: true, icpScore: 92, icpTier: 'TIER_1_OURO' },
-  { id: 'c_dd_3', a: 'a2', u: 'thiago.mendes.dev', email: 'thiago@inovasaas.com', phone: '+5541991122334', tags: ['cliente', 'tier_1'], src: 'comentário', last: 'ontem 18:20', metaSynced: true, icpScore: 89, icpTier: 'TIER_1_OURO' },
-  { id: 'c_dd_4', a: 'a2', u: 'beatriz.lima.mkt', email: 'beatriz@scalegrowth.com.br', phone: '+5531988776655', tags: ['novo', 'tier_2', 'landing_page'], src: 'resposta story', last: 'ontem 15:40', metaSynced: false, icpScore: 78, icpTier: 'TIER_2_PRATA' },
+export const SEED_INTS: InteractionItem[] = [];
 
-  // --- VetBots (a_vetbots) ---
-  { id: 'c_vb_1', a: 'a_vetbots', u: 'dr_marcelo_vetcampinas', email: 'marcelo@hospitalvetcampinas.com.br', phone: '+5519998811223', tags: ['lead quente', 'tier_1', 'hospital_vet'], src: 'BLACK NOVEMBER . Reels', last: 'hoje 11:40', metaSynced: true, icpScore: 97, icpTier: 'TIER_1_OURO' },
-  { id: 'c_vb_2', a: 'a_vetbots', u: 'clinica_bichos_curitiba', email: 'contato@bichoscuritiba.vet.br', phone: '+5541991234567', tags: ['lead quente', 'tier_1', 'fila_inteligente'], src: 'EU QUERO . Post', last: 'hoje 10:15', metaSynced: true, icpScore: 94, icpTier: 'TIER_1_OURO' },
-  { id: 'c_vb_3', a: 'a_vetbots', u: 'dra_camila_vetcare', email: 'camila@vetcare.med.br', phone: '+5511987654321', tags: ['lead quente', 'tier_1', 'whatsapp_ia'], src: 'dm', last: 'ontem 18:20', metaSynced: true, icpScore: 91, icpTier: 'TIER_1_OURO' },
-  { id: 'c_vb_4', a: 'a_vetbots', u: 'petcenter_maringa', email: 'adm@petcentermaringa.com.br', phone: '+5544998765432', tags: ['novo', 'tier_2', 'triagem'], src: 'comentário', last: 'ontem 14:10', metaSynced: false, icpScore: 76, icpTier: 'TIER_2_PRATA' },
-];
-
-export const SEED_INTS: InteractionItem[] = [
-  // --- Amaral Natação (a_amaral) ---
-  {
-    id: 'i_am_1',
-    cat: 'duvida',
-    a: 'a_amaral',
-    u: 'camila.rodrigues.cwb',
-    t: 'DM',
-    s: 'UNREAD',
-    sent: 'positivo',
-    time: '10:24',
-    c: 'Olá! Meu filho tem 4 anos e tem muito medo de água. Como funciona a adaptação e a aula experimental de vocês?',
-    media: 'Reels · Família na Piscina',
-    ai: 'Olá Camila! Nosso método Gustavo Borges trabalha o acolhimento lúdico e respeita 100% o ritmo da criança, nas piscinas aquecidas com ozônio. Podemos agendar uma aula experimental gratuita para ele se divertir com nossos professores!',
-  },
-  {
-    id: 'i_am_2',
-    cat: 'duvida',
-    a: 'a_amaral',
-    u: 'marcos.vinicius.eng',
-    t: 'COMMENT',
-    s: 'UNREAD',
-    sent: 'neutro',
-    time: '09:15',
-    c: 'Vocês têm horário de natação para adultos no começo da manhã? Antes das 8h?',
-    media: 'Carrossel · Constância e Bem-Estar',
-    ai: 'Bom dia Marcos! Sim! Temos turmas de natação adulto iniciando às 06h15 e 07h00. Nossas 7 piscinas são aquecidas. Quer receber a grade de horários completa pelo WhatsApp (41) 98516-9970?',
-  },
-  {
-    id: 'i_am_3',
-    cat: 'elogio',
-    a: 'a_amaral',
-    u: 'juliana.silveira.mamae',
-    t: 'STORY_MENTION',
-    s: 'AI_REPLIED',
-    sent: 'positivo',
-    time: 'Ontem 17:30',
-    c: 'Mencionou você no story: "Melhor momento da semana com meu pequeno na @amaralnatacao 💙💦"',
-    media: 'Story · Natação Bebês',
-    ai: 'Ficamos muito felizes em ver essa conexão linda na água, Juliana! Obrigado pela confiança e carinho!',
-  },
-  {
-    id: 'i_am_4',
-    cat: 'duvida',
-    a: 'a_amaral',
-    u: 'fernanda.souza.saude',
-    t: 'DM',
-    s: 'UNREAD',
-    sent: 'positivo',
-    time: '08:40',
-    c: 'Minha mãe tem 68 anos e indicação médica para hidroginástica por causa de artrose. A água é bem quentinha?',
-    media: 'Post · Benefícios da Hidroginástica',
-    ai: 'Olá Fernanda! Sim, a água das nossas piscinas de hidroginástica é rigorosamente aquecida e tratada com ozônio, o que alivia a pressão nas articulações sem irritar a pele. Convidamos sua mãe para fazer uma aula experimental gratuita com a gente no Mercês!',
-  },
-
-  // --- Duplo D Design & Dev (a2) ---
-  {
-    id: 'i_dd_1',
-    cat: 'duvida',
-    a: 'a2',
-    u: 'lucas.prado.tech',
-    t: 'DM',
-    s: 'UNREAD',
-    sent: 'positivo',
-    time: '11:15',
-    c: 'Fala time da Duplo D! Vimos o post sobre arquitetura de design system. Vocês pegam projetos de ponta a ponta (Figma até frontend em Angular/React)?',
-    media: 'Carrossel · Arquitetura de Design System',
-    ai: 'Fala Lucas! Com certeza. Nosso foco é exatamente a fusão entre UI/UX de alta fidelidade e engenharia de software limpa em Angular e Tailwind. Podemos agendar uma conversa técnica para entender sua demanda!',
-  },
-  {
-    id: 'i_dd_2',
-    cat: 'elogio',
-    a: 'a2',
-    u: 'marina.castro.ux',
-    t: 'COMMENT',
-    s: 'AI_REPLIED',
-    sent: 'positivo',
-    time: '09:50',
-    c: 'A consistência do grid e da tipografia nos posts de vocês é uma aula aberta. Parabéns pelo trabalho!',
-    media: 'Reels · Grids Modernos em Interfaces',
-    ai: 'Muito obrigado, Marina! Valorizamos muito o rigor tipográfico e a precisão técnica no design. Fique ligada que vem mais conteúdo desse tipo por aí!',
-  },
-  {
-    id: 'i_dd_3',
-    cat: 'duvida',
-    a: 'a2',
-    u: 'beatriz.lima.mkt',
-    t: 'DM',
-    s: 'UNREAD',
-    sent: 'neutro',
-    time: 'Ontem 15:40',
-    c: 'Olá! Quanto tempo em média vocês levam para desenvolver uma landing page institucional de alto padrão?',
-    media: 'Post · Landing Pages que Convertem',
-    ai: 'Olá Beatriz! Nossos sprints de landing page de alta conversão costumam durar de 2 a 3 semanas, cobrindo copy estruturada, UI visual e código otimizado com Core Web Vitals perfeitos. Vamos conversar pelo formulário de briefing?',
-  },
-
-  // --- VetBots (a_vetbots) ---
-  {
-    id: 'i_vb_1',
-    cat: 'duvida',
-    a: 'a_vetbots',
-    u: 'dr_marcelo_vetcampinas',
-    t: 'DM',
-    s: 'UNREAD',
-    sent: 'positivo',
-    time: '11:40',
-    c: 'Olá! Vi a campanha da Black November sobre a Fila Presencial na TV. Como funciona o download da licença gratuita?',
-    media: 'Reels · Black November Fila Presencial',
-    ai: 'Olá Dr. Marcelo! É super simples: o sistema roda direto no computador da recepção conectado à TV via HDMI ou rede local. Sem limite de pacientes e sem custo de licença! Te mandei o link no WhatsApp da clínica.',
-  },
-  {
-    id: 'i_vb_2',
-    cat: 'gatilho',
-    a: 'a_vetbots',
-    u: 'clinica_bichos_curitiba',
-    t: 'COMMENT',
-    s: 'UNREAD',
-    sent: 'positivo',
-    time: '10:15',
-    c: 'EU QUERO',
-    media: 'Carrossel · Black November Fila Presencial Grátis',
-    ai: 'Enviamos no seu Direct todos os detalhes e o link para download da Fila Inteligente! 🐾 Dá uma olhadinha lá!',
-  },
-];
-
-export const SEED_RULES: KeywordRule[] = [
-  {
-    id: 'r_am_1',
-    a: 'a_amaral',
-    kw: 'AULA',
-    link: 'https://wa.me/5541985169970?text=Olá!%20Vim%20pelo%20Instagram%20e%20gostaria%20de%20agendar%20minha%20aula%20experimental%20gratuita!',
-    post: 'Todos os posts e Reels de Natação & Hidro',
-    on: true,
-  },
-  {
-    id: 'r_am_2',
-    a: 'a_amaral',
-    kw: 'EXPERIMENTAL',
-    link: 'https://wa.me/5541985169970?text=Olá!%20Quero%20agendar%20uma%20aula%20experimental.',
-    post: 'Carrossel · Família na Piscina',
-    on: true,
-  },
-  {
-    id: 'r_dd_1',
-    a: 'a2',
-    kw: 'ORCAMENTO',
-    link: 'https://duplod.com.br/contato',
-    post: 'Todos os posts de Design System e Desenvolvimento',
-    on: true,
-  },
-  {
-    id: 'r_dd_2',
-    a: 'a2',
-    kw: 'PROJETO',
-    link: 'https://duplod.com.br/contato',
-    post: 'Reels · Do Figma ao Código em Produção',
-    on: true,
-  },
-];
+export const SEED_RULES: KeywordRule[] = [];
 
 export const SEED_AD_ACCOUNTS: MetaAdAccount[] = [
   {
@@ -874,9 +564,9 @@ export const SEED_AD_ACCOUNTS: MetaAdAccount[] = [
     name: 'Amaral Natação Ads',
     currency: 'BRL',
     status: 'ACTIVE',
-    balance: 2450.0,
+    balance: 0,
     timezone: 'America/Sao_Paulo',
-    pixelId: 'px_amaral_meta_2026',
+    pixelId: '',
   },
   {
     id: 'act_891826527522907',
@@ -884,153 +574,15 @@ export const SEED_AD_ACCOUNTS: MetaAdAccount[] = [
     name: 'Anúncios Duplo D',
     currency: 'BRL',
     status: 'ACTIVE',
-    balance: 890.0,
+    balance: 0,
     timezone: 'America/Sao_Paulo',
-    pixelId: 'px_duplod_meta_2026',
+    pixelId: '',
   },
 ];
 
-export const SEED_AUDIENCES: MetaAudience[] = [
-  // --- Amaral Natação (a_amaral) ---
-  {
-    id: 'aud_amaral_1',
-    a: 'a_amaral',
-    name: 'Famílias com Crianças em Curitiba (Raio 10km Mercês/Batel)',
-    type: 'SAVED_INTEREST',
-    size: 240000,
-    status: 'READY',
-    country: 'BR',
-    lastSync: 'hoje às 06:00',
-  },
-  {
-    id: 'aud_amaral_2',
-    a: 'a_amaral',
-    name: 'Lookalike 1% Curitiba — Pais e Alunos Ativos',
-    type: 'LOOKALIKE',
-    size: 145000,
-    status: 'READY',
-    lookalikeRatio: 1,
-    originAudienceName: 'Lista de Alunos & Leads Aula Experimental WhatsApp',
-    country: 'BR',
-    lastSync: 'ontem às 22:00',
-  },
-  {
-    id: 'aud_amaral_3',
-    a: 'a_amaral',
-    name: 'Adultos 40+ Interessados em Hidroginástica e Natação (Curitiba)',
-    type: 'SAVED_INTEREST',
-    size: 180000,
-    status: 'READY',
-    country: 'BR',
-    lastSync: 'hoje às 07:00',
-  },
+export const SEED_AUDIENCES: MetaAudience[] = [];
 
-  // --- Duplo D Design & Dev (a2) ---
-  {
-    id: 'aud_duplo_1',
-    a: 'a2',
-    name: 'Lookalike 1% Brasil — Founders de Startups & Tech Leads',
-    type: 'LOOKALIKE',
-    size: 1650000,
-    status: 'READY',
-    lookalikeRatio: 1,
-    originAudienceName: 'Clientes e Contatos Qualificados Duplo D',
-    country: 'BR',
-    lastSync: 'ontem às 18:00',
-  },
-  {
-    id: 'aud_duplo_2',
-    a: 'a2',
-    name: 'Interesses em UI/UX, Design System, Software Architecture',
-    type: 'SAVED_INTEREST',
-    size: 890000,
-    status: 'READY',
-    country: 'BR',
-    lastSync: 'hoje às 04:30',
-  },
-];
-
-export const SEED_CAMPAIGNS: MetaCampaign[] = [
-  // --- Amaral Natação (a_amaral) ---
-  {
-    id: 'cmp_amaral_1',
-    a: 'a_amaral',
-    name: 'Curitiba 10km | Aula Experimental Gratuita — Natação Infantil & Bebês',
-    objective: 'OUTCOME_LEADS',
-    status: 'ACTIVE',
-    audienceId: 'aud_amaral_1',
-    audienceName: 'Famílias com Crianças em Curitiba (Raio 10km Mercês/Batel)',
-    isLookalike: false,
-    dailyBudget: 50.0,
-    spend: 450.0,
-    impressions: 22400,
-    clicks: 840,
-    leads: 62,
-    cpa: 7.25,
-    roas: 6.4,
-    startDate: '20/10/2026',
-    connectedPostId: 'live_185387824832414_1544580937713912',
-  },
-  {
-    id: 'cmp_amaral_2',
-    a: 'a_amaral',
-    name: 'Curitiba | Hidroginástica e Natação Adulto — 7 Piscinas Aquecidas',
-    objective: 'OUTCOME_LEADS',
-    status: 'ACTIVE',
-    audienceId: 'aud_amaral_3',
-    audienceName: 'Adultos 40+ Interessados em Hidroginástica e Natação (Curitiba)',
-    isLookalike: false,
-    dailyBudget: 40.0,
-    spend: 320.0,
-    impressions: 16800,
-    clicks: 560,
-    leads: 38,
-    cpa: 8.42,
-    roas: 5.8,
-    startDate: '22/10/2026',
-    connectedPostId: 'live_185387824832414_1540854498086556',
-  },
-
-  // --- Duplo D Design & Dev (a2) ---
-  {
-    id: 'cmp_duplo_1',
-    a: 'a2',
-    name: 'LAL 1% BR | Design System & Engenharia de Frontend para Startups',
-    objective: 'OUTCOME_LEADS',
-    status: 'ACTIVE',
-    audienceId: 'aud_duplo_1',
-    audienceName: 'Lookalike 1% Brasil — Founders de Startups & Tech Leads',
-    isLookalike: true,
-    dailyBudget: 60.0,
-    spend: 480.0,
-    impressions: 19800,
-    clicks: 690,
-    leads: 42,
-    cpa: 11.42,
-    roas: 5.1,
-    startDate: '21/10/2026',
-    connectedPostId: 'live_184846338220933_122108745308693893',
-  },
-  {
-    id: 'cmp_duplo_2',
-    a: 'a2',
-    name: 'Captação | Redesign de Plataformas e Landing Pages de Alta Conversão',
-    objective: 'OUTCOME_SALES',
-    status: 'ACTIVE',
-    audienceId: 'aud_duplo_2',
-    audienceName: 'Interesses em UI/UX, Design System, Software Architecture',
-    isLookalike: false,
-    dailyBudget: 45.0,
-    spend: 360.0,
-    impressions: 14200,
-    clicks: 480,
-    leads: 29,
-    cpa: 12.41,
-    roas: 4.9,
-    startDate: '24/10/2026',
-    connectedPostId: 'live_184846338220933_122108520338693893',
-  },
-];
+export const SEED_CAMPAIGNS: MetaCampaign[] = [];
 
 export const SEED_ICPS: IcpProfile[] = [
   // --- Amaral Natação (a_amaral) ---
