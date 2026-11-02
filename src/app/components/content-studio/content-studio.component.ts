@@ -485,7 +485,7 @@ import {
                         <line x1="10" y1="14" x2="21" y2="3"/>
                       </svg>
                     </span>
-                    <span class="text-[10px] font-mono text-[var(--c-dim)] truncate">facebook</span>
+                    <span class="text-[10px] font-mono text-[var(--c-dim)] truncate">{{ p.permalink.includes('instagram.com') ? 'instagram' : 'facebook' }}</span>
                   </a>
                 }
 

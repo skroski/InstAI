@@ -243,7 +243,7 @@ import { SkillCommand } from '../../data/seed-data';
             <div class="card-head">
               <div>
                 <div class="card-title text-xs">próximas publicações</div>
-                <div class="card-sub text-[11px]">fila da Graph API v22.0</div>
+                <div class="card-sub text-[11px]">publicações carregadas do painel</div>
               </div>
             </div>
             <div class="flex flex-col gap-2">
